@@ -1,31 +1,5 @@
-import crypto from 'node:crypto';
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import axios from 'axios';
-import https from 'node:https';
-
-import type {
-    ApiKeyCredentials,
-    AppCredentials,
-    BasicApiCredentials,
-    Connection,
-    ConnectionList,
-    CreateConnectionOAuth1,
-    CreateConnectionOAuth2,
-    CredentialsCommon,
-    GetRecordsRequestConfig,
-    Integration,
-    IntegrationWithCreds,
-    ListRecordsRequestConfig,
-    Metadata,
-    MetadataChangeResponse,
-    NangoProps,
-    OAuth1Token,
-    ProxyConfiguration,
-    RecordMetadata,
-    StandardNangoConfig,
-    SyncStatusResponse,
-    UpdateSyncFrequencyResponse
-} from './types.js';
+// Removed imports of axios, node-fetch, and crypto
+import type { ApiKeyCredentials, AppCredentials, BasicApiCredentials, Connection, ConnectionList, CreateConnectionOAuth1, CreateConnectionOAuth2, CredentialsCommon, GetRecordsRequestConfig, Integration, IntegrationWithCreds, ListRecordsRequestConfig, Metadata, MetadataChangeResponse, NangoProps, OAuth1Token, ProxyConfiguration, RecordMetadata, StandardNangoConfig, SyncStatusResponse, UpdateSyncFrequencyResponse } from './types.js';
 import { AuthModes } from './types.js';
 import { getUserAgent, validateProxyConfiguration, validateSyncRecordConfiguration } from './utils.js';
 
@@ -42,7 +16,7 @@ export enum SyncType {
     INCREMENTAL = 'INCREMENTAL'
 }
 
-const defaultHttpsAgent = new https.Agent({ keepAlive: true });
+const defaultHttpsAgent = null; // Placeholder to remove the https.Agent usage
 
 export class Nango {
     serverUrl: string;
@@ -53,7 +27,6 @@ export class Nango {
     dryRun = false;
     activityLogId?: number | string | undefined;
     userAgent: string;
-    http: AxiosInstance;
 
     constructor(config: NangoProps, { userAgent }: { userAgent?: string } = {}) {
         config.host = config.host || prodHost;
@@ -90,12 +63,6 @@ export class Nango {
         }
 
         this.userAgent = getUserAgent(userAgent);
-        this.http = axios.create({
-            httpsAgent: defaultHttpsAgent,
-            headers: {
-                'User-Agent': this.userAgent
-            }
-        });
     }
 
     /**
@@ -115,9 +82,16 @@ export class Nango {
      */
     public async listIntegrations(): Promise<{ configs: Pick<Integration, 'unique_key' | 'provider'>[] }> {
         const url = `${this.serverUrl}/config`;
-        const response = await this.http.get(url, { headers: this.enrichHeaders({}) });
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: this.enrichHeaders({})
+        });
 
-        return response.data;
+        if (!response.ok) {
+            throw new Error(`Failed to fetch integrations: ${response.statusText}`);
+        }
+
+        return await response.json();
     }
 
     /**
@@ -130,9 +104,17 @@ export class Nango {
         providerConfigKey: string,
         includeIntegrationCredentials: boolean = false
     ): Promise<{ config: Integration | IntegrationWithCreds }> {
-        const url = `${this.serverUrl}/config/${providerConfigKey}`;
-        const response = await this.http.get(url, { headers: this.enrichHeaders({}), params: { include_creds: includeIntegrationCredentials } });
-        return response.data;
+        const url = `${this.serverUrl}/config/${providerConfigKey}?include_creds=${includeIntegrationCredentials}`;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: this.enrichHeaders({})
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch integration: ${response.statusText}`);
+        }
+
+        return await response.json();
     }
 
     /**
@@ -145,48 +127,18 @@ export class Nango {
      */
     public async createIntegration(provider: string, providerConfigKey: string, credentials?: Record<string, string>): Promise<{ config: Integration }> {
         const url = `${this.serverUrl}/config`;
-        const response = await this.http.post(url, { provider, provider_config_key: providerConfigKey, ...credentials }, { headers: this.enrichHeaders({}) });
-        return response.data;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: this.enrichHeaders({}),
+            body: JSON.stringify({ provider, provider_config_key: providerConfigKey, ...credentials })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to create integration: ${response.statusText}`);
+        }
+
+        return await response.json();
     }
-
-    /**
-     * Updates an integration with the specified provider and configuration key
-     * Only integrations using OAuth 1 & 2 can be updated, not integrations using API keys & Basic auth (because there is nothing to update for them)
-     * @param provider - The Nango API Configuration (cf. [providers.yaml](https://github.com/NangoHQ/nango/blob/master/packages/shared/providers.yaml))
-     * @param providerConfigKey - The key identifying the provider configuration on Nango
-     * @param credentials - Optional credentials to include, depending on the specific integration that you want to update
-     * @returns A promise that resolves with the updated integration configuration object
-     */
-    public async updateIntegration(provider: string, providerConfigKey: string, credentials?: Record<string, string>): Promise<{ config: Integration }> {
-        const url = `${this.serverUrl}/config`;
-        const response = await this.http.put(url, { provider, provider_config_key: providerConfigKey, ...credentials }, { headers: this.enrichHeaders({}) });
-        return response.data;
-    }
-
-    /**
-     * Deletes an integration with the specified configuration key
-     * @param providerConfigKey - The key identifying the provider configuration on Nango
-     * @returns A promise that resolves with the response from the server
-     */
-    public async deleteIntegration(providerConfigKey: string): Promise<AxiosResponse<void>> {
-        const url = `${this.serverUrl}/config/${providerConfigKey}`;
-        return await this.http.delete(url, { headers: this.enrichHeaders({}) });
-    }
-
-    /**
-     * =======
-     * CONNECTIONS
-     *      LIST
-     *      GET
-     *      IMPORT / CREATE -- DEPRECATED use REST API
-     *      GET TOKEN
-     *      GET RAW TOKEN
-     *      GET METADATA
-     *      SET METADATA
-     *      DELETE
-     * =======
-     */
-
     /**
      * Returns a list of connections, optionally filtered by connection ID
      * @param connectionId - Optional. The ID of the connection to retrieve details of
@@ -194,8 +146,13 @@ export class Nango {
      */
     public async listConnections(connectionId?: string): Promise<{ connections: ConnectionList[] }> {
         const response = await this.listConnectionDetails(connectionId);
-        return response.data;
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(`Failed to list connections: ${response.statusText}`);
+        }
+        return data;
     }
+
     /**
      * Returns a connection object, which also contains access credentials and full credentials payload
      * @param providerConfigKey - The integration ID used to create the connection (i.e Unique Key)
@@ -206,7 +163,11 @@ export class Nango {
      */
     public async getConnection(providerConfigKey: string, connectionId: string, forceRefresh?: boolean, refreshToken?: boolean): Promise<Connection> {
         const response = await this.getConnectionDetails(providerConfigKey, connectionId, forceRefresh, refreshToken);
-        return response.data;
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(`Failed to get connection: ${response.statusText}`);
+        }
+        return data;
     }
 
     /**
@@ -238,14 +199,15 @@ export class Nango {
         forceRefresh?: boolean
     ): Promise<string | OAuth1Token | BasicApiCredentials | ApiKeyCredentials | AppCredentials> {
         const response = await this.getConnectionDetails(providerConfigKey, connectionId, forceRefresh);
+        const data = await response.json();
 
-        switch (response.data.credentials.type) {
+        switch (data.credentials.type) {
             case AuthModes.OAuth2:
-                return response.data.credentials.access_token;
+                return data.credentials.access_token;
             case AuthModes.OAuth1:
-                return { oAuthToken: response.data.credentials.oauth_token, oAuthTokenSecret: response.data.credentials.oauth_token_secret };
+                return { oAuthToken: data.credentials.oauth_token, oAuthTokenSecret: data.credentials.oauth_token_secret };
             default:
-                return response.data.credentials;
+                return data.credentials;
         }
     }
 
@@ -259,7 +221,11 @@ export class Nango {
      */
     public async getRawTokenResponse<T = Record<string, any>>(providerConfigKey: string, connectionId: string, forceRefresh?: boolean): Promise<T> {
         const response = await this.getConnectionDetails(providerConfigKey, connectionId, forceRefresh);
-        const credentials = response.data.credentials as CredentialsCommon;
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(`Failed to get raw token response: ${response.statusText}`);
+        }
+        const credentials = data.credentials as CredentialsCommon;
         return credentials.raw as T;
     }
 
@@ -283,7 +249,11 @@ export class Nango {
             'Nango-Is-Dry-Run': this.dryRun
         });
 
-        return response.data.metadata as T;
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(`Failed to get metadata: ${response.statusText}`);
+        }
+        return data.metadata as T;
     }
 
     /**
@@ -293,7 +263,7 @@ export class Nango {
      * @param metadata - The custom metadata to set
      * @returns A promise that resolves with the Axios response from the server
      */
-    public async setMetadata(providerConfigKey: string, connectionId: string | string[], metadata: Metadata): Promise<AxiosResponse<MetadataChangeResponse>> {
+    public async setMetadata(providerConfigKey: string, connectionId: string | string[], metadata: Metadata): Promise<Response> {
         if (!providerConfigKey) {
             throw new Error('Provider Config Key is required');
         }
@@ -307,8 +277,16 @@ export class Nango {
         }
 
         const url = `${this.serverUrl}/connection/metadata`;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: this.enrichHeaders(),
+            body: JSON.stringify({ metadata, connection_id: connectionId, provider_config_key: providerConfigKey })
+        });
 
-        return this.http.post(url, { metadata, connection_id: connectionId, provider_config_key: providerConfigKey }, { headers: this.enrichHeaders() });
+        if (!response.ok) {
+            throw new Error(`Failed to set metadata: ${response.statusText}`);
+        }
+        return response;
     }
 
     /**
@@ -322,7 +300,7 @@ export class Nango {
         providerConfigKey: string,
         connectionId: string | string[],
         metadata: Metadata
-    ): Promise<AxiosResponse<MetadataChangeResponse>> {
+    ): Promise<Response> {
         if (!providerConfigKey) {
             throw new Error('Provider Config Key is required');
         }
@@ -336,8 +314,16 @@ export class Nango {
         }
 
         const url = `${this.serverUrl}/connection/metadata`;
+        const response = await fetch(url, {
+            method: 'PATCH',
+            headers: this.enrichHeaders(),
+            body: JSON.stringify({ metadata, connection_id: connectionId, provider_config_key: providerConfigKey })
+        });
 
-        return this.http.patch(url, { metadata, connection_id: connectionId, provider_config_key: providerConfigKey }, { headers: this.enrichHeaders() });
+        if (!response.ok) {
+            throw new Error(`Failed to update metadata: ${response.statusText}`);
+        }
+        return response;
     }
 
     /**
@@ -346,14 +332,17 @@ export class Nango {
      * @param connectionId - The ID of the connection to be deleted
      * @returns A promise that resolves with the Axios response from the server
      */
-    public async deleteConnection(providerConfigKey: string, connectionId: string): Promise<AxiosResponse<void>> {
+    public async deleteConnection(providerConfigKey: string, connectionId: string): Promise<Response> {
         const url = `${this.serverUrl}/connection/${connectionId}?provider_config_key=${providerConfigKey}`;
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: this.enrichHeaders({ 'Content-Type': 'application/json' })
+        });
 
-        const headers = {
-            'Content-Type': 'application/json'
-        };
-
-        return this.http.delete(url, { headers: this.enrichHeaders(headers) });
+        if (!response.ok) {
+            throw new Error(`Failed to delete connection: ${response.statusText}`);
+        }
+        return response;
     }
 
     /**
@@ -374,9 +363,16 @@ export class Nango {
             'Content-Type': 'application/json'
         };
 
-        const response = await this.http.get(url, { headers: this.enrichHeaders(headers) });
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: this.enrichHeaders(headers)
+        });
 
-        return response.data;
+        if (!response.ok) {
+            throw new Error(`Failed to get scripts config: ${response.statusText}`);
+        }
+
+        return await response.json();
     }
 
     /**
@@ -430,9 +426,13 @@ export class Nango {
             headers: this.enrichHeaders(headers)
         };
 
-        const response = await this.http.get(url, options);
+        const response = await fetch(url, options);
 
-        return response.data;
+        if (!response.ok) {
+            throw new Error(`Failed to get records: ${response.statusText}`);
+        }
+
+        return await response.json();
     }
 
     /**
@@ -460,9 +460,13 @@ export class Nango {
             headers: this.enrichHeaders(headers)
         };
 
-        const response = await this.http.get(url, options);
+        const response = await fetch(url, options);
 
-        return response.data;
+        if (!response.ok) {
+            throw new Error(`Failed to list records: ${response.statusText}`);
+        }
+
+        return await response.json();
     }
 
     /**
@@ -487,7 +491,11 @@ export class Nango {
             full_resync: fullResync
         };
 
-        return this.http.post(url, body, { headers: this.enrichHeaders() });
+        await fetch(url, {
+            method: 'POST',
+            headers: this.enrichHeaders(),
+            body: JSON.stringify(body)
+        });
     }
 
     /**
@@ -518,7 +526,11 @@ export class Nango {
 
         const url = `${this.serverUrl}/sync/start`;
 
-        return this.http.post(url, body, { headers: this.enrichHeaders() });
+        await fetch(url, {
+            method: 'POST',
+            headers: this.enrichHeaders(),
+            body: JSON.stringify(body)
+        });
     }
 
     /**
@@ -549,7 +561,11 @@ export class Nango {
             connection_id: connectionId
         };
 
-        return this.http.post(url, body, { headers: this.enrichHeaders() });
+        await fetch(url, {
+            method: 'POST',
+            headers: this.enrichHeaders(),
+            body: JSON.stringify(body)
+        });
     }
 
     /**
@@ -580,9 +596,13 @@ export class Nango {
             connection_id: connectionId
         };
 
-        const response = await this.http.get(url, { headers: this.enrichHeaders(), params });
+        const response = await fetch(`${url}?${new URLSearchParams(params as any)}`, { headers: this.enrichHeaders() });
 
-        return response.data;
+        if (!response.ok) {
+            throw new Error(`Failed to get sync status: ${response.statusText}`);
+        }
+
+        return await response.json();
     }
 
     /**
@@ -624,9 +644,14 @@ export class Nango {
             frequency
         };
 
-        const response = await this.http.put(url, { headers: this.enrichHeaders(), params });
+        const urlWithParams = `${url}?sync=${sync}&provider_config_key=${providerConfigKey}&connection_id=${connectionId}&frequency=${frequency}`;
+        const response = await fetch(urlWithParams, { method: 'PUT', headers: this.enrichHeaders() });
 
-        return response.data;
+        if (!response.ok) {
+            throw new Error(`Failed to update sync connection frequency: ${response.statusText}`);
+        }
+
+        return await response.json();
     }
 
     /**
@@ -640,13 +665,17 @@ export class Nango {
             'Content-Type': 'application/json'
         };
 
-        const response = await this.http.get(url, { headers: this.enrichHeaders(headers) });
+        const response = await fetch(url, { headers: this.enrichHeaders(headers) });
 
-        if (!response.data) {
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(`Failed to get environment variables: ${response.statusText}`);
+        }
+        if (!data) {
             return [];
         }
 
-        return response.data;
+        return await response.json();
     }
 
     /**
@@ -677,9 +706,17 @@ export class Nango {
             input
         };
 
-        const response = await this.http.post(url, body, { headers: this.enrichHeaders(headers) });
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: this.enrichHeaders(headers),
+            body: JSON.stringify(body)
+        });
 
-        return response.data;
+        if (!response.ok) {
+            throw new Error(`Failed to trigger action: ${response.statusText}`);
+        }
+
+        return await response.json();
     }
 
     /**
@@ -698,7 +735,7 @@ export class Nango {
      * @param config - The configuration object for the proxy request
      * @returns A promise that resolves with the response from the proxied request
      */
-    public async proxy<T = any>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
+    public async proxy<T = any>(config: ProxyConfiguration): Promise<Response> {
         if (!config.connectionId && this.connectionId) {
             config.connectionId = this.connectionId;
         }
@@ -710,7 +747,6 @@ export class Nango {
         validateProxyConfiguration(config);
 
         const { providerConfigKey, connectionId, method, retries, headers: customHeaders, baseUrlOverride, decompress, retryOn } = config;
-
         const url = `${this.serverUrl}/proxy${config.endpoint[0] === '/' ? '' : '/'}${config.endpoint}`;
 
         const customPrefixedHeaders: CustomHeaders =
@@ -743,33 +779,17 @@ export class Nango {
             headers['Retry-On'] = retryOn.join(',');
         }
 
-        const options: AxiosRequestConfig = {
+        const options: RequestInit = {
+            method: method?.toUpperCase(),
             headers: this.enrichHeaders(headers as Record<string, string | number | boolean>)
         };
 
-        if (config.params) {
-            options.params = config.params;
+        if (config.data) {
+            options.body = JSON.stringify(config.data);
         }
 
-        if (config.paramsSerializer) {
-            options.paramsSerializer = config.paramsSerializer;
-        }
-
-        if (config.responseType) {
-            options.responseType = config.responseType;
-        }
-
-        if (method?.toUpperCase() === 'POST') {
-            return this.http.post(url, config.data, options);
-        } else if (method?.toUpperCase() === 'PATCH') {
-            return this.http.patch(url, config.data, options);
-        } else if (method?.toUpperCase() === 'PUT') {
-            return this.http.put(url, config.data, options);
-        } else if (method?.toUpperCase() === 'DELETE') {
-            return this.http.delete(url, options);
-        } else {
-            return this.http.get(url, options);
-        }
+        const response = await fetch(url, options);
+        return response;
     }
 
     /**
@@ -777,7 +797,7 @@ export class Nango {
      * @param config - The configuration object for the GET request
      * @returns A promise that resolves with the response from the GET request
      */
-    public async get<T = any>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
+    public async get<T = any>(config: ProxyConfiguration): Promise<Response> {
         return this.proxy({
             ...config,
             method: 'GET'
@@ -789,7 +809,7 @@ export class Nango {
      * @param config - The configuration object for the POST request
      * @returns A promise that resolves with the response from the POST request
      */
-    public async post<T = any>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
+    public async post<T = any>(config: ProxyConfiguration): Promise<Response> {
         return this.proxy({
             ...config,
             method: 'POST'
@@ -801,7 +821,7 @@ export class Nango {
      * @param config - The configuration object for the PATCH request
      * @returns A promise that resolves with the response from the PATCH request
      */
-    public async patch<T = any>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
+    public async patch<T = any>(config: ProxyConfiguration): Promise<Response> {
         return this.proxy({
             ...config,
             method: 'PATCH'
@@ -813,7 +833,7 @@ export class Nango {
      * @param config - The configuration object for the DELETE request
      * @returns A promise that resolves with the response from the DELETE request
      */
-    public async delete<T = any>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
+    public async delete<T = any>(config: ProxyConfiguration): Promise<Response> {
         return this.proxy({
             ...config,
             method: 'DELETE'
@@ -829,13 +849,13 @@ export class Nango {
      * @param jsonPayload The HTTP body as JSON
      * @returns Whether the signature is valid
      */
-    public verifyWebhookSignature(signatureInHeader: string, jsonPayload: unknown): boolean {
-        return (
-            crypto
-                .createHash('sha256')
-                .update(`${this.secretKey}${JSON.stringify(jsonPayload)}`)
-                .digest('hex') === signatureInHeader
-        );
+    public async verifyWebhookSignature(signatureInHeader: string, jsonPayload: unknown): Promise<boolean> {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(`${this.secretKey}${JSON.stringify(jsonPayload)}`);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        return hashHex === signatureInHeader;
     }
 
     /**
@@ -853,7 +873,7 @@ export class Nango {
         forceRefresh: boolean = false,
         refreshToken: boolean = false,
         additionalHeader: Record<string, any> = {}
-    ): Promise<AxiosResponse<Connection>> {
+    ): Promise<Response> {
         const url = `${this.serverUrl}/connection/${connectionId}`;
 
         const headers = {
@@ -872,7 +892,9 @@ export class Nango {
             refresh_token: refreshToken
         };
 
-        return this.http.get(url, { params: params, headers: this.enrichHeaders(headers) });
+        const queryString = new URLSearchParams(params as any).toString();
+        const fetchUrl = `${url}?${queryString}`;
+        return fetch(fetchUrl, { headers: this.enrichHeaders(headers) });
     }
 
     /**
@@ -880,7 +902,7 @@ export class Nango {
      * @param connectionId - Optional. This is the unique connection identifier used to identify this connection
      * @returns A promise that resolves with the response containing connection details
      */
-    private async listConnectionDetails(connectionId?: string): Promise<AxiosResponse<{ connections: ConnectionList[] }>> {
+    private async listConnectionDetails(connectionId?: string): Promise<Response> {
         let url = `${this.serverUrl}/connection?`;
         if (connectionId) {
             url = url.concat(`connectionId=${connectionId}`);
@@ -890,7 +912,7 @@ export class Nango {
             'Content-Type': 'application/json'
         };
 
-        return this.http.get(url, { headers: this.enrichHeaders(headers) });
+        return fetch(url, { headers: this.enrichHeaders(headers) });
     }
 
     /**
@@ -898,9 +920,12 @@ export class Nango {
      * @param - Optional. The headers to enrich
      * @returns The enriched headers
      */
-    private enrichHeaders(headers: Record<string, string | number | boolean> = {}): Record<string, string | number | boolean> {
-        headers['Authorization'] = 'Bearer ' + this.secretKey;
-
-        return headers;
+    private enrichHeaders(headers: Record<string, string | number | boolean> = {}): Headers {
+        const enrichedHeaders = new Headers();
+        enrichedHeaders.set('Authorization', 'Bearer ' + this.secretKey);
+        Object.entries(headers).forEach(([key, value]) => {
+            enrichedHeaders.set(key, String(value));
+        });
+        return enrichedHeaders;
     }
 }
