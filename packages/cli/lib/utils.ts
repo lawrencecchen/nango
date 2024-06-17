@@ -257,9 +257,7 @@ export function enrichHeaders(headers: Record<string, string | number | boolean>
     return headers;
 }
 
-const defaultHttpsAgent = new https.Agent({ keepAlive: true, rejectUnauthorized: false });
 export const http = axios.create({
-    httpsAgent: defaultHttpsAgent,
     headers: { 'User-Agent': getUserAgent() }
 });
 
