@@ -1,0 +1,37 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "rootDir": "lib",
+        "outDir": "dist",
+        "paths": {
+            "@nangohq/shared": ["../shared/lib"]
+        }
+    },
+    "references": [
+        {
+            "path": "../../../database"
+        },
+        {
+            "path": "../../../logs"
+        },
+        {
+            "path": "../../../node-client"
+        },
+        {
+            "path": "../../../types"
+        },
+        {
+            "path": "../../../utils"
+        },
+        {
+            "path": "../../../webhooks"
+        },
+        {
+            "path": "../../../records"
+        },
+        {
+            "path": "../../../orchestrator"
+        }
+    ],
+    "include": ["lib/**/*", "../../../utils/lib/vitest.d.ts"]
+}

@@ -34,8 +34,8 @@ export function getLogsUrl(
 
 export function slidePeriod(period: DateRange | SearchOperationsPeriod): DateRange {
     const now = new Date();
-    let from = new Date(period.from!);
-    let to = new Date(period.to!);
+    let from = new Date(period.from);
+    let to = new Date(period.to);
     const sliding = now.getTime() - to.getTime();
     to = addMilliseconds(to, sliding);
     from = addMilliseconds(from, sliding);

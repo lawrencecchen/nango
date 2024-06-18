@@ -2,7 +2,11 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "rootDir": "lib",
-        "outDir": "dist"
+        "outDir": "dist",
+        "paths": {
+            "@nangohq/shared": ["../shared/lib"],
+            "@nangohq/models": ["../models"]
+        }
     },
     "references": [
         {

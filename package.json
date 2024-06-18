@@ -82,7 +82,7 @@
         "js-yaml": "4.1.0",
         "lint-staged": "15.2.2",
         "onchange": "7.1.0",
-        "prettier": "3.2.5",
+        "prettier": "^3.2.5",
         "rimraf": "5.0.1",
         "testcontainers": "^9.12.0",
         "tsx": "^4.6.2",

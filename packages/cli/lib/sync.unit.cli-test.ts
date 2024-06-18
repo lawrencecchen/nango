@@ -589,7 +589,7 @@ describe('generate function tests', () => {
 
         const { response: config } = await configService.load(path.resolve(`${fixturesPath}/nango-yaml/v2/${name}`));
         expect(config).not.toBeNull();
-        const modelNames = configService.getModelNames(config!);
+        const modelNames = configService.getModelNames(config);
         const result = await compileSingleFile({
             fullPath: dir,
             file: getFileToCompile({ fullPath: dir, filePath: path.join(dir, './github/actions/gh-issues.ts') }),
@@ -612,7 +612,7 @@ describe('generate function tests', () => {
 
         const { response: config } = await configService.load(path.resolve(`${fixturesPath}/nango-yaml/v2/${name}`));
         expect(config).not.toBeNull();
-        const modelNames = configService.getModelNames(config!);
+        const modelNames = configService.getModelNames(config);
         const result = await compileSingleFile({
             fullPath: dir,
             file: getFileToCompile({ fullPath: dir, filePath: path.join(dir, './github/actions/gh-issues.ts') }),
@@ -636,7 +636,7 @@ describe('generate function tests', () => {
 
         const { response: config } = await configService.load(path.resolve(`${fixturesPath}/nango-yaml/v2/${name}`));
         expect(config).not.toBeNull();
-        const modelNames = configService.getModelNames(config!);
+        const modelNames = configService.getModelNames(config);
         const result = await compileSingleFile({
             fullPath: dir,
             file: getFileToCompile({ fullPath: dir, filePath: path.join(dir, './github/actions/gh-issues.ts') }),

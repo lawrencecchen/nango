@@ -327,7 +327,7 @@ export function getFieldType(rawField: string | NangoModel, debug = false): stri
     } else {
         try {
             const nestedFields = Object.keys(rawField)
-                .map((fieldName: string) => `  ${fieldName}: ${getFieldType(rawField[fieldName] as string | NangoModel)};`)
+                .map((fieldName: string) => `  ${fieldName}: ${getFieldType(rawField[fieldName])};`)
                 .join('\n');
             return `{\n${nestedFields}\n}`;
         } catch (_) {

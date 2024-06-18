@@ -1,4 +1,4 @@
-import https from 'node:https';
+import * as https from 'node:https';
 import { Nango, getUserAgent } from '@nangohq/node';
 import configService from '../services/config.service.js';
 import paginateService from '../services/paginate.service.js';
@@ -194,12 +194,6 @@ type AuthCredentials =
 
 type Metadata = Record<string, unknown>;
 
-interface MetadataChangeResponse {
-    metadata: Metadata;
-    provider_config_key: string;
-    connection_id: string | string[];
-}
-
 interface Connection {
     id?: number;
     created_at?: Date;
@@ -222,7 +216,7 @@ export class ActionError<T = Record<string, unknown>> extends Error {
         super();
         this.type = 'action_script_runtime_error';
         if (payload) {
-            this.payload = payload;
+            this.payload = payload as Record<string, unknown>;
         }
     }
 }
@@ -284,6 +278,17 @@ export const defaultPersistApi = axios.create({
         return true;
     }
 });
+
+function transformResponseToAxiosResponse(response: Response): AxiosResponse {
+    return {
+        data: response.json(),
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+        config: {}, // Add any additional config if needed
+        request: {} // Add any additional request info if needed
+    };
+}
 
 export class NangoAction {
     protected nango: Nango;
@@ -414,10 +419,14 @@ export class NangoAction {
         }
     }
 
-    public async proxy<T = any>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
+    public async proxy(config: ProxyConfiguration): Promise<AxiosResponse> {
         this.exitSyncIfAborted();
         if (this.dryRun) {
-            return this.nango.proxy(config);
+            const response = await this.nango.proxy(config);
+            if (response instanceof Response) {
+                return transformResponseToAxiosResponse(response);
+            }
+            return response as AxiosResponse;
         } else {
             const { connectionId, providerConfigKey } = config;
             const connection = await this.getConnection(providerConfigKey, connectionId);
@@ -452,39 +461,42 @@ export class NangoAction {
                 throw response;
             }
 
-            return response;
+            if (response instanceof Response) {
+                return transformResponseToAxiosResponse(response);
+            }
+            return response as AxiosResponse;
         }
     }
 
-    public async get<T = any>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
+    public async get(config: ProxyConfiguration): Promise<AxiosResponse> {
         return this.proxy({
             ...config,
             method: 'GET'
         });
     }
 
-    public async post<T = any>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
+    public async post(config: ProxyConfiguration): Promise<AxiosResponse> {
         return this.proxy({
             ...config,
             method: 'POST'
         });
     }
 
-    public async put<T = any>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
+    public async put(config: ProxyConfiguration): Promise<AxiosResponse> {
         return this.proxy({
             ...config,
             method: 'PUT'
         });
     }
 
-    public async patch<T = any>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
+    public async patch(config: ProxyConfiguration): Promise<AxiosResponse> {
         return this.proxy({
             ...config,
             method: 'PATCH'
         });
     }
 
-    public async delete<T = any>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
+    public async delete(config: ProxyConfiguration): Promise<AxiosResponse> {
         return this.proxy({
             ...config,
             method: 'DELETE'
@@ -514,19 +526,27 @@ export class NangoAction {
         return cachedConnection.connection;
     }
 
-    public async setMetadata(metadata: Metadata): Promise<AxiosResponse<MetadataChangeResponse>> {
+    public async setMetadata(metadata: Metadata): Promise<AxiosResponse> {
         this.exitSyncIfAborted();
         try {
-            return await this.nango.setMetadata(this.providerConfigKey, this.connectionId, metadata);
+            const response = await this.nango.setMetadata(this.providerConfigKey, this.connectionId, metadata);
+            if (response instanceof Response) {
+                return transformResponseToAxiosResponse(response);
+            }
+            return response as AxiosResponse;
         } finally {
             this.memoizedConnections.delete(`${this.providerConfigKey}${this.connectionId}`);
         }
     }
 
-    public async updateMetadata(metadata: Metadata): Promise<AxiosResponse<MetadataChangeResponse>> {
+    public async updateMetadata(metadata: Metadata): Promise<AxiosResponse> {
         this.exitSyncIfAborted();
         try {
-            return await this.nango.updateMetadata(this.providerConfigKey, this.connectionId, metadata);
+            const response = await this.nango.updateMetadata(this.providerConfigKey, this.connectionId, metadata);
+            if (response instanceof Response) {
+                return transformResponseToAxiosResponse(response);
+            }
+            return response as AxiosResponse;
         } finally {
             this.memoizedConnections.delete(`${this.providerConfigKey}${this.connectionId}`);
         }

@@ -157,7 +157,7 @@ class ModelService {
         } else {
             try {
                 const nestedFields = Object.keys(rawField)
-                    .map((fieldName: string) => `  ${fieldName}: ${this.getFieldType(rawField[fieldName] as string | NangoModel, debug, modelName, models)};`)
+                    .map((fieldName: string) => `  ${fieldName}: ${this.getFieldType(rawField[fieldName], debug, modelName, models)};`)
                     .join('\n');
                 return `{\n${nestedFields}\n}`;
             } catch (_) {

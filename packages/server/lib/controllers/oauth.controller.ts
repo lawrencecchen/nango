@@ -322,9 +322,9 @@ class OAuthController {
                 });
             } else if (template.auth_mode === 'APP' || template.auth_mode === 'CUSTOM') {
                 const appCallBackUrl = getGlobalAppCallbackUrl();
-                return this.appRequest(template, config, session, res, authorizationParams, appCallBackUrl, activityLogId!, environmentId, logCtx);
+                return this.appRequest(template, config, session, res, authorizationParams, appCallBackUrl, activityLogId, environmentId, logCtx);
             } else if (template.auth_mode === 'OAUTH1') {
-                return this.oauth1Request(template, config, session, res, callbackUrl, activityLogId!, environmentId, logCtx);
+                return this.oauth1Request(template, config, session, res, callbackUrl, activityLogId, environmentId, logCtx);
             }
 
             const error = WSErrBuilder.UnknownAuthMode(template.auth_mode);
@@ -642,8 +642,8 @@ class OAuthController {
         const tokenUrl = typeof template.token_url === 'string' ? template.token_url : (template.token_url?.['OAUTH2'] as string);
 
         try {
-            if (missesInterpolationParam(template.authorization_url!, connectionConfig)) {
-                const error = WSErrBuilder.InvalidConnectionConfig(template.authorization_url!, JSON.stringify(connectionConfig));
+            if (missesInterpolationParam(template.authorization_url, connectionConfig)) {
+                const error = WSErrBuilder.InvalidConnectionConfig(template.authorization_url, JSON.stringify(connectionConfig));
                 await createActivityLogMessage({
                     level: 'error',
                     environment_id,
@@ -857,8 +857,8 @@ class OAuthController {
         session.connectionConfig = connectionConfig as Record<string, string>;
 
         try {
-            if (missesInterpolationParam(template.authorization_url!, connectionConfig)) {
-                const error = WSErrBuilder.InvalidConnectionConfig(template.authorization_url!, JSON.stringify(connectionConfig));
+            if (missesInterpolationParam(template.authorization_url, connectionConfig)) {
+                const error = WSErrBuilder.InvalidConnectionConfig(template.authorization_url, JSON.stringify(connectionConfig));
                 await createActivityLogMessage({
                     level: 'error',
                     environment_id,
@@ -879,7 +879,7 @@ class OAuthController {
 
             await oAuthSessionService.create(session);
 
-            const appUrl = interpolateStringFromObject(template.authorization_url!, {
+            const appUrl = interpolateStringFromObject(template.authorization_url, {
                 connectionConfig
             });
 
