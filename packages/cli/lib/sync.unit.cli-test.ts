@@ -1,16 +1,43 @@
 import { expect, describe, it, beforeAll } from 'vitest';
 import * as path from 'path';
 import * as fs from 'fs';
-import yaml from 'js-yaml';
+import yaml, { DumpOptions } from 'js-yaml';
 import { SyncConfigType } from '@nangohq/shared';
 import { init, generate } from './cli.js';
 import { exampleSyncName } from './constants.js';
 import configService from './services/config.service.js';
 import { compileAllFiles, compileSingleFile, getFileToCompile } from './services/compile.service.js';
-import { getNangoRootPath } from './utils.js';
+import { getNangoRootPath, printDebug } from './utils.js';
 import parserService from './services/parser.service.js';
 import { copyDirectoryAndContents } from './tests/helpers.js';
 import modelService from './services/model.service.js';
+
+interface Integration {
+    type: string;
+    runs?: string;
+    returns?: string | string[];
+    endpoint?: string;
+    output?: string;
+}
+
+interface Model {
+    id?: string;
+    owner?: string;
+    repo?: string;
+    issue_number?: string;
+    title?: string;
+    author?: string;
+    author_id?: string;
+    state?: string;
+    date_created?: string;
+    date_last_modified?: string;
+    body?: string;
+}
+
+interface Data {
+    integrations?: Record<string, Record<string, Integration>>;
+    models?: Record<string, Model>;
+}
 
 function getTestDirectory(name: string) {
     const dir = `/tmp/${name}/nango-integrations/`;
@@ -26,6 +53,7 @@ describe('generate function tests', () => {
 
         const typesFilePath: string = path.join(fullPath, 'dist', 'nango-sync.d.ts');
         const typesContent: string = await fs.promises.readFile(typesFilePath, 'utf8');
+        printDebug(`Contents of ${typesFilePath} in beforeAll hook: ${typesContent}`);
         expect(typesContent).not.toBe('');
     });
 
@@ -82,7 +110,34 @@ describe('generate function tests', () => {
                 }
             }
         };
-        const yamlData: string = yaml.dump(data as object);
+        interface Integration {
+            type: string;
+            runs?: string;
+            returns?: string | string[];
+            endpoint?: string;
+            output?: string;
+        }
+
+        interface Model {
+            id?: string;
+            owner?: string;
+            repo?: string;
+            issue_number?: string;
+            title?: string;
+            author?: string;
+            author_id?: string;
+            state?: string;
+            date_created?: string;
+            date_last_modified?: string;
+            body?: string;
+        }
+
+        interface Data {
+            integrations: Record<string, Record<string, Integration>>;
+            models: Record<string, Model>;
+        }
+
+        const yamlData: string = yaml.dump(data as unknown as Data, {} as DumpOptions);
         await fs.promises.writeFile(`${dir}/nango.yaml`, yamlData, 'utf8');
         await generate({ debug: false, fullPath: dir });
         expect(fs.existsSync(`${dir}/some-other-sync.ts`)).toBe(true);
@@ -117,7 +172,7 @@ describe('generate function tests', () => {
                 }
             }
         };
-        const yamlData: string = yaml.dump(data as object);
+        const yamlData: string = yaml.dump(data as unknown as Data, {} as DumpOptions);
         await fs.promises.writeFile(`${dir}/nango.yaml`, yamlData, 'utf8');
         await generate({ debug: false, fullPath: dir });
         expect(fs.existsSync(`${dir}/single-model-return.ts`)).toBe(true);
@@ -154,7 +209,7 @@ describe('generate function tests', () => {
                 }
             }
         };
-        const yamlData: string = yaml.dump(data as object);
+        const yamlData: string = yaml.dump(data as unknown as Data, {} as DumpOptions);
         await fs.promises.writeFile(`${dir}/nango.yaml`, yamlData, 'utf8');
         await generate({ debug: false, fullPath: dir });
         expect(fs.existsSync(`${dir}/demo-github-integration/syncs/single-model-return.ts`)).toBe(true);
@@ -191,7 +246,7 @@ describe('generate function tests', () => {
                 }
             }
         };
-        const yamlData: string = yaml.dump(data as object);
+        const yamlData: string = yaml.dump(data as unknown as Data, {} as DumpOptions);
         await fs.promises.writeFile(`${dir}/nango.yaml`, yamlData, 'utf8');
         expect(fs.existsSync(`${dir}/demo-github-integration/syncs/single-model-return.ts`)).toBe(false);
     });
@@ -227,7 +282,7 @@ describe('generate function tests', () => {
                 }
             }
         };
-        const yamlData: string = yaml.dump(data as object);
+        const yamlData: string = yaml.dump(data as unknown as Data, {} as DumpOptions);
         await fs.promises.writeFile(`${dir}/nango.yaml`, yamlData, 'utf8');
         await generate({ debug: false, fullPath: dir });
         expect(fs.existsSync(`${dir}/demo-github-integration/syncs/single-model-issue-output.ts`)).toBe(true);
@@ -261,7 +316,7 @@ describe('generate function tests', () => {
                 }
             }
         };
-        const yamlData: string = yaml.dump(data as object);
+        const yamlData: string = yaml.dump(data as unknown as Data, {} as DumpOptions);
         await fs.promises.writeFile(`${dir}/nango.yaml`, yamlData, 'utf8');
         await expect(generate({ debug: false, fullPath: dir })).rejects.toThrow(
             `Model "GithubIssue" doesn't have an id field. This is required to be able to uniquely identify the data record.`
@@ -297,7 +352,7 @@ describe('generate function tests', () => {
                 }
             }
         };
-        const yamlData: string = yaml.dump(data as object);
+        const yamlData: string = yaml.dump(data as unknown as Data, {} as DumpOptions);
         await fs.promises.writeFile(`${dir}/nango.yaml`, yamlData, 'utf8');
         await generate({ debug: false, fullPath: dir });
         const modelsFile = await fs.promises.readFile(`${dir}/models.ts`, 'utf8');
@@ -331,7 +386,7 @@ describe('generate function tests', () => {
                 }
             }
         };
-        const yamlData: string = yaml.dump(data as object);
+        const yamlData: string = yaml.dump(data as unknown as Data, {} as DumpOptions);
         await fs.promises.writeFile(`${dir}/nango.yaml`, yamlData, 'utf8');
         await generate({ debug: false, fullPath: dir });
     });
@@ -353,7 +408,7 @@ describe('generate function tests', () => {
                 }
             }
         };
-        const yamlData: string = yaml.dump(data as object);
+        const yamlData: string = yaml.dump(data as unknown as Data, {} as DumpOptions);
         await fs.promises.writeFile(`${dir}/nango.yaml`, yamlData, 'utf8');
         await generate({ debug: false, fullPath: dir });
     });
@@ -375,7 +430,7 @@ describe('generate function tests', () => {
                 }
             }
         };
-        const yamlData: string = yaml.dump(data as object);
+        const yamlData: string = yaml.dump(data as unknown as Data, {} as DumpOptions);
         await fs.promises.writeFile(`${dir}/nango.yaml`, yamlData, 'utf8');
         expect(await generate({ debug: false, fullPath: dir })).toBeUndefined();
     });
