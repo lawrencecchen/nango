@@ -1,4 +1,4 @@
-import type { HibobEmployee, NangoSync } from '../../models';
+import type { HibobEmployee, NangoSync } from '../../types/lib/integration/asana';
 
 export default async function fetchData(nango: NangoSync) {
     try {

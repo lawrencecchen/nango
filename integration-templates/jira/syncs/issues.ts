@@ -1,4 +1,4 @@
-import type { NangoSync, JiraIssue } from '../../models';
+import type { NangoSync, JiraIssue } from '../../types/lib/integration/asana';
 
 export default async function fetchData(nango: NangoSync) {
     const jql = nango.lastSyncDate ? `updated >= "${nango.lastSyncDate?.toISOString().slice(0, -8).replace('T', ' ')}"` : '';

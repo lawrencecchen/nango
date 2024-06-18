@@ -1,4 +1,4 @@
-import type { NangoAction, AshbyCreateNoteResponse, AshbyCreateNoteInput, NoteObject } from '../../models';
+import type { NangoAction, AshbyCreateNoteResponse, AshbyCreateNoteInput, NoteObject } from '../../types/lib/integration/asana';
 
 export default async function runAction(nango: NangoAction, input: AshbyCreateNoteInput): Promise<AshbyCreateNoteResponse> {
     //input validation

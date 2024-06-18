@@ -1,4 +1,4 @@
-import type { NangoSync, AsanaWorkspace } from '../../models';
+import type { NangoSync, AsanaWorkspace } from '../../types/lib/integration/asana';
 
 export default async function fetchData(nango: NangoSync): Promise<void> {
     const params: Record<string, string> = {

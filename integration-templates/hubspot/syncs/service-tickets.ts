@@ -1,4 +1,4 @@
-import type { NangoSync, HubspotServiceTicket } from '../../models';
+import type { NangoSync, HubspotServiceTicket } from '../../types/lib/integration/asana';
 
 interface PayloadData {
     properties: string[];

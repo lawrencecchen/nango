@@ -1,4 +1,4 @@
-import type { NangoSync, GoogleCalendar } from '../../models';
+import type { NangoSync, GoogleCalendar } from '../../types/lib/integration/asana';
 
 export default async function fetchData(nango: NangoSync): Promise<void> {
     const maxResults = '100';

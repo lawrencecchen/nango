@@ -1,4 +1,4 @@
-import type { NangoSync, IntercomConversation, IntercomConversationMessage } from '../../models';
+import type { NangoSync, IntercomConversation, IntercomConversationMessage } from '../../types/lib/integration/asana';
 
 /**
  * Fetches Intercom conversations with all their associated messages and notes.

@@ -1,4 +1,4 @@
-import type { NangoSync, User } from '../../models';
+import type { NangoSync, User } from '../../types/lib/integration/asana';
 
 interface DirectoryUser {
     '@odata.type': string;

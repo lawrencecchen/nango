@@ -3,11 +3,11 @@ import type { SyncRunConfig } from './run.service.js';
 import SyncRun from './run.service.js';
 import environmentService from '../environment.service.js';
 import LocalFileService from '../file/local.service.js';
-import { SyncType } from '../../models/Sync.js';
+import { SyncType } from '@nangohq/models/Sync.js';
 import * as configService from './config/config.service.js';
-import type { IntegrationServiceInterface } from '../../models/Sync.js';
-import type { Environment } from '../../models/Environment.js';
-import type { Account } from '../../models/Admin.js';
+import type { IntegrationServiceInterface } from '@nangohq/models/Sync.js';
+import type { Environment } from '@nangohq/models/Environment.js';
+import type { Account } from '@nangohq/models/Admin.js';
 
 class integrationServiceMock implements IntegrationServiceInterface {
     async runScript() {

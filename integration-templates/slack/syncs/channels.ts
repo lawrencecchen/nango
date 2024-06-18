@@ -1,4 +1,4 @@
-import type { SlackChannel, NangoSync } from '../../models';
+import type { SlackChannel, NangoSync } from '../../types/lib/integration/asana';
 
 export default async function fetchData(nango: NangoSync) {
     const responses = await getAllPages(nango, 'conversations.list');

@@ -1,4 +1,4 @@
-import type { LeverPostingApply, NangoSync } from '../../models';
+import type { LeverPostingApply, NangoSync } from '../../types/lib/integration/asana';
 
 const LIMIT = 100;
 

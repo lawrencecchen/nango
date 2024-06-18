@@ -1,4 +1,4 @@
-import type { NangoSync, SalesforceArticle } from '../../models';
+import type { NangoSync, SalesforceArticle } from '../../types/lib/integration/asana';
 
 interface Metadata {
     customFields: string[];

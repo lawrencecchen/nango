@@ -1,7 +1,7 @@
 import db, { schema, dbNamespace } from '@nangohq/database';
-import type { Schedule as SyncSchedule, SyncCommand } from '../../models/Sync.js';
-import { ScheduleStatus, SyncCommandToScheduleStatus } from '../../models/Sync.js';
-import type { ServiceResponse } from '../../models/Generic.js';
+import type { Schedule as SyncSchedule, SyncCommand } from '@nangohq/models/Sync.js';
+import { ScheduleStatus, SyncCommandToScheduleStatus } from '@nangohq/models/Sync.js';
+import type { ServiceResponse } from '@nangohq/models/Generic.js';
 import { getInterval } from '../nango-config.service.js';
 import SyncClient from '../../clients/sync.client.js';
 import { createActivityLogDatabaseErrorMessageAndEnd } from '../activity/activity.service.js';

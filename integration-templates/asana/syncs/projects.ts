@@ -1,4 +1,4 @@
-import type { NangoSync, BaseAsanaModel, AsanaProject } from '../../models';
+import type { NangoSync, BaseAsanaModel, AsanaProject } from '../../types/lib/integration/asana';
 
 export default async function fetchData(nango: NangoSync): Promise<void> {
     for await (const workspaces of nango.paginate<BaseAsanaModel>({ endpoint: '/api/1.0/workspaces', params: { limit: 100 }, retries: 10 })) {

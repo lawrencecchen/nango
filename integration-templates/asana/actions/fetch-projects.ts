@@ -1,4 +1,4 @@
-import type { NangoAction, BaseAsanaModel, AsanaProjectInput } from '../../models';
+import type { NangoAction, BaseAsanaModel, AsanaProjectInput } from '../../types/lib/integration/asana';
 
 export default async function runAction(nango: NangoAction, input: AsanaProjectInput): Promise<BaseAsanaModel[]> {
     const limit = input.limit || 10;

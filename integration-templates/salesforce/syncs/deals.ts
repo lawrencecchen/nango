@@ -1,4 +1,4 @@
-import type { NangoSync, SalesforceDeal } from '../../models';
+import type { NangoSync, SalesforceDeal } from '../../types/lib/integration/asana';
 
 export default async function fetchData(nango: NangoSync) {
     const query = buildQuery(nango.lastSyncDate);

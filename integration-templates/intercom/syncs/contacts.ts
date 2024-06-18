@@ -1,4 +1,4 @@
-import type { NangoSync, IntercomContact } from '../../models';
+import type { NangoSync, IntercomContact } from '../../types/lib/integration/asana';
 
 export default async function fetchData(nango: NangoSync) {
     // Get the list of contacts

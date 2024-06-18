@@ -1,4 +1,4 @@
-import type { LeverStage, NangoSync } from '../../models';
+import type { LeverStage, NangoSync } from '../../types/lib/integration/asana';
 
 const LIMIT = 100;
 

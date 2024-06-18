@@ -1,4 +1,4 @@
-import type { NangoAction, LeverOpportunity, LeverCreateOpportunityInput } from '../../models';
+import type { NangoAction, LeverOpportunity, LeverCreateOpportunityInput } from '../../types/lib/integration/asana';
 
 export default async function runAction(nango: NangoAction, input: LeverCreateOpportunityInput): Promise<LeverOpportunity> {
     if (!input.perform_as) {

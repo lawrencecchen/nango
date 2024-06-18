@@ -1,4 +1,4 @@
-import type { NangoSync, OrganizationalUnit } from '../../models';
+import type { NangoSync, OrganizationalUnit } from '../../types/lib/integration/asana';
 
 interface OrganizationUnit {
     kind: string;

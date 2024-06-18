@@ -1,4 +1,4 @@
-import type { NangoAction, GmailEmailSentOutput, GmailEmailInput } from '../../models';
+import type { NangoAction, GmailEmailSentOutput, GmailEmailInput } from '../../types/lib/integration/asana';
 
 export default async function runAction(nango: NangoAction, input: GmailEmailInput): Promise<GmailEmailSentOutput> {
     try {

@@ -1,4 +1,4 @@
-import type { NangoSync, NotionPage } from '../../models';
+import type { NangoSync, NotionPage } from '../../types/lib/integration/asana';
 
 /**
  * This syncs:

@@ -1,4 +1,4 @@
-import type { NangoSync, GithubRepoFile } from '../../models';
+import type { NangoSync, GithubRepoFile } from '../../types/lib/integration/asana';
 
 enum Models {
     GithubRepoFile = 'GithubRepoFile'

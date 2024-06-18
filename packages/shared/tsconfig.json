@@ -5,9 +5,15 @@
         "outDir": "dist",
         "paths": {
             "@nangohq/shared": ["./lib"],
-            "@nangohq/models": ["./lib/models"]
+            "@nangohq/models": ["./lib/models"],
+            "@nangohq/utils": ["../utils/lib"],
+            "@nangohq/logs": ["../logs/lib"],
+            "@nangohq/database": ["../database/lib"],
+            "@nangohq/node": ["../node-client/lib"]
         },
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "module": "NodeNext",
+        "moduleResolution": "nodenext"
     },
     "references": [
         {

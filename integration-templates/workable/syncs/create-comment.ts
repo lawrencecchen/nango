@@ -1,4 +1,4 @@
-import type { NangoAction, WorkableCreateCommentResponse, WorkableCreateCommentInput } from '../../models';
+import type { NangoAction, WorkableCreateCommentResponse, WorkableCreateCommentInput } from '../../types/lib/integration/asana';
 
 export default async function runAction(nango: NangoAction, input: WorkableCreateCommentInput): Promise<WorkableCreateCommentResponse> {
     if (!input.id) {

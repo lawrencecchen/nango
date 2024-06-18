@@ -6,8 +6,8 @@ import archiver from 'archiver';
 import { isCloud, isEnterprise, isLocal, isTest } from '@nangohq/utils';
 import { NangoError } from '../../utils/error.js';
 import errorManager, { ErrorSourceEnum } from '../../utils/error.manager.js';
-import { LogActionEnum } from '../../models/Activity.js';
-import type { ServiceResponse } from '../../models/Generic.js';
+import { LogActionEnum } from '@nangohq/models/Activity.js';
+import type { ServiceResponse } from '@nangohq/models/Generic.js';
 import { nangoConfigFile } from '../nango-config.service.js';
 import localFileService from './local.service.js';
 

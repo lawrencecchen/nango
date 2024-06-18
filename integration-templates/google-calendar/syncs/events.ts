@@ -1,4 +1,4 @@
-import type { NangoSync, GoogleCalendarEvent } from '../../models';
+import type { NangoSync, GoogleCalendarEvent } from '../../types/lib/integration/asana';
 
 export default async function fetchData(nango: NangoSync): Promise<void> {
     const oneMonthAgo = new Date();

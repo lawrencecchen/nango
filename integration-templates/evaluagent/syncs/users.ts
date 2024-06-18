@@ -1,4 +1,4 @@
-import type { NangoSync, EvaluAgentUser } from '../../models';
+import type { NangoSync, EvaluAgentUser } from '../../types/lib/integration/asana';
 
 interface EvaluAgentUserResponseCustom {
     third_party_id: string;

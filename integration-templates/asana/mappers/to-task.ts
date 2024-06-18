@@ -1,4 +1,4 @@
-import type { AsanaTask, Task } from '../../models';
+import type { AsanaTask, Task } from '../../types/lib/integration/asana';
 
 export function toTask(task: AsanaTask): Task {
     return {

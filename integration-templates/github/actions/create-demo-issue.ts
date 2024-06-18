@@ -1,4 +1,4 @@
-import type { NangoSync, GithubCreateIssueInput, GithubCreateIssueResult } from '../../models';
+import type { NangoSync, GithubCreateIssueInput, GithubCreateIssueResult } from '../../types/lib/integration/asana';
 
 export default async function runAction(nango: NangoSync, input: GithubCreateIssueInput): Promise<GithubCreateIssueResult> {
     // Create one issue in GitHub

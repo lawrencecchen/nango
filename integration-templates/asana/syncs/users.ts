@@ -1,4 +1,4 @@
-import type { NangoSync, AsanaWorkspace, AsanaUser, User } from '../../models';
+import type { NangoSync, AsanaWorkspace, AsanaUser, User } from '../../types/lib/integration/asana';
 import { toUser } from '../mappers/to-user.js';
 
 export default async function fetchData(nango: NangoSync): Promise<void> {

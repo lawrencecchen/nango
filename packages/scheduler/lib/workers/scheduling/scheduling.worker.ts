@@ -6,7 +6,7 @@ import { setTimeout } from 'node:timers/promises';
 import type knex from 'knex';
 import { logger } from '../../utils/logger.js';
 import { dueSchedules } from './scheduling.js';
-import * as tasks from '../../models/tasks.js';
+import * as tasks from '@nangohq/models/tasks.js';
 
 interface CreatedTasksMessage {
     ids: string[];

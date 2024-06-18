@@ -33,3 +33,14 @@ export interface AsanaUser {
     name: string;
     email: string;
 }
+
+export interface CreateAsanaTask {
+    name: string;
+    workspace: string;
+    projects?: string[];
+    parent?: string;
+    due_date?: string;
+    assignee?: AsanaUser;
+    notes?: string;
+    tags?: string[];
+}

@@ -1,4 +1,4 @@
-import type { WorkableJobQuestion, NangoSync } from '../../models';
+import type { WorkableJobQuestion, NangoSync } from '../../types/lib/integration/asana';
 
 const CHUNK_SIZE = 100;
 

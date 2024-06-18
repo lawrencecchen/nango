@@ -1,4 +1,4 @@
-import type { NangoAction, BamboohrEmployee, BamboohrCreateEmployeeResponse } from '../../models';
+import type { NangoAction, BamboohrEmployee, BamboohrCreateEmployeeResponse } from '../../types/lib/integration/asana';
 
 export default async function runAction(nango: NangoAction, input: BamboohrEmployee): Promise<BamboohrCreateEmployeeResponse> {
     // Input validation on only required fields

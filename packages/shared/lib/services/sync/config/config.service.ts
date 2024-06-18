@@ -3,12 +3,12 @@ import db, { schema, dbNamespace } from '@nangohq/database';
 import { getLogger } from '@nangohq/utils';
 import configService from '../../config.service.js';
 import remoteFileService from '../../file/remote.service.js';
-import { LogActionEnum } from '../../../models/Activity.js';
-import type { Action, SyncConfigWithProvider, SyncType, SyncConfig, SlimSync, NangoConfigMetadata } from '../../../models/Sync.js';
-import { SyncConfigType } from '../../../models/Sync.js';
+import { LogActionEnum } from '../@nangohq/models/Activity.js';
+import type { Action, SyncConfigWithProvider, SyncType, SyncConfig, SlimSync, NangoConfigMetadata } from '../@nangohq/models/Sync.js';
+import { SyncConfigType } from '../@nangohq/models/Sync.js';
 import { convertV2ConfigObject } from '../../nango-config.service.js';
-import type { NangoConnection } from '../../../models/Connection.js';
-import type { Config as ProviderConfig } from '../../../models/Provider.js';
+import type { NangoConnection } from '../@nangohq/models/Connection.js';
+import type { Config as ProviderConfig } from '../@nangohq/models/Provider.js';
 import type {
     NangoModelV1,
     NangoSyncModelField,
@@ -18,7 +18,7 @@ import type {
     NangoV2Integration,
     StandardNangoConfig,
     NangoIntegrationDataV2
-} from '../../../models/NangoConfig.js';
+} from '../@nangohq/models/NangoConfig.js';
 import errorManager, { ErrorSourceEnum } from '../../../utils/error.manager.js';
 
 const logger = getLogger('Sync.Config');

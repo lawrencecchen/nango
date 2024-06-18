@@ -1,4 +1,4 @@
-import type { NangoSync, ConfluenceSpace } from '../../models';
+import type { NangoSync, ConfluenceSpace } from '../../types/lib/integration/asana';
 
 async function getCloudId(nango: NangoSync): Promise<string> {
     const response = await nango.get({

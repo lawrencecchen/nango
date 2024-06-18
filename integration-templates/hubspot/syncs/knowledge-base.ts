@@ -1,4 +1,4 @@
-import type { NangoSync, HubspotKnowledgeBase } from '../../models';
+import type { NangoSync, HubspotKnowledgeBase } from '../../types/lib/integration/asana';
 
 interface HubspotDetailsResponse {
     portalId: number;

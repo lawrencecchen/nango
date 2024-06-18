@@ -1,4 +1,4 @@
-import type { GreenhouseCandidate, NangoSync } from '../../models';
+import type { GreenhouseCandidate, NangoSync } from '../../types/lib/integration/asana';
 
 export default async function fetchData(nango: NangoSync) {
     let totalRecords = 0;

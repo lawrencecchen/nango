@@ -1,4 +1,4 @@
-import type { ClariCopilotCall, NangoSync } from '../../models';
+import type { ClariCopilotCall, NangoSync } from '../../types/lib/integration/asana';
 
 const LIMIT = 100;
 

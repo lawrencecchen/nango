@@ -1,4 +1,4 @@
-import type { NangoSync, LinearTeam } from '../../models';
+import type { NangoSync, LinearTeam } from '../../types/lib/integration/asana';
 
 export default async function fetchData(nango: NangoSync) {
     const { lastSyncDate } = nango;

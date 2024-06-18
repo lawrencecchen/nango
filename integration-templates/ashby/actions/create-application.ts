@@ -1,4 +1,4 @@
-import type { NangoAction, AshbyCreateApplicationResponse, AshbyCreateCandidateInput } from '../../models';
+import type { NangoAction, AshbyCreateApplicationResponse, AshbyCreateCandidateInput } from '../../types/lib/integration/asana';
 
 export default async function runAction(nango: NangoAction, input: AshbyCreateCandidateInput): Promise<AshbyCreateApplicationResponse> {
     if (!input.candidateId) {

@@ -21,21 +21,21 @@ import {
 import { errorNotificationService } from '../notification/error.service.js';
 import SyncClient from '../../clients/sync.client.js';
 import configService from '../config.service.js';
-import type { LogLevel } from '../../models/Activity.js';
-import type { Connection, NangoConnection } from '../../models/Connection.js';
-import type { SyncDeploymentResult, IncomingFlowConfig, Sync, SyncType, ReportedSyncJobStatus } from '../../models/Sync.js';
+import type { LogLevel } from '@nangohq/models/Activity.js';
+import type { Connection, NangoConnection } from '@nangohq/models/Connection.js';
+import type { SyncDeploymentResult, IncomingFlowConfig, Sync, SyncType, ReportedSyncJobStatus } from '@nangohq/models/Sync.js';
 import { NangoError } from '../../utils/error.js';
-import type { Config as ProviderConfig } from '../../models/Provider.js';
-import type { ServiceResponse } from '../../models/Generic.js';
-import { SyncStatus, ScheduleStatus, SyncConfigType, SyncCommand, CommandToActivityLog } from '../../models/Sync.js';
+import type { Config as ProviderConfig } from '@nangohq/models/Provider.js';
+import type { ServiceResponse } from '@nangohq/models/Generic.js';
+import { SyncStatus, ScheduleStatus, SyncConfigType, SyncCommand, CommandToActivityLog } from '@nangohq/models/Sync.js';
 import type { LogContext, LogContextGetter } from '@nangohq/logs';
 import type { RecordsServiceInterface } from '../../clients/sync.client.js';
-import { LogActionEnum } from '../../models/Activity.js';
+import { LogActionEnum } from '@nangohq/models/Activity.js';
 import { getLogger, stringifyError } from '@nangohq/utils';
 import environmentService from '../environment.service.js';
-import type { Environment } from '../../models/Environment.js';
+import type { Environment } from '@nangohq/models/Environment.js';
 import type { Orchestrator } from '../../clients/orchestrator.js';
-import type { NangoConfig, NangoIntegration, NangoIntegrationData } from '../../models/NangoConfig.js';
+import type { NangoConfig, NangoIntegration, NangoIntegrationData } from '@nangohq/models/NangoConfig.js';
 import { featureFlags } from '../../index.js';
 
 // Should be in "logs" package but impossible thanks to CLI

@@ -1,4 +1,4 @@
-import type { AshbyJob, NangoSync } from '../../models';
+import type { AshbyJob, NangoSync } from '../../types/lib/integration/asana';
 
 let nextCursor: string | null = null;
 

@@ -1,4 +1,4 @@
-import type { WorkableCandidateActivity, NangoSync } from '../../models';
+import type { WorkableCandidateActivity, NangoSync } from '../../types/lib/integration/asana';
 
 const LIMIT = 100;
 

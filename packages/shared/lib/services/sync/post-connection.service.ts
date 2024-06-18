@@ -1,7 +1,7 @@
 import db from '@nangohq/database';
 import remoteFileService from '../file/remote.service.js';
-import type { Account } from '../../models/Admin.js';
-import type { Environment } from '../../models/Environment.js';
+import type { Account } from '@nangohq/models/Admin.js';
+import type { Environment } from '@nangohq/models/Environment.js';
 import { env } from '@nangohq/utils';
 import type { PostConnectionScriptByProvider, PostConnectionScript } from '@nangohq/types';
 import { increment } from './config/config.service.js';

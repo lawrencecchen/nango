@@ -1,4 +1,4 @@
-import type { GithubIssueDemo, NangoSync } from '../../models';
+import type { GithubIssueDemo, NangoSync } from '../../types/lib/integration/asana';
 
 export default async function fetchData(nango: NangoSync) {
     // Fetch issues from GitHub

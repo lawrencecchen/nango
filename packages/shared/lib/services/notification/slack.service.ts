@@ -1,10 +1,10 @@
 import db, { schema, dbNamespace } from '@nangohq/database';
-import type { SlackNotification } from '../../models/SlackNotification.js';
-import type { NangoConnection } from '../../models/Connection.js';
-import type { ServiceResponse } from '../../models/Generic.js';
+import type { SlackNotification } from '@nangohq/models/SlackNotification.js';
+import type { NangoConnection } from '@nangohq/models/Connection.js';
+import type { ServiceResponse } from '@nangohq/models/Generic.js';
 import environmentService from '../environment.service.js';
-import type { LogLevel } from '../../models/Activity.js';
-import { LogActionEnum } from '../../models/Activity.js';
+import type { LogLevel } from '@nangohq/models/Activity.js';
+import { LogActionEnum } from '@nangohq/models/Activity.js';
 import { updateSuccess as updateSuccessActivityLog, createActivityLogMessage, createActivityLog } from '../activity/activity.service.js';
 import { basePublicUrl, getLogger } from '@nangohq/utils';
 import connectionService from '../connection.service.js';

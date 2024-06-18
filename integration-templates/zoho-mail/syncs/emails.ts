@@ -1,4 +1,4 @@
-import type { NangoSync, ZohoMailEmail } from '../../models';
+import type { NangoSync, ZohoMailEmail } from '../../types/lib/integration/asana';
 
 const LIMIT = 100;
 

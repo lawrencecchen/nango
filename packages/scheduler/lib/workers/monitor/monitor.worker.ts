@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import type { MessagePort } from 'node:worker_threads';
 import { Worker, isMainThread } from 'node:worker_threads';
 import { stringifyError } from '@nangohq/utils';
-import * as tasks from '../../models/tasks.js';
+import * as tasks from '@nangohq/models/tasks.js';
 import { setTimeout } from 'node:timers/promises';
 import type knex from 'knex';
 import { logger } from '../../utils/logger.js';

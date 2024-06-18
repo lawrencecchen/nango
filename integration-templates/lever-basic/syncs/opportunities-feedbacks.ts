@@ -1,4 +1,4 @@
-import type { LeverOpportunityFeedback, NangoSync } from '../../models';
+import type { LeverOpportunityFeedback, NangoSync } from '../../types/lib/integration/asana';
 
 const LIMIT = 100;
 

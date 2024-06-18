@@ -1,4 +1,4 @@
-import type { NangoSync, SalesforceTicket } from '../../models';
+import type { NangoSync, SalesforceTicket } from '../../types/lib/integration/asana';
 
 export default async function fetchData(nango: NangoSync) {
     const query = buildQuery(nango.lastSyncDate);

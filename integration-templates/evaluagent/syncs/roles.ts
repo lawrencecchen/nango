@@ -1,4 +1,4 @@
-import type { NangoSync, EvaluAgentRole } from '../../models';
+import type { NangoSync, EvaluAgentRole } from '../../types/lib/integration/asana';
 
 interface EvaluAgentRoleResponse {
     id: string;

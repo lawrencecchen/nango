@@ -1,4 +1,4 @@
-import type { NangoAction, FirefliesAddtoLiveResponse, FirefliesAddtoLiveInput } from '../../models';
+import type { NangoAction, FirefliesAddtoLiveResponse, FirefliesAddtoLiveInput } from '../../types/lib/integration/asana';
 
 export default async function runAction(nango: NangoAction, input: FirefliesAddtoLiveInput): Promise<FirefliesAddtoLiveResponse> {
     if (!input.query) {

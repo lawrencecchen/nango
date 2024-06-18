@@ -1,4 +1,4 @@
-import type { NangoSync, GithubIssue } from '../../models';
+import type { NangoSync, GithubIssue } from '../../types/lib/integration/asana';
 
 const LIMIT = 100;
 

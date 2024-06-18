@@ -1,6 +1,6 @@
 import type { Knex } from 'knex';
-import { SCHEDULES_TABLE } from '../../models/schedules.js';
-import { TASKS_TABLE } from '../../models/tasks.js';
+import { SCHEDULES_TABLE } from '@nangohq/models/schedules.js';
+import { TASKS_TABLE } from '@nangohq/models/tasks.js';
 
 export const config = {
     transaction: false

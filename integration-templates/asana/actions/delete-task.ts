@@ -1,4 +1,4 @@
-import type { NangoAction, Id, NangoActionError } from '../../models';
+import type { NangoAction, Id, NangoActionError } from '../../types/lib/integration/asana';
 
 export default async function runAction(nango: NangoAction, input: Id): Promise<boolean> {
     if (!input.id) {

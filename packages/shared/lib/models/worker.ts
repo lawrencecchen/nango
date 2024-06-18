@@ -1,5 +1,5 @@
-import type { NangoConnection } from './Connection';
-import type { NangoIntegrationData } from './NangoConfig';
+import type { NangoConnection } from './Connection.js';
+import type { NangoIntegrationData } from './NangoConfig.js';
 
 export interface InitialSyncArgs {
     syncId: string;

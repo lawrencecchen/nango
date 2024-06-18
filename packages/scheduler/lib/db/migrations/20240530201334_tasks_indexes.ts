@@ -1,5 +1,5 @@
 import type { Knex } from 'knex';
-import { TASKS_TABLE } from '../../models/tasks.js';
+import { TASKS_TABLE } from '@nangohq/models/tasks.js';
 
 export const config = {
     transaction: false

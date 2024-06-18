@@ -1,4 +1,4 @@
-import type { NangoSync, Document } from '../../models';
+import type { NangoSync, Document } from '../../types/lib/integration/asana';
 
 interface GoogleDriveFileResponse {
     id: string;

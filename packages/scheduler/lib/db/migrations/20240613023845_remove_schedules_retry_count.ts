@@ -1,5 +1,5 @@
 import type { Knex } from 'knex';
-import { SCHEDULES_TABLE } from '../../models/schedules.js';
+import { SCHEDULES_TABLE } from '@nangohq/models/schedules.js';
 
 export async function up(knex: Knex): Promise<void> {
     await knex.raw(`

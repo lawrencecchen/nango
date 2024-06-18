@@ -1,4 +1,4 @@
-import type { NangoSync, ZendeskTicket } from '../../models';
+import type { NangoSync, ZendeskTicket } from '../../types/lib/integration/asana';
 
 async function getZendeskSubdomain(nango: NangoSync): Promise<string | undefined> {
     const response = await nango.getConnection();
