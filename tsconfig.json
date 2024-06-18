@@ -5,6 +5,11 @@
     "declaration": true,
     "sourceMap": true,
     "composite": true,
-    "checkJs": false
+    "checkJs": false,
+    "baseUrl": ".",
+    "paths": {
+      "@nangohq/shared": ["./packages/shared/lib"],
+      "@nangohq/models": ["./packages/models"]
+    }
   }
 }

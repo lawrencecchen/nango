@@ -1,4 +1,16 @@
-import type { NangoAction, AlgoliaContact, AlgoliaCreateContactInput } from '../../models';
+import type { NangoAction } from '@nangohq/shared/lib/sdk/sync';
+
+export type AlgoliaContact = {
+    createdAt: string;
+    taskID: string;
+    objectID: string;
+};
+
+export type AlgoliaCreateContactInput = {
+    name: string;
+    company?: string;
+    email?: string;
+};
 
 export default async function runAction(nango: NangoAction, input: AlgoliaCreateContactInput): Promise<AlgoliaContact> {
     if (!input.name) {
