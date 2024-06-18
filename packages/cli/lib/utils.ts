@@ -14,7 +14,6 @@ import type { NangoModel, NangoIntegrationData, NangoIntegration } from '@nangoh
 import { SyncConfigType, cloudHost, stagingHost, NANGO_VERSION } from '@nangohq/shared';
 import * as dotenv from 'dotenv';
 import { state } from './state.js';
-import https from 'node:https';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -327,7 +326,7 @@ export function getFieldType(rawField: string | NangoModel, debug = false): stri
     } else {
         try {
             const nestedFields = Object.keys(rawField)
-                .map((fieldName: string) => `  ${fieldName}: ${getFieldType(rawField[fieldName])};`)
+                .map((fieldName: string) => `  ${fieldName}: ${getFieldType(rawField[fieldName] as string | NangoModel)};`)
                 .join('\n');
             return `{\n${nestedFields}\n}`;
         } catch (_) {
@@ -416,11 +415,12 @@ export function getNangoRootPath(debug = false) {
         return null;
     }
 
+    const rootPath = path.resolve(packagePath, '..');
     if (debug) {
-        printDebug(`Found the nango cli root path at ${path.resolve(packagePath, '..')}`);
+        printDebug(`Found the nango cli root path at ${rootPath}`);
     }
 
-    return path.resolve(packagePath, '..');
+    return rootPath;
 }
 
 function getPackagePath(debug = false) {
@@ -429,7 +429,11 @@ function getPackagePath(debug = false) {
             if (debug) {
                 printDebug('Found locally installed nango');
             }
-            return path.resolve(__dirname, '../package.json');
+            const localPackagePath = path.resolve(__dirname, '../package.json');
+            if (debug) {
+                printDebug(`Local package path: ${localPackagePath}`);
+            }
+            return localPackagePath;
         }
         const packageMainPath = require.resolve('nango');
         const packagePath = path.dirname(packageMainPath);
