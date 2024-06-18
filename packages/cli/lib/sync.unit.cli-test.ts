@@ -25,7 +25,7 @@ describe('generate function tests', () => {
         await modelService.createModelFile({ fullPath });
 
         const typesFilePath: string = path.join(fullPath, 'dist', 'nango-sync.d.ts');
-        const typesContent: string = fs.readFileSync(typesFilePath, 'utf8');
+        const typesContent: string = await fs.promises.readFile(typesFilePath, 'utf8');
         expect(typesContent).not.toBe('');
     });
 
