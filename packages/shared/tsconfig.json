@@ -6,7 +6,8 @@
         "paths": {
             "@nangohq/shared": ["./lib"],
             "@nangohq/models": ["./lib/models"]
-        }
+        },
+        "esModuleInterop": true
     },
     "references": [
         {
