@@ -8,6 +8,7 @@
     "paths": {
       "@nangohq/shared": ["./packages/shared/lib"],
       "@nangohq/models": ["./packages/shared/lib/models"]
-    }
+    },
+    "lib": ["es2015", "dom"]
   }
 }
