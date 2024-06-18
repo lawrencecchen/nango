@@ -52,8 +52,17 @@ export async function generate({ fullPath, debug = false }: { fullPath: string; 
     }
 
     // insert NangoSync types to the bottom of the file
-    const typesContent = fs.readFileSync(`${getNangoRootPath()}/${NangoSyncTypesFileLocation}`, 'utf8');
-    fs.writeFileSync(`${fullPath}/${TYPES_FILE_NAME}`, typesContent, { flag: 'a' });
+    const typesFilePath = `${getNangoRootPath()}/${NangoSyncTypesFileLocation}`;
+    if (fs.existsSync(typesFilePath)) {
+        const typesContent = fs.readFileSync(typesFilePath, 'utf8');
+        if (typesContent) {
+            fs.writeFileSync(`${fullPath}/${TYPES_FILE_NAME}`, typesContent, { flag: 'a' });
+        } else {
+            console.log(chalk.red(`Empty ${NangoSyncTypesFileLocation}`));
+        }
+    } else {
+        console.log(chalk.red(`Failed to load ${NangoSyncTypesFileLocation}`));
+    }
 
     const { success, error, response: config } = await configService.load(fullPath, debug);
 
@@ -333,7 +342,7 @@ export function configWatch({ fullPath, debug = false }: { fullPath: string; deb
     const watcher = chokidar.watch(watchPath, { ignoreInitial: true });
 
     watcher.on('change', () => {
-        void modelService.createModelFile({ fullPath, notify: true });
+        void modelService.createModelFile({ fullPath });
     });
 }
 

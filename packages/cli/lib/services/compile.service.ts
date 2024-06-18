@@ -43,7 +43,15 @@ export async function compileAllFiles({
             printDebug(`Creating ${TYPES_FILE_NAME} file`);
         }
     }
+    if (debug) {
+        printDebug(`Calling createModelFile with fullPath: ${fullPath}`);
+    }
     await modelService.createModelFile({ fullPath });
+    if (debug) {
+        printDebug(`Completed createModelFile call. Checking contents of dist directory:`);
+        const distFiles = fs.readdirSync(distDir);
+        printDebug(`Contents of dist directory: ${distFiles.join(', ')}`);
+    }
 
     const compilerOptions = (JSON.parse(tsconfig) as { compilerOptions: Record<string, any> }).compilerOptions;
     const compiler = tsNode.create({

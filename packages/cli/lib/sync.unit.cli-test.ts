@@ -10,25 +10,29 @@ import { compileAllFiles, compileSingleFile, getFileToCompile } from './services
 import { getNangoRootPath } from './utils.js';
 import parserService from './services/parser.service.js';
 import { copyDirectoryAndContents } from './tests/helpers.js';
+import modelService from './services/model.service.js';
 
 function getTestDirectory(name: string) {
     const dir = `/tmp/${name}/nango-integrations/`;
-    fs.mkdirSync(dir, { recursive: true });
-    fs.rmSync(dir, { recursive: true, force: true });
+    fs.mkdirSync(dir, { recursive: true } as fs.MakeDirectoryOptions);
+    fs.rmSync(dir, { recursive: true, force: true } as fs.RmOptions);
     return dir;
 }
 describe('generate function tests', () => {
     const fixturesPath = './packages/cli/fixtures';
 
     beforeAll(async () => {
-        if (!fs.existsSync('./packages/cli/dist/nango-sync.d.ts')) {
-            await fs.promises.writeFile('./packages/cli/dist/nango-sync.d.ts', '', 'utf8');
-        }
+        const fullPath: string = path.resolve('./packages/cli') as string;
+        await modelService.createModelFile({ fullPath });
+
+        const typesFilePath: string = path.join(fullPath, 'dist', 'nango-sync.d.ts') as string;
+        const typesContent: string = fs.readFileSync(typesFilePath, 'utf8') as string;
+        expect(typesContent).not.toBe('');
     });
 
     it('should init the expected files in the nango-integrations directory', async () => {
         const dir = getTestDirectory('init');
-        await init({ absolutePath: path.resolve(dir, '..'), debug: false });
+        await init({ absolutePath: path.resolve(dir, '..') as string, debug: false });
         expect(fs.existsSync(`${dir}/demo-github-integration/syncs/${exampleSyncName}.ts`)).toBe(true);
         expect(fs.existsSync(`${dir}/.env`)).toBe(true);
         expect(fs.existsSync(`${dir}/nango.yaml`)).toBe(true);
@@ -40,13 +44,13 @@ describe('generate function tests', () => {
         await fs.promises.writeFile(`${dir}/${exampleSyncName}.ts`, 'dummy fake content', 'utf8');
 
         const dummyContent = 'This is dummy content. Do not overwrite!';
-        const exampleFilePath = path.join(dir, `${exampleSyncName}.ts`);
+        const exampleFilePath = path.join(dir, `${exampleSyncName}.ts`) as string;
         await fs.promises.writeFile(exampleFilePath, dummyContent, 'utf8');
 
         await init({ absolutePath: dir });
 
         expect(fs.existsSync(exampleFilePath)).toBe(true);
-        const fileContentAfterInit = await fs.promises.readFile(exampleFilePath, 'utf8');
+        const fileContentAfterInit = await fs.promises.readFile(exampleFilePath, 'utf8') as string;
         expect(fileContentAfterInit).toBe(dummyContent);
     });
 
@@ -589,16 +593,18 @@ describe('generate function tests', () => {
 
         const { response: config } = await configService.load(path.resolve(`${fixturesPath}/nango-yaml/v2/${name}`));
         expect(config).not.toBeNull();
-        const modelNames = configService.getModelNames(config);
-        const result = await compileSingleFile({
-            fullPath: dir,
-            file: getFileToCompile({ fullPath: dir, filePath: path.join(dir, './github/actions/gh-issues.ts') }),
-            tsconfig,
-            config: config!,
-            modelNames,
-            debug: false
-        });
-        expect(result).toBe(false);
+        if (config) {
+            const modelNames = configService.getModelNames(config);
+            const result = await compileSingleFile({
+                fullPath: dir,
+                file: getFileToCompile({ fullPath: dir, filePath: path.join(dir, './github/actions/gh-issues.ts') }),
+                tsconfig,
+                config: config,
+                modelNames,
+                debug: false
+            });
+            expect(result).toBe(false);
+        }
     });
 
     it('should complain if a nango call is used incorrectly in a nested file', async () => {
@@ -612,16 +618,18 @@ describe('generate function tests', () => {
 
         const { response: config } = await configService.load(path.resolve(`${fixturesPath}/nango-yaml/v2/${name}`));
         expect(config).not.toBeNull();
-        const modelNames = configService.getModelNames(config);
-        const result = await compileSingleFile({
-            fullPath: dir,
-            file: getFileToCompile({ fullPath: dir, filePath: path.join(dir, './github/actions/gh-issues.ts') }),
-            tsconfig,
-            config: config!,
-            modelNames,
-            debug: false
-        });
-        expect(result).toBe(false);
+        if (config) {
+            const modelNames = configService.getModelNames(config);
+            const result = await compileSingleFile({
+                fullPath: dir,
+                file: getFileToCompile({ fullPath: dir, filePath: path.join(dir, './github/actions/gh-issues.ts') }),
+                tsconfig,
+                config: config,
+                modelNames,
+                debug: false
+            });
+            expect(result).toBe(false);
+        }
     });
 
     it('should not allow imports higher than the current directory', async () => {
@@ -636,15 +644,17 @@ describe('generate function tests', () => {
 
         const { response: config } = await configService.load(path.resolve(`${fixturesPath}/nango-yaml/v2/${name}`));
         expect(config).not.toBeNull();
-        const modelNames = configService.getModelNames(config);
-        const result = await compileSingleFile({
-            fullPath: dir,
-            file: getFileToCompile({ fullPath: dir, filePath: path.join(dir, './github/actions/gh-issues.ts') }),
-            tsconfig,
-            config: config!,
-            modelNames,
-            debug: false
-        });
-        expect(result).toBe(false);
+        if (config) {
+            const modelNames = configService.getModelNames(config);
+            const result = await compileSingleFile({
+                fullPath: dir,
+                file: getFileToCompile({ fullPath: dir, filePath: path.join(dir, './github/actions/gh-issues.ts') }),
+                tsconfig,
+                config: config,
+                modelNames,
+                debug: false
+            });
+            expect(result).toBe(false);
+        }
     });
 });

@@ -1,6 +1,5 @@
 import fs from 'fs';
 import yaml from 'js-yaml';
-import chalk from 'chalk';
 import type { NangoConfig, NangoModel, NangoIntegration, NangoIntegrationData } from '@nangohq/shared';
 import { isJsOrTsType, SyncConfigType, nangoConfigFile } from '@nangohq/shared';
 import { printDebug, getNangoRootPath } from '../utils.js';
@@ -79,6 +78,7 @@ class ModelService {
             return interfaceDefinition;
         });
 
+        console.log(`Generated interface definitions: ${interfaceDefinitions.join('\n')}`);
         return interfaceDefinitions;
     }
 
@@ -156,54 +156,65 @@ class ModelService {
             return tsType;
         } else {
             try {
-                const nestedFields = Object.keys(rawField)
-                    .map((fieldName: string) => `  ${fieldName}: ${this.getFieldType(rawField[fieldName], debug, modelName, models)};`)
-                    .join('\n');
+                const nestedFields =
+                    rawField && typeof rawField === 'object'
+                        ? Object.keys(rawField)
+                              .map((fieldName: string) => {
+                                  const field = rawField[fieldName];
+                                  if (typeof field === 'string' || typeof field === 'object') {
+                                      return `  ${fieldName}: ${this.getFieldType(field as string | NangoModel, debug, modelName, models)};`;
+                                  }
+                                  return `  ${fieldName}: ${String(field)};`;
+                              })
+                              .join('\n')
+                        : '';
                 return `{\n${nestedFields}\n}`;
             } catch (_) {
-                // eslint-disable-next-line no-console
-                console.log(chalk.red(`Failed to parse field ${JSON.stringify(rawField)} so just returning it back as a string`));
                 return String(rawField);
             }
         }
     }
 
-    public async createModelFile({ fullPath, notify = false }: { fullPath: string; notify?: boolean }) {
+    public async createModelFile({ fullPath }: { fullPath: string }) {
         const configContents = fs.readFileSync(path.join(fullPath, nangoConfigFile), 'utf8');
         const configData: NangoConfig = yaml.load(configContents) as NangoConfig;
         const { models, integrations } = configData;
         const interfaceDefinitions = modelService.build(models, integrations);
+
         if (interfaceDefinitions) {
             fs.writeFileSync(path.join(fullPath, TYPES_FILE_NAME), interfaceDefinitions.join('\n'));
+            console.log(`Contents of ${TYPES_FILE_NAME} after writing interface definitions: ${fs.readFileSync(path.join(fullPath, TYPES_FILE_NAME), 'utf8')}`);
         }
 
-        if (!fs.existsSync(`${getNangoRootPath()}/${NangoSyncTypesFileLocation}`)) {
+        const typesFilePath = `${getNangoRootPath()}/${NangoSyncTypesFileLocation}`;
+
+        if (!fs.existsSync(typesFilePath)) {
+            console.log(`Failed to load ${NangoSyncTypesFileLocation}`);
             throw new Error(`Failed to load ${NangoSyncTypesFileLocation}`);
         }
 
         // insert NangoSync types to the bottom of the file
-        const typesContent = fs.readFileSync(`${getNangoRootPath()}/${NangoSyncTypesFileLocation}`, 'utf8');
+        const typesContent = fs.readFileSync(typesFilePath, 'utf8');
+        console.log(`Types content from ${typesFilePath}: ${typesContent}`);
+
         if (!typesContent) {
+            console.log(`Empty ${NangoSyncTypesFileLocation}`);
             throw new Error(`Empty ${NangoSyncTypesFileLocation}`);
         }
 
         fs.writeFileSync(path.join(fullPath, TYPES_FILE_NAME), typesContent, { flag: 'a' });
+        console.log(`Contents of ${TYPES_FILE_NAME} after appending types content: ${fs.readFileSync(path.join(fullPath, TYPES_FILE_NAME), 'utf8')}`);
 
-        const { success, error, response: config } = await configService.load(fullPath);
+        const { success, response: config } = await configService.load(fullPath);
 
         if (!success || !config) {
-            // eslint-disable-next-line no-console
-            console.log(chalk.red(error?.message));
+            console.log('Failed to load config');
             throw new Error('Failed to load config');
         }
 
         const flowConfig = `export const NangoFlows = ${JSON.stringify(config, null, 2)} as const; \n`;
         fs.writeFileSync(path.join(fullPath, TYPES_FILE_NAME), flowConfig, { flag: 'a' });
-
-        if (notify) {
-            // eslint-disable-next-line no-console
-            console.log(chalk.green(`The ${nangoConfigFile} was updated. The interface file (${TYPES_FILE_NAME}) was updated to reflect the updated config`));
-        }
+        console.log(`Contents of ${TYPES_FILE_NAME} after appending flow config: ${fs.readFileSync(path.join(fullPath, TYPES_FILE_NAME), 'utf8')}`);
     }
 }
 

@@ -110,7 +110,7 @@ export class Nango {
             throw new Error(`Failed to fetch integrations: ${response.statusText}`);
         }
 
-        return await response.json() as { configs: Pick<Integration, 'unique_key' | 'provider'>[] };
+        return (await response.json()) as { configs: Pick<Integration, 'unique_key' | 'provider'>[] };
     }
 
     /**
@@ -133,7 +133,7 @@ export class Nango {
             throw new Error(`Failed to fetch integration: ${response.statusText}`);
         }
 
-        return await response.json() as { config: Integration | IntegrationWithCreds };
+        return (await response.json()) as { config: Integration | IntegrationWithCreds };
     }
 
     /**
@@ -156,7 +156,7 @@ export class Nango {
             throw new Error(`Failed to create integration: ${response.statusText}`);
         }
 
-        return await response.json() as { config: Integration };
+        return (await response.json()) as { config: Integration };
     }
     /**
      * Returns a list of connections, optionally filtered by connection ID
@@ -224,7 +224,10 @@ export class Nango {
             case AuthModes.OAuth2:
                 return (data as { credentials: { access_token: string } }).credentials.access_token;
             case AuthModes.OAuth1:
-                return { oAuthToken: (data as { credentials: { oauth_token: string } }).credentials.oauth_token, oAuthTokenSecret: (data as { credentials: { oauth_token_secret: string } }).credentials.oauth_token_secret };
+                return {
+                    oAuthToken: (data as { credentials: { oauth_token: string } }).credentials.oauth_token,
+                    oAuthTokenSecret: (data as { credentials: { oauth_token_secret: string } }).credentials.oauth_token_secret
+                };
             default:
                 return (data as { credentials: BasicApiCredentials | ApiKeyCredentials | AppCredentials }).credentials;
         }
@@ -387,7 +390,7 @@ export class Nango {
             throw new Error(`Failed to get scripts config: ${response.statusText}`);
         }
 
-        return await response.json() as StandardNangoConfig[];
+        return (await response.json()) as StandardNangoConfig[];
     }
 
     /**
@@ -447,7 +450,7 @@ export class Nango {
             throw new Error(`Failed to get records: ${response.statusText}`);
         }
 
-        return await response.json() as (T & { _nango_metadata: RecordMetadata })[];
+        return (await response.json()) as (T & { _nango_metadata: RecordMetadata })[];
     }
 
     /**
@@ -481,7 +484,7 @@ export class Nango {
             throw new Error(`Failed to list records: ${response.statusText}`);
         }
 
-        return await response.json() as { records: (T & { _nango_metadata: RecordMetadata })[]; next_cursor: string | null };
+        return (await response.json()) as { records: (T & { _nango_metadata: RecordMetadata })[]; next_cursor: string | null };
     }
 
     /**
@@ -617,7 +620,7 @@ export class Nango {
             throw new Error(`Failed to get sync status: ${response.statusText}`);
         }
 
-        return await response.json() as SyncStatusResponse;
+        return (await response.json()) as SyncStatusResponse;
     }
 
     /**
@@ -659,7 +662,7 @@ export class Nango {
             throw new Error(`Failed to update sync connection frequency: ${response.statusText}`);
         }
 
-        return await response.json() as UpdateSyncFrequencyResponse;
+        return (await response.json()) as UpdateSyncFrequencyResponse;
     }
 
     /**
@@ -683,7 +686,7 @@ export class Nango {
             return [];
         }
 
-        return await response.json() as { name: string; value: string }[];
+        return (await response.json()) as { name: string; value: string }[];
     }
 
     /**
@@ -724,7 +727,7 @@ export class Nango {
             throw new Error(`Failed to trigger action: ${response.statusText}`);
         }
 
-        return await response.json() as object;
+        return (await response.json()) as object;
     }
 
     /**
