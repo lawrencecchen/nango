@@ -4,8 +4,8 @@
         "rootDir": "lib",
         "outDir": "dist",
         "paths": {
-            "@nangohq/shared": ["../shared/lib"],
-            "@nangohq/models": ["../models"]
+            "@nangohq/shared": ["./lib"],
+            "@nangohq/models": ["./lib/models"]
         }
     },
     "references": [

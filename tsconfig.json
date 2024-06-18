@@ -1,7 +1,5 @@
 {
-  "extends": "@tsconfig/node18-strictest-esm/tsconfig.json",
   "compilerOptions": {
-    "ignoreDeprecations": "5.0",
     "declaration": true,
     "sourceMap": true,
     "composite": true,
@@ -9,7 +7,8 @@
     "baseUrl": ".",
     "paths": {
       "@nangohq/shared": ["./packages/shared/lib"],
-      "@nangohq/models": ["./packages/models"]
-    }
+      "@nangohq/models": ["./packages/shared/lib/models"]
+    },
+    "ignoreDeprecations": "5.0"
   }
 }

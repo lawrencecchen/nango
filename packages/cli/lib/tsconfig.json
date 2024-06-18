@@ -3,7 +3,12 @@
     "compilerOptions": {
         "rootDir": ".",
         "outDir": "../dist",
-        "types": ["node"]
+        "types": ["node"],
+        "baseUrl": ".",
+        "paths": {
+            "@nangohq/shared": ["../../../packages/shared/lib"],
+            "@nangohq/models": ["../../../packages/shared/lib/models"]
+        }
     },
     "include": ["**/*"]
 }
