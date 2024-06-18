@@ -3,24 +3,25 @@ import db, { schema, dbNamespace } from '@nangohq/database';
 import type { IncomingFlowConfig, SyncAndActionDifferences, Sync, Job as SyncJob, SyncWithSchedule, SlimSync, SlimAction } from '@nangohq/models/Sync.js';
 import { SyncConfigType, SyncStatus, SyncCommand, ScheduleStatus } from '@nangohq/models/Sync.js';
 import type { Connection, NangoConnection } from '@nangohq/models/Connection.js';
-import SyncClient from '../../clients/sync.client.js.js';
-import { updateSuccess as updateSuccessActivityLog, createActivityLogMessage, createActivityLogMessageAndEnd } from '../activity/activity.service.js.js';
-import { updateScheduleStatus } from './schedule.service.js.js';
 import type { ActiveLogIds } from '@nangohq/types';
-import telemetry, { LogTypes } from '../../utils/telemetry.js.js';
+import type { LogContext, LogContextGetter } from '@nangohq/logs';
+import { LogActionEnum } from '@nangohq/models/Activity.js';
+import { stringifyError } from '@nangohq/utils';
+
+import SyncClient from '../../clients/sync.client.js';
+import { updateSuccess as updateSuccessActivityLog, createActivityLogMessage, createActivityLogMessageAndEnd } from '../activity/activity.service.js';
+import { updateScheduleStatus } from './schedule.service.js';
+import telemetry, { LogTypes } from '../../utils/telemetry.js';
 import {
     getActiveCustomSyncConfigsByEnvironmentId,
     getSyncConfigsByProviderConfigKey,
     getActionConfigByNameAndProviderConfigKey
 } from './config/config.service.js';
-import syncManager from './manager.service.js.js';
-import connectionService from '../connection.service.js.js';
-import { DEMO_GITHUB_CONFIG_KEY, DEMO_SYNC_NAME } from '../onboarding.service.js.js';
-import type { LogContext, LogContextGetter } from '@nangohq/logs';
-import { LogActionEnum } from '@nangohq/models/Activity.js';
-import type { Orchestrator } from '../../clients/orchestrator.js.js';
-import { featureFlags } from '../../index.js.js';
-import { stringifyError } from '@nangohq/utils';
+import syncManager from './manager.service.js';
+import connectionService from '../connection.service.js';
+import { DEMO_GITHUB_CONFIG_KEY, DEMO_SYNC_NAME } from '../onboarding.service.js';
+import type { Orchestrator } from '../../clients/orchestrator.js';
+import { featureFlags } from '../../index.js';
 
 const TABLE = dbNamespace + 'syncs';
 const SYNC_JOB_TABLE = dbNamespace + 'sync_jobs';

@@ -1,5 +1,6 @@
-import type { NangoSync, SlackMessage, SlackMessageReaction, SlackMessageReply } from '../../types/lib/integration/asana.js';
 import { createHash } from 'crypto';
+
+import type { NangoSync, SlackMessage, SlackMessageReaction, SlackMessageReply } from '../../types/lib/integration/asana.js';
 
 export default async function fetchData(nango: NangoSync) {
     let batchMessages: SlackMessage[] = [];

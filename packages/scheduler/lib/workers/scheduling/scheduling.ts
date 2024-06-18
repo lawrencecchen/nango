@@ -1,9 +1,10 @@
 import type knex from 'knex';
-import type { Schedule } from '../../types.js.js';
 import { DbSchedule, SCHEDULES_TABLE } from '@nangohq/models/schedules.js';
 import type { Result } from '@nangohq/utils';
 import { Err, Ok, stringifyError } from '@nangohq/utils';
 import { TASKS_TABLE } from '@nangohq/models/tasks.js';
+
+import type { Schedule } from '../../types.js';
 
 export async function dueSchedules(db: knex.Knex): Promise<Result<Schedule[]>> {
     try {

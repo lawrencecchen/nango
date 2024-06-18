@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-
 import type { SignupWithToken } from '@nangohq/types';
+
 import { apiFetch, useInviteSignupAPI } from '../../utils/api';
 import { useAnalyticsTrack } from '../../utils/analytics';
 import { MANAGED_AUTH_ENABLED, isEnterprise } from '../../utils/utils';

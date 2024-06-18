@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { Prism } from '@mantine/prism';
+
 import { useGetFlows, useCreateFlow, apiFetch } from '../utils/api';
 import type { Sync } from '../types';
 import { LeftNavBarItems } from '../components/LeftNavBar';

@@ -11,7 +11,8 @@ import type {
     AuthOperationType
 } from '@nangohq/types';
 import type { LogContext } from '@nangohq/logs';
-import { deliver, shouldSend } from './utils.js.js';
+
+import { deliver, shouldSend } from './utils.js';
 
 export const sendAuth = async ({
     connection,

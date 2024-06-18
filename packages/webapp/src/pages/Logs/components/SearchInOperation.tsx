@@ -1,8 +1,12 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import type { SearchMessages, SearchOperationsData } from '@nangohq/types';
+import { ChevronRightIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useDebounce, useIntersection, useInterval } from 'react-use';
+
 import { Input } from '../../../components/ui/input/Input';
 import { useSearchMessages } from '../../../hooks/useLogs';
-import type { SearchMessages, SearchOperationsData } from '@nangohq/types';
 import { formatDateToLogFormat, formatQuantity } from '../../../utils/utils';
 import { useStore } from '../../../store';
 import * as Table from '../../../components/ui/Table';
@@ -10,9 +14,6 @@ import Spinner from '../../../components/ui/Spinner';
 import Info from '../../../components/ui/Info';
 import { LevelTag } from './LevelTag';
 import { MessageRow } from './MessageRow';
-import { ChevronRightIcon, MagnifyingGlassIcon } from '@radix-ui/react-icons';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useDebounce, useIntersection, useInterval } from 'react-use';
 import { Tag } from '../../../components/ui/label/Tag';
 import { Skeleton } from '../../../components/ui/Skeleton';
 import Button from '../../../components/ui/button/Button';

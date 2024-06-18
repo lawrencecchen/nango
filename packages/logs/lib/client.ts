@@ -1,9 +1,10 @@
 import type { MessageRow, MessageRowInsert, MessageMeta, OperationRow } from '@nangohq/types';
-import { setRunning, createMessage, setFailed, setCancelled, setTimeouted, setSuccess, update } from './models/messages.js.js';
-import { getFormattedMessage } from './models/helpers.js.js';
 import { errorToObject, metrics, stringifyError } from '@nangohq/utils';
-import { isCli, logger } from './utils.js.js';
-import { envs } from './env.js.js';
+
+import { setRunning, createMessage, setFailed, setCancelled, setTimeouted, setSuccess, update } from './models/messages.js';
+import { getFormattedMessage } from './models/helpers.js';
+import { isCli, logger } from './utils.js';
+import { envs } from './env.js';
 
 interface Options {
     dryRun?: boolean;

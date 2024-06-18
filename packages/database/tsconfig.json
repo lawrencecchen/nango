@@ -2,12 +2,14 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "rootDir": "lib",
-        "outDir": "dist"
+        "outDir": "dist",
+        "skipLibCheck": true
     },
     "references": [
         {
             "path": "../utils"
         }
     ],
-    "include": ["lib/**/*", "../utils/lib/vitest.d.ts"]
+    "include": ["lib/**/*", "../utils/lib/vitest.d.ts"],
+    "exclude": ["node_modules"]
 }

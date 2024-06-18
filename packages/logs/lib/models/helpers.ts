@@ -2,7 +2,8 @@ import { nanoid } from '@nangohq/utils';
 import type { MessageRow } from '@nangohq/types';
 import { z } from 'zod';
 import type { estypes } from '@elastic/elasticsearch';
-import { defaultOperationExpiration } from '../env.js.js';
+
+import { defaultOperationExpiration } from '../env.js';
 
 export const operationIdRegex = z.string().regex(/([0-9]|[a-zA-Z0-9]{20})/);
 

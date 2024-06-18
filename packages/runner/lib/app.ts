@@ -1,6 +1,7 @@
 import './tracer.js';
-import { server } from './server.js.js';
 import { getLogger, stringifyError } from '@nangohq/utils';
+
+import { server } from './server.js';
 
 const logger = getLogger('Runner');
 

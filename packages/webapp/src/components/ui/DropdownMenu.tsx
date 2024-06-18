@@ -1,7 +1,8 @@
 import * as React from 'react';
 import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
-import { cn } from '../../utils/utils';
 import { CheckIcon, ChevronRightIcon, CircleIcon } from '@radix-ui/react-icons';
+
+import { cn } from '../../utils/utils';
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 

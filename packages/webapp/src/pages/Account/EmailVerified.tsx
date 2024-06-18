@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Loading } from '@geist-ui/core';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAnalyticsTrack } from '../../utils/analytics';
-import { useSignin } from '../../utils/user';
 import type { ValidateEmailAndLogin } from '@nangohq/types';
 import { toast } from 'react-toastify';
+
+import { useAnalyticsTrack } from '../../utils/analytics';
+import { useSignin } from '../../utils/user';
 import { useStore } from '../../store';
 import { apiFetch } from '../../utils/api';
 

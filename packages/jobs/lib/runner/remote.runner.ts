@@ -1,7 +1,8 @@
 import { getLogger } from '@nangohq/utils';
-import type { Runner } from './runner.js.js';
-import { RunnerType } from './runner.js.js';
 import { getRunnerClient } from '@nangohq/nango-runner';
+
+import type { Runner } from './runner.js';
+import { RunnerType } from './runner.js';
 
 const logger = getLogger('Jobs');
 

@@ -11,8 +11,8 @@ const logger = getLogger('Runner');
 export class RunnerMonitor {
     private runnerId: string;
     private tracked: Map<number, NangoProps> = new Map<number, NangoProps>();
-    private jobsServiceUrl: string = '';
-    private persistServiceUrl: string = '';
+    private jobsServiceUrl = '';
+    private persistServiceUrl = '';
     private idleMaxDurationMs = parseInt(process.env['IDLE_MAX_DURATION_MS'] || '') || 0;
     private lastIdleTrackingDate = Date.now();
     private lastMemoryReportDate: Date | null = null;

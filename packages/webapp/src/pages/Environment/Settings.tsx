@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { AlertTriangle, HelpCircle } from '@geist-ui/icons';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { Tooltip, useModal, Modal } from '@geist-ui/core';
+import type { WebhookSettings as CheckboxState } from '@nangohq/types';
 
 import {
     useEditCallbackUrlAPI,
@@ -24,7 +25,6 @@ import Button from '../../components/ui/button/Button';
 import { useEnvironment } from '../../hooks/useEnvironment';
 import { connectSlack } from '../../utils/slack-connection';
 import WebhookCheckboxes from './WebhookCheckboxes';
-import type { WebhookSettings as CheckboxState } from '@nangohq/types';
 
 export const EnvironmentSettings: React.FC = () => {
     const env = useStore((state) => state.env);

@@ -1,8 +1,9 @@
 import { expect, describe, it } from 'vitest';
-import proxyService from './proxy.service.js.js';
-import type { HTTP_VERB, UserProvidedProxyConfiguration, InternalProxyConfiguration, OAuth2Credentials } from '../models/index.js.js';
-import type { ApplicationConstructedProxyConfiguration } from '../models/Proxy.js.js';
 import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+
+import proxyService from './proxy.service.js';
+import type { HTTP_VERB, UserProvidedProxyConfiguration, InternalProxyConfiguration, OAuth2Credentials } from '../models/index.js';
+import type { ApplicationConstructedProxyConfiguration } from '../models/Proxy.js';
 
 describe('Proxy service Construct Header Tests', () => {
     it('Should correctly construct a header using an api key with multiple headers', () => {

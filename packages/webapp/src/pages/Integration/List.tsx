@@ -6,7 +6,6 @@ import DashboardLayout from '../../layout/DashboardLayout';
 import { LeftNavBarItems } from '../../components/LeftNavBar';
 import IntegrationLogo from '../../components/ui/IntegrationLogo';
 import { requestErrorToast } from '../../utils/api';
-
 import { useStore } from '../../store';
 import { useListIntegration } from '../../hooks/useIntegration';
 

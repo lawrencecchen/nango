@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Prism } from '@mantine/prism';
 import { Loading } from '@geist-ui/core';
+import type { Connection } from '@nangohq/types';
 
 import PrismPlus from '../../components/ui/prism/PrismPlus';
 import { AuthModes } from '../../types';
-import type { Connection } from '@nangohq/types';
 import { formatDateToShortUSFormat } from '../../utils/utils';
 import SecretInput from '../../components/ui/input/SecretInput';
 import CopyButton from '../../components/ui/button/CopyButton';

@@ -1,5 +1,6 @@
 import { expect, describe, it } from 'vitest';
-import * as utils from './utils.js.js';
+
+import * as utils from './utils.js';
 
 describe('Proxy service Construct Header Tests', () => {
     it('Should correctly return true if the url is valid', () => {

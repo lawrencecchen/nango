@@ -1,14 +1,15 @@
 import yaml from 'js-yaml';
 import path from 'path';
 import fs from 'fs';
-import { dirname } from '../utils/utils.js.js';
-import { getPublicConfig } from './sync/config/config.service.js.js';
-import { loadStandardConfig } from './nango-config.service.js.js';
-import remoteFileService from './file/remote.service.js.js';
-import type { NangoConfig, NangoIntegration, NangoSyncConfig, NangoModelV1, StandardNangoConfig } from '../models/NangoConfig.js.js';
-import type { HTTP_VERB } from '../models/Generic.js.js';
-import { errorManager } from '../index.js.js';
 import { stringifyError } from '@nangohq/utils';
+
+import { dirname } from '../utils/utils.js';
+import { getPublicConfig } from './sync/config/config.service.js';
+import { loadStandardConfig } from './nango-config.service.js';
+import remoteFileService from './file/remote.service.js';
+import type { NangoConfig, NangoIntegration, NangoSyncConfig, NangoModelV1, StandardNangoConfig } from '../models/NangoConfig.js';
+import type { HTTP_VERB } from '../models/Generic.js';
+import { errorManager } from '../index.js';
 
 export interface Config {
     integrations: NangoIntegration & NangoModelV1;

@@ -1,4 +1,4 @@
-import type { Endpoint } from '../../api.js.js';
+import type { Endpoint } from '../../api.js';
 
 export interface WebhookSettings {
     alwaysSendWebhook: boolean;

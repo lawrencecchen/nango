@@ -2,13 +2,13 @@ import fs from 'fs';
 import chalk from 'chalk';
 import promptly from 'promptly';
 import path from 'path';
-
 import { nangoConfigFile } from '@nangohq/shared';
-import configService from './config.service.js.js';
-import { compileAllFiles, listFilesToCompile } from './compile.service.js.js';
-import { printDebug } from '../utils.js.js';
-import { NANGO_INTEGRATIONS_NAME } from '../constants.js.js';
-import { init, generate } from '../cli.js.js';
+
+import configService from './config.service.js';
+import { compileAllFiles, listFilesToCompile } from './compile.service.js';
+import { printDebug } from '../utils.js';
+import { NANGO_INTEGRATIONS_NAME } from '../constants.js';
+import { init, generate } from '../cli.js';
 
 class VerificationService {
     public async necessaryFilesExist({

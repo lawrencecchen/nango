@@ -34,8 +34,9 @@ import type { LogContext } from '@nangohq/logs';
 import { defaultOperationExpiration, logContextGetter } from '@nangohq/logs';
 import { records as recordsService } from '@nangohq/records';
 import type { GetOnboardingStatus } from '@nangohq/types';
-import type { RequestLocals } from '../utils/express.js.js';
-import { getOrchestrator } from '../utils/utils.js.js';
+
+import type { RequestLocals } from '../utils/express.js';
+import { getOrchestrator } from '../utils/utils.js';
 
 const logger = getLogger('Server.Onboarding');
 const orchestrator = getOrchestrator();

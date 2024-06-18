@@ -1,7 +1,5 @@
 // import { ChevronRight } from '@geist-ui/icons';
 import type { SearchOperationsData } from '@nangohq/types';
-import { cn } from '../../../utils/utils';
-import { Tag } from '../../../components/ui/label/Tag';
 import {
     CrossCircledIcon,
     Crosshair1Icon,
@@ -13,6 +11,9 @@ import {
     ResumeIcon,
     UploadIcon
 } from '@radix-ui/react-icons';
+
+import { cn } from '../../../utils/utils';
+import { Tag } from '../../../components/ui/label/Tag';
 import * as Tooltip from '../../../components/ui/Tooltip';
 
 export const OperationTag: React.FC<{ message: string; operation: Exclude<SearchOperationsData['operation'], null>; highlight?: boolean }> = ({

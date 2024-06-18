@@ -14,8 +14,9 @@ import {
     DEMO_SYNC_NAME,
     SyncConfigType
 } from '@nangohq/shared';
-import { exec } from './autoIdleDemo.js.js';
 import { nanoid, Ok } from '@nangohq/utils';
+
+import { exec } from './autoIdleDemo.js';
 
 describe('Auto Idle Demo', async () => {
     let env: Environment;

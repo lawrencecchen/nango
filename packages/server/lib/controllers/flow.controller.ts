@@ -18,8 +18,9 @@ import {
     environmentService
 } from '@nangohq/shared';
 import { logContextGetter } from '@nangohq/logs';
-import type { RequestLocals } from '../utils/express.js.js';
-import { getOrchestrator } from '../utils/utils.js.js';
+
+import type { RequestLocals } from '../utils/express.js';
+import { getOrchestrator } from '../utils/utils.js';
 
 const orchestrator = getOrchestrator();
 

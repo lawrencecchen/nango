@@ -1,14 +1,15 @@
 import * as https from 'node:https';
 import { Nango, getUserAgent } from '@nangohq/node';
-import configService from '../services/config.service.js.js';
-import paginateService from '../services/paginate.service.js.js';
-import proxyService from '../services/proxy.service.js.js';
 import type { AxiosInstance } from 'axios';
 import axios from 'axios';
-import { getPersistAPIUrl, safeStringify } from '../utils/utils.js.js';
 import type { IntegrationWithCreds } from '@nangohq/node';
-import type { UserProvidedProxyConfiguration } from '../models/Proxy.js.js';
 import { getLogger, metrics } from '@nangohq/utils';
+
+import configService from '../services/config.service.js';
+import paginateService from '../services/paginate.service.js';
+import proxyService from '../services/proxy.service.js';
+import { getPersistAPIUrl, safeStringify } from '../utils/utils.js';
+import type { UserProvidedProxyConfiguration } from '../models/Proxy.js';
 
 const logger = getLogger('SDK');
 

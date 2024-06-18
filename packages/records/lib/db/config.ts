@@ -1,5 +1,6 @@
-import { envs } from '../env.js.js';
 import type { Knex } from 'knex';
+
+import { envs } from '../env.js';
 
 export const schema = envs.RECORDS_DATABASE_SCHEMA;
 const runningMigrationOnly = process.argv.some((v) => v === 'migrate:latest');

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
+import type { GetOnboardingStatus } from '@nangohq/types';
 
 import DashboardLayout from '../../layout/DashboardLayout';
 import { LeftNavBarItems } from '../../components/LeftNavBar';
-
 import { useStore } from '../../store';
 import { useAnalyticsTrack } from '../../utils/analytics';
 import { AuthorizeBloc } from './AuthorizeBloc';
@@ -14,7 +14,6 @@ import { WebhookBloc } from './WebhookBloc';
 import { DeployBloc } from './DeployBloc';
 import Spinner from '../../components/ui/Spinner';
 import { useEnvironment } from '../../hooks/useEnvironment';
-import type { GetOnboardingStatus } from '@nangohq/types';
 import { apiFetch } from '../../utils/api';
 
 export const InteractiveDemo: React.FC = () => {

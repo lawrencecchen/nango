@@ -1,6 +1,7 @@
 import { getLogger } from '@nangohq/utils';
-import { RedisKVStore } from './kvstore/RedisStore.js.js';
-import { getRedisUrl } from './utils.js.js';
+
+import { RedisKVStore } from './kvstore/RedisStore.js';
+import { getRedisUrl } from './utils.js';
 
 const logger = getLogger('FeatureFlags');
 
@@ -15,7 +16,7 @@ class FeatureFlags {
         }
     }
 
-    async isEnabled(key: string, distinctId: string, fallback: boolean, isExcludingFlag: boolean = false): Promise<boolean> {
+    async isEnabled(key: string, distinctId: string, fallback: boolean, isExcludingFlag = false): Promise<boolean> {
         if (!this.redis) {
             return fallback;
         }

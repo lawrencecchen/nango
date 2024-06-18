@@ -37,11 +37,12 @@ import {
 } from '@nangohq/shared';
 import { records as recordsService } from '@nangohq/records';
 import { getLogger, stringifyError, errorToObject } from '@nangohq/utils';
-import integrationService from './integration.service.js.js';
 import type { LogContext } from '@nangohq/logs';
 import { logContextGetter } from '@nangohq/logs';
 import { sendSync } from '@nangohq/webhooks';
-import { bigQueryClient, slackService } from './clients.js.js';
+
+import integrationService from './integration.service.js';
+import { bigQueryClient, slackService } from './clients.js';
 
 const logger = getLogger('Jobs');
 

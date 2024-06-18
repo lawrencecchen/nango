@@ -1,8 +1,10 @@
 import { Prism } from '@mantine/prism';
 import { ChevronDown, ChevronRight } from '@geist-ui/icons';
+import { useEffect, useMemo, useState } from 'react';
+import { CheckCircledIcon, InfoCircledIcon } from '@radix-ui/react-icons';
+
 import { Language, Steps, endpointSync, model } from './utils';
 import Button from '../../components/ui/button/Button';
-import { useEffect, useMemo, useState } from 'react';
 import { curlSnippet, nodeSnippet } from '../../utils/language-snippets';
 import { useStore } from '../../store';
 import CopyButton from '../../components/ui/button/CopyButton';
@@ -10,7 +12,6 @@ import Spinner from '../../components/ui/Spinner';
 import { Bloc, Tab } from './Bloc';
 import { cn } from '../../utils/utils';
 import { useAnalyticsTrack } from '../../utils/analytics';
-import { CheckCircledIcon, InfoCircledIcon } from '@radix-ui/react-icons';
 import { apiFetch } from '../../utils/api';
 
 type Interval = ReturnType<typeof setInterval>;

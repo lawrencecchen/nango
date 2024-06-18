@@ -1,10 +1,11 @@
-import { LocalRunner } from './local.runner.js.js';
-import { RenderRunner } from './render.runner.js.js';
-import { RemoteRunner } from './remote.runner.js.js';
 import { isEnterprise, env, getLogger } from '@nangohq/utils';
 import type { ProxyAppRouter } from '@nangohq/nango-runner';
 import type { KVStore } from '@nangohq/kvstore';
 import { createKVStore } from '@nangohq/kvstore';
+
+import { RemoteRunner } from './remote.runner.js';
+import { RenderRunner } from './render.runner.js';
+import { LocalRunner } from './local.runner.js';
 
 const logger = getLogger('Runner');
 

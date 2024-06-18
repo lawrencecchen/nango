@@ -96,7 +96,7 @@ async function fetchAndUpdateUsers(nango: NangoSync, orgUnit: OrgToSync | null, 
     const baseUrlOverride = 'https://admin.googleapis.com';
     const endpoint = '/admin/directory/v1/users';
 
-    let pageToken: string = '';
+    let pageToken = '';
     do {
         const suspendedUsers: User[] = [] as User[];
 

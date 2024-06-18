@@ -4,6 +4,7 @@ import type { ChangeEvent } from 'react';
 import { HelpCircle } from '@geist-ui/icons';
 import { Tooltip } from '@geist-ui/core';
 import type { WebhookSettings as CheckboxState } from '@nangohq/types';
+
 import { apiFetch } from '../../utils/api';
 
 interface CheckboxConfig {

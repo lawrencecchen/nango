@@ -1,9 +1,10 @@
 import { z } from 'zod';
-import { asyncWrapper } from '../../../utils/asyncWrapper.js.js';
 import { userService } from '@nangohq/shared';
 import { getLogger, requireEmptyQuery, zodErrorToHTTP } from '@nangohq/utils';
-import { sendVerificationEmail } from '../../../helpers/email.js.js';
 import type { GetEmailByExpiredToken } from '@nangohq/types';
+
+import { sendVerificationEmail } from '../../../helpers/email.js';
+import { asyncWrapper } from '../../../utils/asyncWrapper.js';
 
 const logger = getLogger('Server.GetEmailByExpiredToken');
 

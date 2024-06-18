@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import type { WebUser, Signin } from '@nangohq/types';
 
 import { apiFetch, useSigninAPI } from '../../utils/api';
 import { useSignin } from '../../utils/user';
-import type { WebUser, Signin } from '@nangohq/types';
 import { MANAGED_AUTH_ENABLED } from '../../utils/utils';
 import DefaultLayout from '../../layout/DefaultLayout';
 import GoogleButton from '../../components/ui/button/Auth/Google';

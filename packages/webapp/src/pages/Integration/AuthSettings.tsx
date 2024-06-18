@@ -5,6 +5,8 @@ import { HelpCircle } from '@geist-ui/icons';
 import { PencilSquareIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import type { EnvironmentAndAccount } from '@nangohq/server';
 import { Tooltip, useModal } from '@geist-ui/core';
+import { useSWRConfig } from 'swr';
+
 import type { IntegrationConfig } from '../../types';
 import { AuthModes } from '../../types';
 import { useDeleteIntegrationAPI, useCreateIntegrationAPI, useEditIntegrationAPI, useEditIntegrationNameAPI } from '../../utils/api';
@@ -15,9 +17,7 @@ import SecretTextArea from '../../components/ui/input/SecretTextArea';
 import { formatDateToShortUSFormat, defaultCallback } from '../../utils/utils';
 import CopyButton from '../../components/ui/button/CopyButton';
 import TagsInput from '../../components/ui/input/TagsInput';
-
 import { useStore } from '../../store';
-import { useSWRConfig } from 'swr';
 
 interface AuthSettingsProps {
     integration: IntegrationConfig | null;

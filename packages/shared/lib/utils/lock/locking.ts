@@ -1,5 +1,6 @@
 import { stringifyError } from '@nangohq/utils';
-import type { KVStore } from '../kvstore/KVStore.js.js';
+
+import type { KVStore } from '../kvstore/KVStore.js';
 
 export class Locking {
     private store: KVStore;

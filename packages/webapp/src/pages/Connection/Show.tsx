@@ -4,12 +4,13 @@ import { Loading, useModal } from '@geist-ui/core';
 import { useState, useEffect, Fragment } from 'react';
 import { toast } from 'react-toastify';
 import useSWR, { useSWRConfig } from 'swr';
+import { TrashIcon } from '@heroicons/react/24/outline';
+import type { GetConnection } from '@nangohq/types';
 
 import { requestErrorToast, swrFetcher, useGetConnectionDetailsAPI, useDeleteConnectionAPI } from '../../utils/api';
 import { LeftNavBarItems } from '../../components/LeftNavBar';
 import ActionModal from '../../components/ui/ActionModal';
 import { ErrorCircle } from '../../components/ui/label/error-circle';
-import { TrashIcon } from '@heroicons/react/24/outline';
 import DashboardLayout from '../../layout/DashboardLayout';
 import Info from '../../components/ui/Info';
 import IntegrationLogo from '../../components/ui/IntegrationLogo';
@@ -21,8 +22,6 @@ import type { SyncResponse } from '../../types';
 import PageNotFound from '../PageNotFound';
 import { isHosted } from '../../utils/utils';
 import { connectSlack } from '../../utils/slack-connection';
-import type { GetConnection } from '@nangohq/types';
-
 import { useStore } from '../../store';
 import { getLogsUrl } from '../../utils/logs';
 

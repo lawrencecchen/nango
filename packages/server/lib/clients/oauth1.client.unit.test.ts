@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+
 import { extractQueryParams } from './oauth1.client.js';
 
 describe('oauth1', () => {

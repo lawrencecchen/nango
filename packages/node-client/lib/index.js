@@ -1,0 +1,794 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+import { AuthModes } from './types.js';
+import { getUserAgent, validateProxyConfiguration, validateSyncRecordConfiguration } from './utils.js';
+export const stagingHost = 'https://api-staging.nango.dev';
+export const prodHost = 'https://api.nango.dev';
+export * from './types.js';
+export { getUserAgent } from './utils.js';
+export var SyncType;
+(function (SyncType) {
+    SyncType["INITIAL"] = "INITIAL";
+    SyncType["INCREMENTAL"] = "INCREMENTAL";
+})(SyncType = SyncType || (SyncType = {}));
+export class Nango {
+    constructor(config, { userAgent } = {}) {
+        this.isSync = false;
+        this.dryRun = false;
+        config.host = config.host || prodHost;
+        this.serverUrl = config.host;
+        if (this.serverUrl.slice(-1) === '/') {
+            this.serverUrl = this.serverUrl.slice(0, -1);
+        }
+        if (!config.secretKey) {
+            throw new Error('You must specify a secret key (cf. documentation).');
+        }
+        try {
+            new URL(this.serverUrl);
+        }
+        catch (_a) {
+            throw new Error(`Invalid URL provided for the Nango host: ${this.serverUrl}`);
+        }
+        this.secretKey = config.secretKey;
+        this.connectionId = config.connectionId || '';
+        this.providerConfigKey = config.providerConfigKey || '';
+        if (config.isSync) {
+            this.isSync = config.isSync;
+        }
+        if (config.dryRun) {
+            this.dryRun = config.dryRun;
+        }
+        if (config.activityLogId) {
+            this.activityLogId = config.activityLogId;
+        }
+        this.userAgent = getUserAgent(userAgent);
+    }
+    /**
+     * =======
+     * INTEGRATIONS
+     *      LIST
+     *      GET
+     *      CREATE
+     *      UPDATE
+     *      DELETE
+     * =======
+     */
+    /**
+     * Returns a list of integrations
+     * @returns A promise that resolves with an object containing an array of integration configurations
+     */
+    listIntegrations() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const url = `${this.serverUrl}/config`;
+            const response = yield fetch(url, {
+                method: 'GET',
+                headers: this.enrichHeaders({})
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to fetch integrations: ${response.statusText}`);
+            }
+            return (yield response.json());
+        });
+    }
+    /**
+     * Returns a specific integration
+     * @param providerConfigKey - The key identifying the provider configuration on Nango
+     * @param includeIntegrationCredentials - An optional flag indicating whether to include integration credentials in the response. Default is false
+     * @returns A promise that resolves with an object containing an integration configuration
+     */
+    getIntegration(providerConfigKey, includeIntegrationCredentials = false) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const url = `${this.serverUrl}/config/${providerConfigKey}?include_creds=${includeIntegrationCredentials}`;
+            const response = yield fetch(url, {
+                method: 'GET',
+                headers: this.enrichHeaders({})
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to fetch integration: ${response.statusText}`);
+            }
+            return (yield response.json());
+        });
+    }
+    /**
+     * Creates a new integration with the specified provider and configuration key
+     * Optionally, you can provide credentials for the integration
+     * @param provider - The provider of the integration
+     * @param providerConfigKey - The key identifying the provider configuration on Nango
+     * @param credentials - Optional credentials for the integration
+     * @returns A promise that resolves with the created integration configuration
+     */
+    createIntegration(provider, providerConfigKey, credentials) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const url = `${this.serverUrl}/config`;
+            const response = yield fetch(url, {
+                method: 'POST',
+                headers: this.enrichHeaders({}),
+                body: JSON.stringify(Object.assign({ provider, provider_config_key: providerConfigKey }, credentials))
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to create integration: ${response.statusText}`);
+            }
+            return (yield response.json());
+        });
+    }
+    /**
+     * Returns a list of connections, optionally filtered by connection ID
+     * @param connectionId - Optional. The ID of the connection to retrieve details of
+     * @returns A promise that resolves with an array of connection objects
+     */
+    listConnections(connectionId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield this.listConnectionDetails(connectionId);
+            const data = yield response.json();
+            if (!response.ok) {
+                throw new Error(`Failed to list connections: ${response.statusText}`);
+            }
+            return data;
+        });
+    }
+    /**
+     * Returns a connection object, which also contains access credentials and full credentials payload
+     * @param providerConfigKey - The integration ID used to create the connection (i.e Unique Key)
+     * @param connectionId - This is the unique connection identifier used to identify this connection
+     * @param forceRefresh - Optional. When set to true, this obtains a new access token from the provider before the current token has expired
+     * @param refreshToken - Optional. When set to true, this returns the refresh token as part of the response
+     * @returns A promise that resolves with a connection object
+     */
+    getConnection(providerConfigKey, connectionId, forceRefresh, refreshToken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield this.getConnectionDetails(providerConfigKey, connectionId, forceRefresh, refreshToken);
+            const data = yield response.json();
+            if (!response.ok) {
+                throw new Error(`Failed to get connection: ${response.statusText}`);
+            }
+            return data;
+        });
+    }
+    /**
+     * @deprecated This method has been deprecated, please use the REST API to import a connection.
+     */
+    importConnection(_connectionArgs) {
+        throw new Error('This method has been deprecated, please use the REST API to import a connection.');
+    }
+    /**
+     * @deprecated This method has been deprecated, please use the REST API to import a connection.
+     */
+    createConnection(_connectionArgs) {
+        throw new Error('This method has been deprecated, please use the REST API to create a connection.');
+    }
+    /**
+     * For OAuth 2: returns the access token directly as a string
+     * For OAuth 2: If you want to obtain a new refresh token from the provider before the current token has expired,
+     * you can set the forceRefresh argument to true
+     * For OAuth 1: returns an object with 'oAuthToken' and 'oAuthTokenSecret' fields
+     * @param providerConfigKey - The integration ID used to create the connection (i.e Unique Key)
+     * @param connectionId - This is the unique connection identifier used to identify this connection
+     * @param forceRefresh - Optional. When set to true, this obtains a new access token from the provider before the current token has expired
+     */
+    getToken(providerConfigKey, connectionId, forceRefresh) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield this.getConnectionDetails(providerConfigKey, connectionId, forceRefresh);
+            const data = yield response.json();
+            switch (data.credentials.type) {
+                case AuthModes.OAuth2:
+                    return data.credentials.access_token;
+                case AuthModes.OAuth1:
+                    return {
+                        oAuthToken: data.credentials.oauth_token,
+                        oAuthTokenSecret: data.credentials.oauth_token_secret
+                    };
+                default:
+                    return data.credentials;
+            }
+        });
+    }
+    /**
+     * Get the full (fresh) credentials payload returned by the external API,
+     * which also contains access credentials
+     * @param providerConfigKey - The integration ID used to create the connection (i.e Unique Key)
+     * @param connectionId - This is the unique connection identifier used to identify this connection
+     * @param forceRefresh - Optional. When set to true, this obtains a new access token from the provider before the current token has expired
+     * @returns A promise that resolves with the raw token response
+     */
+    getRawTokenResponse(providerConfigKey, connectionId, forceRefresh) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const response = yield this.getConnectionDetails(providerConfigKey, connectionId, forceRefresh);
+            const data = yield response.json();
+            if (!response.ok) {
+                throw new Error(`Failed to get raw token response: ${response.statusText}`);
+            }
+            const credentials = data.credentials;
+            return credentials.raw;
+        });
+    }
+    /**
+     * Retrieves metadata for a given provider configuration key and connection ID
+     * @param providerConfigKey - The key identifying the provider configuration on Nango
+     * @param connectionId - The ID of the connection for which to retrieve metadata
+     * @returns A promise that resolves with the retrieved metadata
+     */
+    getMetadata(providerConfigKey, connectionId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!providerConfigKey) {
+                throw new Error('Provider Config Key is required');
+            }
+            if (!connectionId) {
+                throw new Error('Connection Id is required');
+            }
+            const response = yield this.getConnectionDetails(providerConfigKey, connectionId, false, false, {
+                'Nango-Is-Sync': true,
+                'Nango-Is-Dry-Run': this.dryRun
+            });
+            const data = yield response.json();
+            if (!response.ok) {
+                throw new Error(`Failed to get metadata: ${response.statusText}`);
+            }
+            return data.metadata;
+        });
+    }
+    /**
+     * Sets custom metadata for a connection
+     * @param providerConfigKey - The key identifying the provider configuration on Nango
+     * @param connectionId - The ID(s) of the connection(s) for which to set metadata
+     * @param metadata - The custom metadata to set
+     * @returns A promise that resolves with the Axios response from the server
+     */
+    setMetadata(providerConfigKey, connectionId, metadata) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!providerConfigKey) {
+                throw new Error('Provider Config Key is required');
+            }
+            if (!connectionId) {
+                throw new Error('Connection Id is required');
+            }
+            if (!metadata) {
+                throw new Error('Metadata is required');
+            }
+            const url = `${this.serverUrl}/connection/metadata`;
+            const response = yield fetch(url, {
+                method: 'POST',
+                headers: this.enrichHeaders(),
+                body: JSON.stringify({ metadata, connection_id: connectionId, provider_config_key: providerConfigKey })
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to set metadata: ${response.statusText}`);
+            }
+            return response;
+        });
+    }
+    /**
+     * Edits custom metadata for a connection, only overriding specified properties, not the entire metadata
+     * @param providerConfigKey - The key identifying the provider configuration on Nango
+     * @param connectionId - The ID(s) of the connection(s) for which to update metadata
+     * @param metadata - The custom metadata to update
+     * @returns A promise that resolves with the Axios response from the server
+     */
+    updateMetadata(providerConfigKey, connectionId, metadata) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!providerConfigKey) {
+                throw new Error('Provider Config Key is required');
+            }
+            if (!connectionId) {
+                throw new Error('Connection Id is required');
+            }
+            if (!metadata) {
+                throw new Error('Metadata is required');
+            }
+            const url = `${this.serverUrl}/connection/metadata`;
+            const response = yield fetch(url, {
+                method: 'PATCH',
+                headers: this.enrichHeaders(),
+                body: JSON.stringify({ metadata, connection_id: connectionId, provider_config_key: providerConfigKey })
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to update metadata: ${response.statusText}`);
+            }
+            return response;
+        });
+    }
+    /**
+     * Deletes a specific connection
+     * @param providerConfigKey - The key identifying the provider configuration on Nango
+     * @param connectionId - The ID of the connection to be deleted
+     * @returns A promise that resolves with the Axios response from the server
+     */
+    deleteConnection(providerConfigKey, connectionId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const url = `${this.serverUrl}/connection/${connectionId}?provider_config_key=${providerConfigKey}`;
+            const response = yield fetch(url, {
+                method: 'DELETE',
+                headers: this.enrichHeaders({ 'Content-Type': 'application/json' })
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to delete connection: ${response.statusText}`);
+            }
+            return response;
+        });
+    }
+    /**
+     * =======
+     * SCRIPTS
+     *      CONFIG
+     * =======
+     */
+    /**
+     * Retrieves the configuration for all integration scripts
+     * @returns A promise that resolves with an array of configuration objects for all integration scripts
+     */
+    getScriptsConfig() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const url = `${this.serverUrl}/scripts/config`;
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            const response = yield fetch(url, {
+                method: 'GET',
+                headers: this.enrichHeaders(headers)
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to get scripts config: ${response.statusText}`);
+            }
+            return (yield response.json());
+        });
+    }
+    /**
+     * =======
+     * SYNCS
+     *      GET RECORDS
+     *      TRIGGER
+     *      START
+     *      PAUSE
+     *      STATUS
+     *      GET ENVIRONMENT VARIABLES
+     * =======
+     */
+    /**
+     * @deprecated. Use listRecords() instead.
+     */
+    getRecords(config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { connectionId, providerConfigKey, model, delta, offset, limit, includeNangoMetadata, filter } = config;
+            validateSyncRecordConfiguration(config);
+            const order = (config === null || config === void 0 ? void 0 : config.order) === 'asc' ? 'asc' : 'desc';
+            let sortBy = 'id';
+            switch (config.sortBy) {
+                case 'createdAt':
+                    sortBy = 'created_at';
+                    break;
+                case 'updatedAt':
+                    sortBy = 'updated_at';
+                    break;
+            }
+            if (includeNangoMetadata) {
+                console.warn(`The includeNangoMetadata option will be deprecated soon and will be removed in a future release. Each record now has a _nango_metadata property which includes the same properties.`);
+            }
+            const includeMetadata = includeNangoMetadata || false;
+            const url = `${this.serverUrl}/sync/records/?model=${model}&order=${order}&delta=${delta || ''}&offset=${offset || ''}&limit=${limit || ''}&sort_by=${sortBy || ''}&include_nango_metadata=${includeMetadata}${filter ? `&filter=${filter}` : ''}`;
+            const headers = {
+                'Connection-Id': connectionId,
+                'Provider-Config-Key': providerConfigKey
+            };
+            const options = {
+                headers: this.enrichHeaders(headers)
+            };
+            const response = yield fetch(url, options);
+            if (!response.ok) {
+                throw new Error(`Failed to get records: ${response.statusText}`);
+            }
+            return (yield response.json());
+        });
+    }
+    /**
+     * Returns the synced data, ordered by modification date ascending
+     * If some records are updated while you paginate through this endpoint, you might see these records multiple times
+     * @param config - Configuration object for listing records
+     * @returns A promise that resolves with an object containing an array of records and a cursor for pagination
+     */
+    listRecords(config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { connectionId, providerConfigKey, model, delta, modifiedAfter, limit, filter, cursor } = config;
+            validateSyncRecordConfiguration(config);
+            const url = `${this.serverUrl}/records/?model=${model}${delta || modifiedAfter ? `&modified_after=${modifiedAfter || delta}` : ''}${limit ? `&limit=${limit}` : ''}${filter ? `&filter=${filter}` : ''}${cursor ? `&cursor=${cursor}` : ''}`;
+            const headers = {
+                'Connection-Id': connectionId,
+                'Provider-Config-Key': providerConfigKey
+            };
+            const options = {
+                headers: this.enrichHeaders(headers)
+            };
+            const response = yield fetch(url, options);
+            if (!response.ok) {
+                throw new Error(`Failed to list records: ${response.statusText}`);
+            }
+            return (yield response.json());
+        });
+    }
+    /**
+     * Triggers an additional, one-off execution of specified sync(s) for a given connection or all applicable connections if no connection is specified
+     * @param providerConfigKey - The key identifying the provider configuration on Nango
+     * @param syncs - An optional array of sync names to trigger. If empty, all applicable syncs will be triggered
+     * @param connectionId - An optional ID of the connection for which to trigger the syncs. If not provided, syncs will be triggered for all applicable connections
+     * @param fullResync - An optional flag indicating whether to perform a full resynchronization. Default is false
+     * @returns A promise that resolves when the sync trigger request is sent
+     */
+    triggerSync(providerConfigKey, syncs, connectionId, fullResync) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const url = `${this.serverUrl}/sync/trigger`;
+            if (typeof syncs === 'string') {
+                throw new Error('Syncs must be an array of strings. If it is a single sync, please wrap it in an array.');
+            }
+            const body = {
+                syncs: syncs || [],
+                provider_config_key: providerConfigKey,
+                connection_id: connectionId,
+                full_resync: fullResync
+            };
+            yield fetch(url, {
+                method: 'POST',
+                headers: this.enrichHeaders(),
+                body: JSON.stringify(body)
+            });
+        });
+    }
+    /**
+     * Starts the schedule of specified sync(s) for a given connection or all applicable connections if no connection is specified
+     * @param providerConfigKey - The key identifying the provider configuration on Nango
+     * @param syncs - An optional array of sync names to start. If empty, all applicable syncs will be started
+     * @param connectionId - An optional ID of the connection for which to start the syncs. If not provided, syncs will be started for all applicable connections
+     * @returns A promise that resolves when the sync start request is sent
+     */
+    startSync(providerConfigKey, syncs, connectionId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!providerConfigKey) {
+                throw new Error('Provider Config Key is required');
+            }
+            if (!syncs) {
+                throw new Error('Sync is required');
+            }
+            if (typeof syncs === 'string') {
+                throw new Error('Syncs must be an array of strings. If it is a single sync, please wrap it in an array.');
+            }
+            const body = {
+                syncs: syncs || [],
+                provider_config_key: providerConfigKey,
+                connection_id: connectionId
+            };
+            const url = `${this.serverUrl}/sync/start`;
+            yield fetch(url, {
+                method: 'POST',
+                headers: this.enrichHeaders(),
+                body: JSON.stringify(body)
+            });
+        });
+    }
+    /**
+     * Pauses the schedule of specified sync(s) for a given connection or all applicable connections
+     * @param providerConfigKey -The key identifying the provider configuration on Nango
+     * @param syncs - An optional array of sync names to pause. If empty, all applicable syncs will be paused
+     * @param connectionId - An optional ID of the connection for which to pause the syncs. If not provided, syncs will be paused for all applicable connections
+     * @returns A promise that resolves when the sync pause request is sent
+     */
+    pauseSync(providerConfigKey, syncs, connectionId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!providerConfigKey) {
+                throw new Error('Provider Config Key is required');
+            }
+            if (!syncs) {
+                throw new Error('Sync is required');
+            }
+            if (typeof syncs === 'string') {
+                throw new Error('Syncs must be an array of strings. If it is a single sync, please wrap it in an array.');
+            }
+            const url = `${this.serverUrl}/sync/pause`;
+            const body = {
+                syncs: syncs || [],
+                provider_config_key: providerConfigKey,
+                connection_id: connectionId
+            };
+            yield fetch(url, {
+                method: 'POST',
+                headers: this.enrichHeaders(),
+                body: JSON.stringify(body)
+            });
+        });
+    }
+    /**
+     * Get the status of specified sync(s) for a given connection or all applicable connections
+     * @param providerConfigKey - The key identifying the provider configuration on Nango
+     * @param syncs - An array of sync names to get status for, or '*' to get status for all syncs
+     * @param connectionId - An optional ID of the connection for which to get sync status. If not provided, status for all applicable connections will be retrieved
+     * @returns A promise that resolves with the status of the specified sync(s)
+     */
+    syncStatus(providerConfigKey, syncs, connectionId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!providerConfigKey) {
+                throw new Error('Provider Config Key is required');
+            }
+            if (!syncs) {
+                throw new Error('Sync is required');
+            }
+            if (typeof syncs === 'string' && syncs !== '*') {
+                throw new Error('Syncs must be an array of strings. If it is a single sync, please wrap it in an array.');
+            }
+            const url = `${this.serverUrl}/sync/status`;
+            const params = {
+                syncs: syncs === '*' ? '*' : syncs.join(','),
+                provider_config_key: providerConfigKey,
+                connection_id: connectionId
+            };
+            const response = yield fetch(`${url}?${new URLSearchParams(params)}`, { headers: this.enrichHeaders() });
+            if (!response.ok) {
+                throw new Error(`Failed to get sync status: ${response.statusText}`);
+            }
+            return (yield response.json());
+        });
+    }
+    /**
+     * Override a sync’s default frequency for a specific connection, or revert to the default frequency
+     * @param providerConfigKey - The key identifying the provider configuration on Nango
+     * @param sync - The name of the sync to update
+     * @param connectionId - The ID of the connection for which to update the sync frequency
+     * @param frequency - The new frequency to set for the sync, or null to revert to the default frequency
+     * @returns A promise that resolves with the response data after updating the sync frequency
+     */
+    updateSyncConnectionFrequency(providerConfigKey, sync, connectionId, frequency) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!providerConfigKey) {
+                throw new Error('Provider Config Key is required');
+            }
+            if (typeof sync === 'string') {
+                throw new Error('Sync must be a string.');
+            }
+            if (typeof connectionId === 'string') {
+                throw new Error('ConnectionId must be a string.');
+            }
+            if (typeof frequency !== 'string' && frequency !== null) {
+                throw new Error('Frequency must be a string or null.');
+            }
+            const url = `${this.serverUrl}/sync/update-connection-frequency`;
+            const urlWithParams = `${url}?sync=${sync}&provider_config_key=${providerConfigKey}&connection_id=${connectionId}&frequency=${frequency}`;
+            const response = yield fetch(urlWithParams, { method: 'PUT', headers: this.enrichHeaders() });
+            if (!response.ok) {
+                throw new Error(`Failed to update sync connection frequency: ${response.statusText}`);
+            }
+            return (yield response.json());
+        });
+    }
+    /**
+     * Retrieve the environment variables as added in the Nango dashboard
+     * @returns A promise that resolves with an array of environment variables
+     */
+    getEnvironmentVariables() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const url = `${this.serverUrl}/environment-variables`;
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            const response = yield fetch(url, { headers: this.enrichHeaders(headers) });
+            const data = yield response.json();
+            if (!response.ok) {
+                throw new Error(`Failed to get environment variables: ${response.statusText}`);
+            }
+            if (!data) {
+                return [];
+            }
+            return (yield response.json());
+        });
+    }
+    /**
+     * =======
+     * ACTIONS
+     *      TRIGGER
+     * =======
+     */
+    /**
+     * Triggers an action for a connection
+     * @param providerConfigKey - The key identifying the provider configuration on Nango
+     * @param connectionId - The ID of the connection for which the action should be triggered
+     * @param actionName - The name of the action to trigger
+     * @param input - An optional input data for the action
+     * @returns A promise that resolves with an object containing the response data from the triggered action
+     */
+    triggerAction(providerConfigKey, connectionId, actionName, input) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const url = `${this.serverUrl}/action/trigger`;
+            const headers = {
+                'Connection-Id': connectionId,
+                'Provider-Config-Key': providerConfigKey
+            };
+            const body = {
+                action_name: actionName,
+                input
+            };
+            const response = yield fetch(url, {
+                method: 'POST',
+                headers: this.enrichHeaders(headers),
+                body: JSON.stringify(body)
+            });
+            if (!response.ok) {
+                throw new Error(`Failed to trigger action: ${response.statusText}`);
+            }
+            return (yield response.json());
+        });
+    }
+    /**
+     * =======
+     * PROXY
+     *      GET
+     *      POST
+     *      PUT
+     *      PATCH
+     *      DELETE
+     * =======
+     */
+    /**
+     * Sends a proxied HTTP request based on the provided configuration
+     * @param config - The configuration object for the proxy request
+     * @returns A promise that resolves with the response from the proxied request
+     */
+    proxy(config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!config.connectionId && this.connectionId) {
+                config.connectionId = this.connectionId;
+            }
+            if (!config.providerConfigKey && this.providerConfigKey) {
+                config.providerConfigKey = this.providerConfigKey;
+            }
+            validateProxyConfiguration(config);
+            const { providerConfigKey, connectionId, method, retries, headers: customHeaders, baseUrlOverride, decompress, retryOn } = config;
+            const url = `${this.serverUrl}/proxy${config.endpoint[0] === '/' ? '' : '/'}${config.endpoint}`;
+            const customPrefixedHeaders = customHeaders && Object.keys(customHeaders).length > 0
+                ? Object.keys(customHeaders).reduce((acc, key) => {
+                    acc[`Nango-Proxy-${key}`] = customHeaders[key];
+                    return acc;
+                }, {})
+                : {};
+            const headers = Object.assign({ 'Connection-Id': connectionId, 'Provider-Config-Key': providerConfigKey, 'Base-Url-Override': baseUrlOverride || '', 'Nango-Is-Sync': this.isSync, 'Nango-Is-Dry-Run': this.dryRun, 'Nango-Activity-Log-Id': this.activityLogId || '' }, customPrefixedHeaders);
+            if (retries) {
+                headers['Retries'] = retries;
+            }
+            if (decompress) {
+                headers['Decompress'] = decompress;
+            }
+            if (retryOn) {
+                headers['Retry-On'] = retryOn.join(',');
+            }
+            const options = {
+                method: method === null || method === void 0 ? void 0 : method.toUpperCase(),
+                headers: this.enrichHeaders(headers)
+            };
+            if (config.data) {
+                options.body = JSON.stringify(config.data);
+            }
+            const response = yield fetch(url, options);
+            return response;
+        });
+    }
+    /**
+     * Sends a GET request using the proxy based on the provided configuration
+     * @param config - The configuration object for the GET request
+     * @returns A promise that resolves with the response from the GET request
+     */
+    get(config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.proxy(Object.assign(Object.assign({}, config), { method: 'GET' }));
+        });
+    }
+    /**
+     * Sends a POST request using the proxy based on the provided configuration
+     * @param config - The configuration object for the POST request
+     * @returns A promise that resolves with the response from the POST request
+     */
+    post(config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.proxy(Object.assign(Object.assign({}, config), { method: 'POST' }));
+        });
+    }
+    /**
+     * Sends a PATCH request using the proxy based on the provided configuration
+     * @param config - The configuration object for the PATCH request
+     * @returns A promise that resolves with the response from the PATCH request
+     */
+    patch(config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.proxy(Object.assign(Object.assign({}, config), { method: 'PATCH' }));
+        });
+    }
+    /**
+     * Sends a DELETE request using the proxy based on the provided configuration
+     * @param config - The configuration object for the DELETE request
+     * @returns A promise that resolves with the response from the DELETE request
+     */
+    delete(config) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.proxy(Object.assign(Object.assign({}, config), { method: 'DELETE' }));
+        });
+    }
+    // -- Webhooks
+    /**
+     *
+     * Verify incoming webhooks signature
+     *
+     * @param signatureInHeader The value in the header X-Nango-Signature
+     * @param jsonPayload The HTTP body as JSON
+     * @returns Whether the signature is valid
+     */
+    verifyWebhookSignature(signatureInHeader, jsonPayload) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(`${this.secretKey}${JSON.stringify(jsonPayload)}`);
+            const hashBuffer = yield crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+            return hashHex === signatureInHeader;
+        });
+    }
+    /**
+     * Retrieves details of a specific connection
+     * @param providerConfigKey - The key identifying the provider configuration on Nango
+     * @param connectionId - The ID of the connection for which to retrieve connection details
+     * @param forceRefresh - An optional flag indicating whether to force a refresh of the access tokens. Defaults to false
+     * @param refreshToken - An optional flag indicating whether to send the refresh token as part of the response. Defaults to false
+     * @param additionalHeader - Optional. Additional headers to include in the request
+     * @returns A promise that resolves with the response containing connection details
+     */
+    getConnectionDetails(providerConfigKey, connectionId, forceRefresh = false, refreshToken = false, additionalHeader = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const url = `${this.serverUrl}/connection/${connectionId}`;
+            const headers = {
+                'Content-Type': 'application/json',
+                'Nango-Is-Sync': this.isSync,
+                'Nango-Is-Dry-Run': this.dryRun
+            };
+            if (additionalHeader) {
+                Object.assign(headers, additionalHeader);
+            }
+            const params = {
+                provider_config_key: providerConfigKey,
+                force_refresh: forceRefresh,
+                refresh_token: refreshToken
+            };
+            const queryString = new URLSearchParams(params).toString();
+            const fetchUrl = `${url}?${queryString}`;
+            return fetch(fetchUrl, { headers: this.enrichHeaders(headers) });
+        });
+    }
+    /**
+     * Retrieves details of all connections from the server or details of a specific connection if a connection ID is provided
+     * @param connectionId - Optional. This is the unique connection identifier used to identify this connection
+     * @returns A promise that resolves with the response containing connection details
+     */
+    listConnectionDetails(connectionId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let url = `${this.serverUrl}/connection?`;
+            if (connectionId) {
+                url = url.concat(`connectionId=${connectionId}`);
+            }
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            return fetch(url, { headers: this.enrichHeaders(headers) });
+        });
+    }
+    /**
+     * Enriches the headers with the Authorization token
+     * @param - Optional. The headers to enrich
+     * @returns The enriched headers
+     */
+    enrichHeaders(headers = {}) {
+        const enrichedHeaders = new Headers();
+        enrichedHeaders.set('Authorization', 'Bearer ' + this.secretKey);
+        Object.entries(headers).forEach(([key, value]) => {
+            enrichedHeaders.set(key, String(value));
+        });
+        return enrichedHeaders;
+    }
+}
+//# sourceMappingURL=index.js.map

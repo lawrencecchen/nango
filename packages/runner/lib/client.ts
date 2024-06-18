@@ -1,9 +1,10 @@
 import type { CreateTRPCProxyClient } from '@trpc/client';
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
-import type { AppRouter } from './server.js.js';
 import superjson from 'superjson';
 import type { RequestInit } from 'undici';
 import { fetch, Agent } from 'undici';
+
+import type { AppRouter } from './server.js';
 
 export type ProxyAppRouter = CreateTRPCProxyClient<AppRouter>;
 

@@ -1,6 +1,7 @@
 import * as crypto from 'node:crypto';
 import { schema } from '@nangohq/database';
-import type { Environment } from '../models/Environment.js.js';
+
+import type { Environment } from '../models/Environment.js';
 
 class HmacService {
     private algorithm = 'sha256';

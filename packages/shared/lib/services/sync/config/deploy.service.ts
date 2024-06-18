@@ -1,8 +1,12 @@
 import { schema, dbNamespace } from '@nangohq/database';
-import configService from '../../config.service.js.js';
-import remoteFileService from '../../file/remote.service.js.js';
-import environmentService from '../../environment.service.js.js';
-import accountService from '../../account.service.js.js';
+import type { PostConnectionScriptByProvider } from '@nangohq/types';
+import { env } from '@nangohq/utils';
+import type { LogContext, LogContextGetter } from '@nangohq/logs';
+
+import configService from '../../config.service.js';
+import remoteFileService from '../../file/remote.service.js';
+import environmentService from '../../environment.service.js';
+import accountService from '../../account.service.js';
 import {
     createActivityLog,
     createActivityLogMessage,
@@ -11,11 +15,11 @@ import {
     createActivityLogMessageAndEnd,
     createActivityLogDatabaseErrorMessageAndEnd
 } from '../../activity/activity.service.js';
-import { getSyncsByProviderConfigAndSyncName } from '../sync.service.js.js';
-import connectionService from '../../connection.service.js.js';
-import type { LogLevel } from '../@nangohq/models/Activity.js.js';
-import { LogActionEnum } from '../@nangohq/models/Activity.js.js';
-import type { HTTP_VERB, ServiceResponse } from '../@nangohq/models/Generic.js.js';
+import { getSyncsByProviderConfigAndSyncName } from '../sync.service.js';
+import connectionService from '../../connection.service.js';
+import type { LogLevel } from '../@nangohq/models/Activity.js';
+import { LogActionEnum } from '../@nangohq/models/Activity.js';
+import type { HTTP_VERB, ServiceResponse } from '../@nangohq/models/Generic.js';
 import type {
     SyncModelSchema,
     IncomingFlowConfig,
@@ -25,18 +29,15 @@ import type {
     IncomingPreBuiltFlowConfig,
     SyncEndpoint
 } from '../@nangohq/models/Sync.js';
-import type { PostConnectionScriptByProvider } from '@nangohq/types';
-import { postConnectionScriptService } from '../post-connection.service.js.js';
-import { SyncConfigType } from '../@nangohq/models/Sync.js.js';
-import { NangoError } from '../../../utils/error.js.js';
-import telemetry, { LogTypes } from '../../../utils/telemetry.js.js';
-import { env } from '@nangohq/utils';
-import { nangoConfigFile } from '../../nango-config.service.js.js';
-import { getSyncAndActionConfigByParams, increment, getSyncAndActionConfigsBySyncNameAndConfigId } from './config.service.js.js';
-import type { LogContext, LogContextGetter } from '@nangohq/logs';
-import type { Environment } from '../@nangohq/models/Environment.js.js';
-import type { Account } from '../@nangohq/models/Admin.js.js';
-import type { Orchestrator } from '../../../clients/orchestrator.js.js';
+import { postConnectionScriptService } from '../post-connection.service.js';
+import { SyncConfigType } from '../@nangohq/models/Sync.js';
+import { NangoError } from '../../../utils/error.js';
+import telemetry, { LogTypes } from '../../../utils/telemetry.js';
+import { nangoConfigFile } from '../../nango-config.service.js';
+import { getSyncAndActionConfigByParams, increment, getSyncAndActionConfigsBySyncNameAndConfigId } from './config.service.js';
+import type { Environment } from '../@nangohq/models/Environment.js';
+import type { Account } from '../@nangohq/models/Admin.js';
+import type { Orchestrator } from '../../../clients/orchestrator.js';
 
 const TABLE = dbNamespace + 'sync_configs';
 const ENDPOINT_TABLE = dbNamespace + 'sync_endpoints';

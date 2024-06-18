@@ -1,6 +1,7 @@
-import type { KVStore } from './KVStore.js.js';
 import { createClient } from 'redis';
 import type { RedisClientType } from 'redis';
+
+import type { KVStore } from './KVStore.js';
 
 export class RedisKVStore implements KVStore {
     private client: RedisClientType;

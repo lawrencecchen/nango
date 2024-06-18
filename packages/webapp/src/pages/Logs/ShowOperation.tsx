@@ -1,17 +1,18 @@
 import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { CalendarIcon, ClockIcon, ExternalLinkIcon } from '@radix-ui/react-icons';
+import { Prism } from '@mantine/prism';
+import { useInterval } from 'react-use';
+
 import Info from '../../components/ui/Info';
 import { useGetOperation } from '../../hooks/useLogs';
 import { useStore } from '../../store';
 import { OperationTag } from './components/OperationTag';
 import { StatusTag } from './components/StatusTag';
 import { elapsedTime, formatDateToLogFormat } from '../../utils/utils';
-import { Link } from 'react-router-dom';
-import { CalendarIcon, ClockIcon, ExternalLinkIcon } from '@radix-ui/react-icons';
 import { SearchInOperation } from './components/SearchInOperation';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { ProviderTag } from './components/ProviderTag';
-import { Prism } from '@mantine/prism';
-import { useInterval } from 'react-use';
 import ClipboardButton from '../../components/ui/button/CopyButton';
 
 export const ShowOperation: React.FC<{ operationId: string }> = ({ operationId }) => {

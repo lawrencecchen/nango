@@ -1,6 +1,7 @@
 import { v4 as uuid } from 'uuid';
-import type { Account } from '../models/index.js.js';
-import accountService from '../services/account.service.js.js';
+
+import type { Account } from '../models/index.js';
+import accountService from '../services/account.service.js';
 
 export async function createAccount(): Promise<Account> {
     const acc = await accountService.getOrCreateAccount(uuid());

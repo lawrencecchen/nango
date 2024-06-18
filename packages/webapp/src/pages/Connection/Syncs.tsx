@@ -3,9 +3,6 @@ import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { HelpCircle } from '@geist-ui/icons';
 import { Loading, Tooltip, useModal, Modal } from '@geist-ui/core';
-import ActionModal from '../../components/ui/ActionModal';
-import { Tag } from '../../components/ui/label/Tag';
-import Spinner from '../../components/ui/Spinner';
 import { Link } from 'react-router-dom';
 import {
     AdjustmentsHorizontalIcon,
@@ -16,8 +13,12 @@ import {
     ArrowPathRoundedSquareIcon,
     StopCircleIcon
 } from '@heroicons/react/24/outline';
-import type { SyncResponse, RunSyncCommand } from '../../types';
 import type { Connection } from '@nangohq/types';
+
+import ActionModal from '../../components/ui/ActionModal';
+import { Tag } from '../../components/ui/label/Tag';
+import Spinner from '../../components/ui/Spinner';
+import type { SyncResponse, RunSyncCommand } from '../../types';
 import { UserFacingSyncCommand } from '../../types';
 import { formatFrequency, getRunTime, parseLatestSyncResult, formatDateToUSFormat, interpretNextRun } from '../../utils/utils';
 import Button from '../../components/ui/button/Button';

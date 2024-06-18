@@ -1,19 +1,20 @@
 import { expect, describe, it, vi } from 'vitest';
-import type { IncomingFlowConfig } from '../@nangohq/models/Sync.js.js';
-import { SyncConfigType } from '../@nangohq/models/Sync.js.js';
-import environmentService from '../../environment.service.js.js';
-import * as SyncConfigService from './config.service.js.js';
-import * as SyncService from '../sync.service.js.js';
-import * as DeployConfigService from './deploy.service.js.js';
-import connectionService from '../../connection.service.js.js';
-import configService from '../../config.service.js.js';
-import { mockAddEndTime, mockCreateActivityLog, mockUpdateSuccess } from '../../activity/mocks.js.js';
-import { mockErrorManagerReport } from '../../../utils/error.manager.mocks.js.js';
 import { logContextGetter } from '@nangohq/logs';
-import type { Environment } from '../@nangohq/models/Environment.js.js';
-import type { Account } from '../@nangohq/models/Admin.js.js';
-import { Orchestrator } from '../../../clients/orchestrator.js.js';
-import type { OrchestratorClientInterface } from '../../../clients/orchestrator.js.js';
+
+import type { IncomingFlowConfig } from '../@nangohq/models/Sync.js';
+import { SyncConfigType } from '../@nangohq/models/Sync.js';
+import environmentService from '../../environment.service.js';
+import * as SyncConfigService from './config.service.js';
+import * as SyncService from '../sync.service.js';
+import * as DeployConfigService from './deploy.service.js';
+import connectionService from '../../connection.service.js';
+import configService from '../../config.service.js';
+import { mockAddEndTime, mockCreateActivityLog, mockUpdateSuccess } from '../../activity/mocks.js';
+import { mockErrorManagerReport } from '../../../utils/error.manager.mocks.js';
+import type { Environment } from '../@nangohq/models/Environment.js';
+import type { Account } from '../@nangohq/models/Admin.js';
+import { Orchestrator } from '../../../clients/orchestrator.js';
+import type { OrchestratorClientInterface } from '../../../clients/orchestrator.js';
 
 const orchestratorClientNoop: OrchestratorClientInterface = {
     recurring: () => Promise.resolve({}) as any,

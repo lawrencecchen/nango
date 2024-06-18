@@ -1,4 +1,4 @@
-import type { TimestampsAndDeleted } from '../db.js.js';
+import type { TimestampsAndDeleted } from '../db.js';
 
 export interface IntegrationConfig extends TimestampsAndDeleted {
     id?: number;

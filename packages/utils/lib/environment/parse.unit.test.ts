@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { ENVS, parseEnvs } from './parse.js.js';
+
+import { ENVS, parseEnvs } from './parse.js';
 
 describe('parse', () => {
     it('should parse correctly', () => {

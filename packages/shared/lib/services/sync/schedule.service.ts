@@ -2,12 +2,13 @@ import db, { schema, dbNamespace } from '@nangohq/database';
 import type { Schedule as SyncSchedule, SyncCommand } from '@nangohq/models/Sync.js';
 import { ScheduleStatus, SyncCommandToScheduleStatus } from '@nangohq/models/Sync.js';
 import type { ServiceResponse } from '@nangohq/models/Generic.js';
-import { getInterval } from '../nango-config.service.js.js';
-import SyncClient from '../../clients/sync.client.js.js';
-import { createActivityLogDatabaseErrorMessageAndEnd } from '../activity/activity.service.js.js';
 import type { LogContext } from '@nangohq/logs';
 import { Ok, Err } from '@nangohq/utils';
 import type { Result } from '@nangohq/utils';
+
+import { getInterval } from '../nango-config.service.js';
+import SyncClient from '../../clients/sync.client.js';
+import { createActivityLogDatabaseErrorMessageAndEnd } from '../activity/activity.service.js';
 
 const TABLE = dbNamespace + 'sync_schedules';
 

@@ -1,8 +1,9 @@
 import { Fragment } from 'react';
+import type { EnvironmentAndAccount } from '@nangohq/server';
+
 import type { Tabs, SubTabs, EndpointResponse } from './Show';
 import EndpointRow from './components/EndpointRow';
 import HelpFooter from './components/HelpFooter';
-import type { EnvironmentAndAccount } from '@nangohq/server';
 import type { IntegrationConfig, Flow, FlowEndpoint } from '../../types';
 
 interface APIReferenceProps {

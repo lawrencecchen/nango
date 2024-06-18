@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { AdjustmentsHorizontalIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import type { EnvironmentAndAccount } from '@nangohq/server';
 import { Prism } from '@mantine/prism';
+
 import Button from '../../components/ui/button/Button';
 import CopyButton from '../../components/ui/button/CopyButton';
 import Info from '../../components/ui/Info';

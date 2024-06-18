@@ -2,7 +2,8 @@ import db from '@nangohq/database';
 import * as uuid from 'uuid';
 import type { Result } from '@nangohq/utils';
 import { isEnterprise, Ok, Err } from '@nangohq/utils';
-import type { User, InviteUser, Account } from '../models/Admin.js.js';
+
+import type { User, InviteUser, Account } from '../models/Admin.js';
 
 const VERIFICATION_EMAIL_EXPIRATION = 3 * 24 * 60 * 60 * 1000;
 const INVITE_EMAIL_EXPIRATION = 7 * 24 * 60 * 60 * 1000;
@@ -110,14 +111,7 @@ class UserService {
         return result[0];
     }
 
-    async createUser(
-        email: string,
-        name: string,
-        hashed_password: string,
-        salt: string,
-        account_id: number,
-        email_verified: boolean = true
-    ): Promise<User | null> {
+    async createUser(email: string, name: string, hashed_password: string, salt: string, account_id: number, email_verified = true): Promise<User | null> {
         const expires_at = new Date(new Date().getTime() + VERIFICATION_EMAIL_EXPIRATION);
         const result: Pick<User, 'id'>[] = await db.knex
             .from<User>('_nango_users')

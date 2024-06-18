@@ -1,6 +1,7 @@
 import { expect, describe, it } from 'vitest';
-import { getConnectionMetadataFromTokenResponse, parseConnectionConfigParamsFromTemplate, getAdditionalAuthorizationParams } from './utils.js.js';
 import type { Template as ProviderTemplate } from '@nangohq/types';
+
+import { getConnectionMetadataFromTokenResponse, parseConnectionConfigParamsFromTemplate, getAdditionalAuthorizationParams } from './utils.js';
 
 describe('Utils unit tests', () => {
     it('Should parse config params in authorization_url', () => {

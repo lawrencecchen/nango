@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react';
 import { Prism } from '@mantine/prism';
 import Nango, { AuthError } from '@nangohq/frontend';
+import { CheckCircledIcon, GitHubLogoIcon } from '@radix-ui/react-icons';
+
 import { useAnalyticsTrack } from '../../utils/analytics';
 import { Steps } from './utils';
 import Button from '../../components/ui/button/Button';
 import CopyButton from '../../components/ui/button/CopyButton';
 import { Bloc, Tab } from './Bloc';
-import { CheckCircledIcon, GitHubLogoIcon } from '@radix-ui/react-icons';
 import { apiFetch } from '../../utils/api';
 
 export const AuthorizeBloc: React.FC<{

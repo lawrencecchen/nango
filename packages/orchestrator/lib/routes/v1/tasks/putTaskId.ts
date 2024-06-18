@@ -4,7 +4,8 @@ import type { Scheduler, Task } from '@nangohq/scheduler';
 import type { ApiError, Endpoint } from '@nangohq/types';
 import type { EndpointRequest, EndpointResponse, RouteHandler, Route, Result } from '@nangohq/utils';
 import { validateRequest } from '@nangohq/utils';
-import { jsonSchema } from '../../../utils/validation.js.js';
+
+import { jsonSchema } from '../../../utils/validation.js';
 
 type PutTask = Endpoint<{
     Method: typeof method;

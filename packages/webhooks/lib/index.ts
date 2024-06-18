@@ -1,7 +1,7 @@
-export { sendAuth } from './auth.js.js';
-import { sendSync } from './sync.js.js';
+export { sendAuth } from './auth.js';
+import { sendSync } from './sync.js';
 
-export { forwardWebhook } from './forward.js.js';
+export { forwardWebhook } from './forward.js';
 
 type SendSyncParams = Parameters<typeof sendSync>[0];
 

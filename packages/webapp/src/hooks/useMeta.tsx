@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import type { GetMeta } from '@nangohq/server';
+
 import { swrFetcher } from '../utils/api';
 
 export function useMeta() {

@@ -1,5 +1,6 @@
-import type { InternalNango as Nango } from './post-connection.js.js';
 import axios from 'axios';
+
+import type { InternalNango as Nango } from './post-connection.js';
 
 export default async function execute(nango: Nango) {
     const query = `

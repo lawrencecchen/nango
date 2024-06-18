@@ -1,11 +1,12 @@
 import { taskStates } from '@nangohq/scheduler';
 import type { Schedule, Task } from '@nangohq/scheduler';
-import type { OrchestratorSchedule, OrchestratorTask } from './types.js.js';
-import { TaskAction, TaskWebhook, TaskPostConnection, TaskSync } from './types.js.js';
 import { z } from 'zod';
 import { Err, Ok, stringifyError } from '@nangohq/utils';
 import type { Result } from '@nangohq/utils';
-import { jsonSchema } from '../utils/validation.js.js';
+
+import { TaskAction, TaskWebhook, TaskPostConnection, TaskSync } from './types.js';
+import type { OrchestratorSchedule, OrchestratorTask } from './types.js';
+import { jsonSchema } from '../utils/validation.js';
 
 export const commonSchemaArgsFields = {
     connection: z.object({

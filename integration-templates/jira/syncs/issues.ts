@@ -2,8 +2,8 @@ import type { NangoSync, JiraIssue } from '../../types/lib/integration/asana.js'
 
 export default async function fetchData(nango: NangoSync) {
     const jql = nango.lastSyncDate ? `updated >= "${nango.lastSyncDate?.toISOString().slice(0, -8).replace('T', ' ')}"` : '';
-    let startAt: number = 0;
-    const maxResults: number = 50;
+    let startAt = 0;
+    const maxResults = 50;
     const fields = 'id,key,summary,description,issuetype,status,assignee,reporter,project,created,updated';
     const cloudId = await getCloudId(nango);
 

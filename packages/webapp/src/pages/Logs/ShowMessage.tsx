@@ -1,10 +1,11 @@
 import type { MessageRow } from '@nangohq/types';
 import { useMemo } from 'react';
-import { formatDateToLogFormat } from '../../utils/utils';
 import { Prism } from '@mantine/prism';
+import { CalendarIcon } from '@radix-ui/react-icons';
+
+import { formatDateToLogFormat } from '../../utils/utils';
 import { LevelTag } from './components/LevelTag';
 import { Tag } from '../../components/ui/label/Tag';
-import { CalendarIcon } from '@radix-ui/react-icons';
 
 export const ShowMessage: React.FC<{ message: MessageRow }> = ({ message }) => {
     const createdAt = useMemo(() => {

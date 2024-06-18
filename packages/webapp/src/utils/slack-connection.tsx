@@ -1,4 +1,5 @@
 import Nango from '@nangohq/frontend';
+
 import { apiFetch } from './api';
 
 export const connectSlack = async ({

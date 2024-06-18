@@ -1,6 +1,7 @@
 import { ChatBubbleBottomCenterIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
-import { useStore } from '../store';
 import { useMemo } from 'react';
+
+import { useStore } from '../store';
 import { useSignout } from '../utils/user';
 import Info from './ui/Info';
 

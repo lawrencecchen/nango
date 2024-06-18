@@ -1,6 +1,10 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
-import { db } from '../db/client.js.js';
+import { Err, Ok, retry } from '@nangohq/utils';
+import type { Result } from '@nangohq/utils';
+import type { Knex } from 'knex';
+
+import { db } from '../db/client.js';
 import type {
     FormattedRecord,
     FormattedRecordWithMetadata,
@@ -10,13 +14,10 @@ import type {
     UnencryptedRecord,
     UpsertSummary
 } from '../types.js';
-import { decryptRecord, decryptRecords, encryptRecords } from '../utils/encryption.js.js';
-import { RECORDS_TABLE } from '../constants.js.js';
-import { removeDuplicateKey, getUniqueId } from '../helpers/uniqueKey.js.js';
-import { logger } from '../utils/logger.js.js';
-import { Err, Ok, retry } from '@nangohq/utils';
-import type { Result } from '@nangohq/utils';
-import type { Knex } from 'knex';
+import { decryptRecord, decryptRecords, encryptRecords } from '../utils/encryption.js';
+import { RECORDS_TABLE } from '../constants.js';
+import { removeDuplicateKey, getUniqueId } from '../helpers/uniqueKey.js';
+import { logger } from '../utils/logger.js';
 
 dayjs.extend(utc);
 

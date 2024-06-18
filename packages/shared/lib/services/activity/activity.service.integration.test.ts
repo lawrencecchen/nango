@@ -1,7 +1,8 @@
 import { expect, describe, it, beforeAll } from 'vitest';
 import db, { multipleMigrations } from '@nangohq/database';
-import * as ActivityService from './activity.service.js.js';
 import type { ActivityLog } from '@nangohq/models/Activity.js';
+
+import * as ActivityService from './activity.service.js';
 
 describe('Activity service integration tests', () => {
     beforeAll(async () => {

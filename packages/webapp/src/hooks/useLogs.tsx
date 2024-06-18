@@ -1,6 +1,7 @@
 import type { GetOperation, SearchFilters, SearchMessages, SearchOperations } from '@nangohq/types';
 import { useEffect, useRef, useState } from 'react';
 import useSWR from 'swr';
+
 import { apiFetch, swrFetcher } from '../utils/api';
 import { slidePeriod } from '../utils/logs';
 

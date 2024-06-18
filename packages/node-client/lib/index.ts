@@ -21,14 +21,14 @@ import type {
     SyncStatusResponse,
     UpdateSyncFrequencyResponse
 } from './types.js';
-import { AuthModes } from './types.js.js';
-import { getUserAgent, validateProxyConfiguration, validateSyncRecordConfiguration } from './utils.js.js';
+import { AuthModes } from './types.js';
+import { getUserAgent, validateProxyConfiguration, validateSyncRecordConfiguration } from './utils.js';
 
 export const stagingHost = 'https://api-staging.nango.dev';
 export const prodHost = 'https://api.nango.dev';
 
-export * from './types.js.js';
-export { getUserAgent } from './utils.js.js';
+export * from './types.js';
+export { getUserAgent } from './utils.js';
 
 type CustomHeaders = Record<string, string | number | boolean>;
 
@@ -119,10 +119,7 @@ export class Nango {
      * @param includeIntegrationCredentials - An optional flag indicating whether to include integration credentials in the response. Default is false
      * @returns A promise that resolves with an object containing an integration configuration
      */
-    public async getIntegration(
-        providerConfigKey: string,
-        includeIntegrationCredentials: boolean = false
-    ): Promise<{ config: Integration | IntegrationWithCreds }> {
+    public async getIntegration(providerConfigKey: string, includeIntegrationCredentials = false): Promise<{ config: Integration | IntegrationWithCreds }> {
         const url = `${this.serverUrl}/config/${providerConfigKey}?include_creds=${includeIntegrationCredentials}`;
         const response = await fetch(url, {
             method: 'GET',
@@ -881,8 +878,8 @@ export class Nango {
     private async getConnectionDetails(
         providerConfigKey: string,
         connectionId: string,
-        forceRefresh: boolean = false,
-        refreshToken: boolean = false,
+        forceRefresh = false,
+        refreshToken = false,
         additionalHeader: Record<string, any> = {}
     ): Promise<Response> {
         const url = `${this.serverUrl}/connection/${connectionId}`;

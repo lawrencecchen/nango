@@ -1,4 +1,5 @@
 import type { ClassValue } from 'clsx';
+
 import { DebugMode } from '../components/DebugMode';
 import type { LeftNavBarItems } from '../components/LeftNavBar';
 import LeftNavBar from '../components/LeftNavBar';

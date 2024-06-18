@@ -1,7 +1,8 @@
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { getFileToCompile, listFilesToCompile } from './compile.service.js';
 import { fileURLToPath } from 'node:url';
+
+import { getFileToCompile, listFilesToCompile } from './compile.service.js';
 
 const thisFolder = path.dirname(fileURLToPath(import.meta.url));
 

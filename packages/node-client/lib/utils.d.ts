@@ -1,0 +1,14 @@
+import type { ProxyConfiguration, GetRecordsRequestConfig } from './types.js';
+/**
+ * Validates the configuration for a proxy call
+ * @param config - Configuration object for the proxy call
+ * @throws If required parameters are missing in the configuration
+ */
+export declare const validateProxyConfiguration: (config: ProxyConfiguration) => void;
+/**
+ * Validates the configuration for fetching sync records
+ * @param config - Configuration object for fetching sync records
+ * @throws If required parameters are missing in the configuration
+ */
+export declare const validateSyncRecordConfiguration: (config: GetRecordsRequestConfig) => void;
+export declare function getUserAgent(userAgent?: string): string;

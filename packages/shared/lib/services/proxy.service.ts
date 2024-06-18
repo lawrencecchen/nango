@@ -2,15 +2,15 @@ import type { AxiosError, AxiosResponse, AxiosRequestConfig, ParamsSerializerOpt
 import { axiosInstance as axios, getLogger } from '@nangohq/utils';
 import { backOff } from 'exponential-backoff';
 import FormData from 'form-data';
-import type { ApiKeyCredentials, BasicApiCredentials } from '../models/Auth.js.js';
-import type { HTTP_VERB, ServiceResponse } from '../models/Generic.js.js';
-import type { ResponseType, ApplicationConstructedProxyConfiguration, UserProvidedProxyConfiguration, InternalProxyConfiguration } from '../models/Proxy.js.js';
-
-import configService from './config.service.js.js';
-import { interpolateIfNeeded, connectionCopyWithParsedConnectionConfig, mapProxyBaseUrlInterpolationFormat } from '../utils/utils.js.js';
-import { NangoError } from '../utils/error.js.js';
-import type { ActivityLogMessage } from '../models/Activity.js.js';
 import type { Template as ProviderTemplate } from '@nangohq/types';
+
+import type { ApiKeyCredentials, BasicApiCredentials } from '../models/Auth.js';
+import type { HTTP_VERB, ServiceResponse } from '../models/Generic.js';
+import type { ResponseType, ApplicationConstructedProxyConfiguration, UserProvidedProxyConfiguration, InternalProxyConfiguration } from '../models/Proxy.js';
+import configService from './config.service.js';
+import { interpolateIfNeeded, connectionCopyWithParsedConnectionConfig, mapProxyBaseUrlInterpolationFormat } from '../utils/utils.js';
+import { NangoError } from '../utils/error.js';
+import type { ActivityLogMessage } from '../models/Activity.js';
 
 const logger = getLogger('Proxy');
 

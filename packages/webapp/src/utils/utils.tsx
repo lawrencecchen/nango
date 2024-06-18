@@ -2,11 +2,12 @@ import { clsx } from 'clsx';
 import type { ClassValue } from 'clsx';
 import { format } from 'date-fns';
 import { twMerge } from 'tailwind-merge';
+
 import type { Flow, SyncResult, NangoSyncModel } from '../types';
 
-export const localhostUrl: string = 'http://localhost:3003';
-export const stagingUrl: string = 'https://api-staging.nango.dev';
-export const prodUrl: string = 'https://api.nango.dev';
+export const localhostUrl = 'http://localhost:3003';
+export const stagingUrl = 'https://api-staging.nango.dev';
+export const prodUrl = 'https://api.nango.dev';
 
 export const syncDocs = 'https://docs.nango.dev/integrate/guides/sync-data-from-an-api';
 

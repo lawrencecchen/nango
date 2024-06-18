@@ -3,9 +3,10 @@ import type { EventHint } from '@sentry/node';
 import sentry from '@sentry/node';
 import type { Tracer } from 'dd-trace';
 import type { ErrorEvent } from '@sentry/types';
-import { NangoError } from './error.js';
 import type { Response, Request } from 'express';
 import { getLogger, isCloud, stringifyError } from '@nangohq/utils';
+
+import { NangoError } from './error.js';
 import environmentService from '../services/environment.service.js';
 import accountService from '../services/account.service.js';
 import userService from '../services/user.service.js';

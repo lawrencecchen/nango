@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import type { ListIntegration } from '@nangohq/server';
+
 import { swrFetcher } from '../utils/api';
 
 export function useListIntegration(env: string) {

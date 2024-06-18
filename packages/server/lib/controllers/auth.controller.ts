@@ -1,14 +1,15 @@
 import type { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import util from 'util';
-import { resetPasswordSecret } from '../utils/utils.js.js';
 import jwt from 'jsonwebtoken';
-import EmailClient from '../clients/email.client.js.js';
 import type { User } from '@nangohq/shared';
 import { baseUrl, basePublicUrl, getLogger, Err, Ok } from '@nangohq/utils';
 import type { Result } from '@nangohq/utils';
-import { getWorkOSClient } from '../clients/workos.client.js.js';
 import { userService, accountService, errorManager, ErrorSourceEnum, NangoError } from '@nangohq/shared';
+
+import { getWorkOSClient } from '../clients/workos.client.js';
+import EmailClient from '../clients/email.client.js';
+import { resetPasswordSecret } from '../utils/utils.js';
 
 export interface WebUser {
     id: number;

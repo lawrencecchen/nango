@@ -1,13 +1,14 @@
 import { expect, describe, it, vi } from 'vitest';
-import type { SyncRunConfig } from './run.service.js.js';
-import SyncRun from './run.service.js.js';
-import environmentService from '../environment.service.js.js';
-import LocalFileService from '../file/local.service.js.js';
 import { SyncType } from '@nangohq/models/Sync.js';
-import * as configService from './config/config.service.js.js';
 import type { IntegrationServiceInterface } from '@nangohq/models/Sync.js';
 import type { Environment } from '@nangohq/models/Environment.js';
 import type { Account } from '@nangohq/models/Admin.js';
+
+import type { SyncRunConfig } from './run.service.js';
+import SyncRun from './run.service.js';
+import environmentService from '../environment.service.js';
+import LocalFileService from '../file/local.service.js';
+import * as configService from './config/config.service.js';
 
 class integrationServiceMock implements IntegrationServiceInterface {
     async runScript() {

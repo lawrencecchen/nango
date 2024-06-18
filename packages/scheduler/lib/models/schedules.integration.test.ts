@@ -1,8 +1,9 @@
 import { expect, describe, it, beforeEach, afterEach } from 'vitest';
-import * as schedules from './schedules.js.js';
-import { getTestDbClient } from '../db/helpers.test.js.js';
-import type { Schedule } from '../types.js.js';
 import type knex from 'knex';
+
+import * as schedules from './schedules.js';
+import { getTestDbClient } from '../db/helpers.test.js';
+import type { Schedule } from '../types.js';
 
 describe('Schedules', () => {
     const dbClient = getTestDbClient();

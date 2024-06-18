@@ -1,0 +1,125 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+import { describe, beforeAll, it, expect, vi } from 'vitest';
+import { afterEach } from 'node:test';
+import { deleteIndex, migrateMapping } from '../es/helpers.js';
+import { getOperation, listOperations, listMessages, setTimeoutForAll } from './messages.js';
+import { logContextGetter } from './logContextGetter.js';
+import { getFormattedMessage } from './helpers.js';
+import { indexMessages } from '../es/schema.js';
+const account = { id: 1234, name: 'test' };
+const environment = { id: 5678, name: 'dev' };
+const operationPayload = { operation: { type: 'sync', action: 'run' }, message: '' };
+describe('model', () => {
+    beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield deleteIndex({ prefix: indexMessages.index });
+        yield migrateMapping();
+    }));
+    afterEach(() => {
+        vi.clearAllMocks();
+    });
+    describe('operations', () => {
+        it('should list nothing', () => __awaiter(void 0, void 0, void 0, function* () {
+            const list = yield listOperations({ accountId: account.id, limit: 1, states: ['all'] });
+            expect(list).toStrictEqual({
+                cursor: null,
+                count: 0,
+                items: []
+            });
+        }));
+        it('should paginate', () => __awaiter(void 0, void 0, void 0, function* () {
+            yield logContextGetter.create(operationPayload, { start: false, account, environment }, { logToConsole: false });
+            yield logContextGetter.create(operationPayload, { start: false, account, environment }, { logToConsole: false });
+            // First operation = should list one
+            const list1 = yield listOperations({ accountId: account.id, limit: 1, states: ['all'] });
+            expect(list1.count).toBe(2);
+            expect(list1.items).toHaveLength(1);
+            expect(list1.cursor).toBeDefined();
+            // Second operation = should list the second one
+            const list2 = yield listOperations({ accountId: account.id, limit: 1, states: ['all'], cursor: list1.cursor });
+            expect(list2.count).toBe(2);
+            expect(list2.items).toHaveLength(1);
+            expect(list2.cursor).toBeDefined();
+            expect(list2.items[0].id).not.toEqual(list1.items[0].id);
+            // Empty results
+            // When we get the second operation, it's not possible to know if there are more after so we still need to return a cursor
+            const list3 = yield listOperations({ accountId: account.id, limit: 1, states: ['all'], cursor: list2.cursor });
+            expect(list3.count).toBe(2);
+            expect(list3.items).toHaveLength(0);
+            expect(list3.cursor).toBeNull();
+        }));
+        it('should timeout old operations', () => __awaiter(void 0, void 0, void 0, function* () {
+            const ctx1 = yield logContextGetter.create(getFormattedMessage(Object.assign(Object.assign({}, operationPayload), { expiresAt: new Date(Date.now() - 86400 * 1000).toISOString() })), { account, environment }, { logToConsole: false });
+            const ctx2 = yield logContextGetter.create(getFormattedMessage(Object.assign(Object.assign({}, operationPayload), { expiresAt: new Date(Date.now() + 86400 * 1000).toISOString() })), { account, environment }, { logToConsole: false });
+            yield setTimeoutForAll({ wait: true });
+            const op1 = yield getOperation({ id: ctx1.id });
+            expect(op1.state).toBe('timeout');
+            const op2 = yield getOperation({ id: ctx2.id });
+            expect(op2.state).toBe('running');
+        }));
+    });
+    describe('messages', () => {
+        it('should list nothing', () => __awaiter(void 0, void 0, void 0, function* () {
+            const list = yield listMessages({ limit: 10, parentId: '1' });
+            expect(list).toStrictEqual({
+                cursorAfter: null,
+                cursorBefore: null,
+                count: 0,
+                items: []
+            });
+        }));
+        it('should paginate', () => __awaiter(void 0, void 0, void 0, function* () {
+            var _a, _b;
+            const ctx = yield logContextGetter.create(operationPayload, { start: false, account, environment }, { logToConsole: false });
+            yield ctx.info('1');
+            yield ctx.info('2');
+            yield ctx.info('3');
+            yield ctx.info('4');
+            // Should list 2 rows
+            const list1 = yield listMessages({ limit: 2, parentId: ctx.id });
+            expect(list1.count).toBe(4);
+            expect(list1.items).toHaveLength(2);
+            expect(list1.cursorBefore).toBeDefined();
+            expect(list1.cursorAfter).toBeDefined();
+            // After:  Should list 2 more rows
+            const list2 = yield listMessages({ limit: 2, parentId: ctx.id, cursorAfter: list1.cursorAfter });
+            expect(list2.count).toBe(4);
+            expect(list2.items).toHaveLength(2);
+            expect(list2.cursorAfter).toBeDefined();
+            expect(list2.items[0].id).not.toEqual(list1.items[0].id);
+            // After: Empty results
+            // When we get the second operation, it's not possible to know if there are more after so we still need to return a cursor
+            const list3 = yield listMessages({ limit: 1, parentId: ctx.id, cursorAfter: list2.cursorAfter });
+            expect(list3.count).toBe(4);
+            expect(list3.items).toHaveLength(0);
+            expect(list2.cursorAfter).toBeDefined();
+            // Before: Should list 0 rows before
+            const list4 = yield listMessages({ limit: 2, parentId: ctx.id, cursorBefore: list1.cursorBefore });
+            expect(list4.count).toBe(4);
+            expect(list4.items).toHaveLength(0);
+            expect(list4.cursorBefore).toBeNull();
+            expect(list4.cursorAfter).toBeDefined();
+            // Insert a new row
+            yield ctx.info('4');
+            yield ctx.info('5');
+            // Before: Should list 1 rows before
+            const list5 = yield listMessages({ limit: 2, parentId: ctx.id, cursorBefore: list1.cursorBefore });
+            expect(list5.count).toBe(6);
+            expect(list5.items).toHaveLength(2);
+            expect((_a = list5.items[0]) === null || _a === void 0 ? void 0 : _a.message).toBe('5');
+            expect((_b = list5.items[1]) === null || _b === void 0 ? void 0 : _b.message).toBe('4');
+            expect(list5.cursorBefore).toBeDefined();
+            expect(list5.cursorAfter).toBeDefined();
+            expect(list5.items[0].id).not.toEqual(list1.items[0].id);
+            expect(list5.cursorBefore).not.toEqual(list1.cursorBefore);
+        }));
+    });
+});
+//# sourceMappingURL=messages.integration.test.js.map

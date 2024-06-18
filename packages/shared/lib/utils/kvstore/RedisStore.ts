@@ -1,6 +1,7 @@
-import type { KVStore } from './KVStore.js.js';
 import { createClient } from 'redis';
 import type { RedisClientType } from 'redis';
+
+import type { KVStore } from './KVStore.js';
 
 export class RedisKVStore implements KVStore {
     private client: RedisClientType;
@@ -21,7 +22,7 @@ export class RedisKVStore implements KVStore {
         return this.client.get(key);
     }
 
-    public async set(key: string, value: string, canOverride: boolean = true, ttlInMs: number = 0): Promise<void> {
+    public async set(key: string, value: string, canOverride = true, ttlInMs = 0): Promise<void> {
         const options: any = {};
         if (ttlInMs > 0) {
             options['PX'] = ttlInMs;

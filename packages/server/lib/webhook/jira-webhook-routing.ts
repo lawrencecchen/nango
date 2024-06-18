@@ -1,5 +1,6 @@
-import type { WebhookHandler } from './types.js.js';
 import type { LogContextGetter } from '@nangohq/logs';
+
+import type { WebhookHandler } from './types.js';
 
 const route: WebhookHandler = async (nango, integration, _headers, body, _rawBody, logContextGetter: LogContextGetter) => {
     if (Array.isArray(body)) {

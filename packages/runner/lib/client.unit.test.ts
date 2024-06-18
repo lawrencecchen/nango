@@ -1,6 +1,7 @@
 import { expect, describe, it, beforeAll } from 'vitest';
-import { getRunnerClient } from './client.js.js';
-import { server } from './server.js.js';
+
+import { getRunnerClient } from './client.js';
+import { server } from './server.js';
 
 describe('Runner client', () => {
     const port = 3095;

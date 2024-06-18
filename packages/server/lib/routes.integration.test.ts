@@ -2,7 +2,8 @@ import { migrateLogsMapping } from '@nangohq/logs';
 import { seeders } from '@nangohq/shared';
 import { multipleMigrations } from '@nangohq/database';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { runServer } from './utils/tests.js.js';
+
+import { runServer } from './utils/tests.js';
 
 let api: Awaited<ReturnType<typeof runServer>>;
 describe('GET /logs', () => {

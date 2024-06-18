@@ -3,25 +3,9 @@ import type { StringValue } from 'ms';
 import type { LogContext, LogContextGetter } from '@nangohq/logs';
 import { Err, Ok, stringifyError, metrics } from '@nangohq/utils';
 import type { Result } from '@nangohq/utils';
-import { NangoError } from '../utils/error.js.js';
-import telemetry, { LogTypes } from '../utils/telemetry.js.js';
-import type { RunnerOutput } from '../models/Runner.js.js';
-import type { NangoConnection, Connection as NangoFullConnection } from '../models/Connection.js.js';
-import {
-    createActivityLog,
-    createActivityLogMessage,
-    createActivityLogMessageAndEnd,
-    updateSuccess as updateSuccessActivityLog
-} from '../services/activity/activity.service.js';
-import { SYNC_TASK_QUEUE, WEBHOOK_TASK_QUEUE } from '../constants.js.js';
 import { v4 as uuid } from 'uuid';
-import featureFlags from '../utils/featureflags.js.js';
-import errorManager, { ErrorSourceEnum } from '../utils/error.manager.js.js';
-import type { Config as ProviderConfig } from '../models/Provider.js.js';
 import type { LogLevel } from '@nangohq/types';
-import SyncClient from './sync.client.js.js';
 import type { Client as TemporalClient } from '@temporalio/client';
-import { LogActionEnum } from '../models/Activity.js.js';
 import type {
     ExecuteReturn,
     ExecuteActionProps,
@@ -34,16 +18,33 @@ import type {
     SchedulesReturn,
     OrchestratorSchedule
 } from '@nangohq/nango-orchestrator';
-import type { Account } from '../models/Admin.js.js';
-import type { Environment } from '../models/Environment.js.js';
-import type { NangoIntegrationData, Sync, SyncConfig } from '../models/index.js.js';
-import { SyncCommand } from '../models/index.js.js';
 import tracer from 'dd-trace';
-import { clearLastSyncDate } from '../services/sync/sync.service.js.js';
-import { isSyncJobRunning } from '../services/sync/job.service.js.js';
-import { updateSyncScheduleFrequency } from '../services/sync/schedule.service.js.js';
-import { getSyncConfigRaw } from '../services/sync/config/config.service.js.js';
-import environmentService from '../services/environment.service.js.js';
+
+import { NangoError } from '../utils/error.js';
+import telemetry, { LogTypes } from '../utils/telemetry.js';
+import type { RunnerOutput } from '../models/Runner.js';
+import type { NangoConnection, Connection as NangoFullConnection } from '../models/Connection.js';
+import {
+    createActivityLog,
+    createActivityLogMessage,
+    createActivityLogMessageAndEnd,
+    updateSuccess as updateSuccessActivityLog
+} from '../services/activity/activity.service.js';
+import { SYNC_TASK_QUEUE, WEBHOOK_TASK_QUEUE } from '../constants.js';
+import featureFlags from '../utils/featureflags.js';
+import errorManager, { ErrorSourceEnum } from '../utils/error.manager.js';
+import type { Config as ProviderConfig } from '../models/Provider.js';
+import SyncClient from './sync.client.js';
+import { LogActionEnum } from '../models/Activity.js';
+import type { Account } from '../models/Admin.js';
+import type { Environment } from '../models/Environment.js';
+import type { NangoIntegrationData, Sync, SyncConfig } from '../models/index.js';
+import { SyncCommand } from '../models/index.js';
+import { clearLastSyncDate } from '../services/sync/sync.service.js';
+import { isSyncJobRunning } from '../services/sync/job.service.js';
+import { updateSyncScheduleFrequency } from '../services/sync/schedule.service.js';
+import { getSyncConfigRaw } from '../services/sync/config/config.service.js';
+import environmentService from '../services/environment.service.js';
 
 async function getTemporal(): Promise<TemporalClient> {
     const instance = await SyncClient.getInstance();
@@ -155,7 +156,7 @@ export class Orchestrator {
                     ...(activeSpan ? { childOf: activeSpan } : {})
                 });
                 try {
-                    const groupKey: string = 'action';
+                    const groupKey = 'action';
                     const executionId = `${groupKey}:environment:${connection.environment_id}:connection:${connection.id}:action:${actionName}:at:${new Date().toISOString()}:${uuid()}`;
                     const parsedInput = input ? JSON.parse(JSON.stringify(input)) : null;
                     const args = {
@@ -397,7 +398,7 @@ export class Orchestrator {
                     ...(activeSpan ? { childOf: activeSpan } : {})
                 });
                 try {
-                    const groupKey: string = 'webhook';
+                    const groupKey = 'webhook';
                     const executionId = `${groupKey}:environment:${connection.environment_id}:connection:${connection.id}:webhook:${webhookName}:at:${new Date().toISOString()}:${uuid()}`;
                     const parsedInput = input ? JSON.parse(JSON.stringify(input)) : null;
                     const args = {
@@ -557,7 +558,7 @@ export class Orchestrator {
                     ...(activeSpan ? { childOf: activeSpan } : {})
                 });
                 try {
-                    const groupKey: string = 'post-connection-script';
+                    const groupKey = 'post-connection-script';
                     const executionId = `${groupKey}:environment:${connection.environment_id}:connection:${connection.id}:post-connection-script:${name}:at:${new Date().toISOString()}:${uuid()}`;
                     const args = {
                         postConnectionName: name,

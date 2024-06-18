@@ -1,10 +1,11 @@
 import { z } from 'zod';
-import { asyncWrapper } from '../../../utils/asyncWrapper.js.js';
 import crypto from 'crypto';
 import util from 'util';
 import { getLogger, isCloud, requireEmptyQuery, zodErrorToHTTP } from '@nangohq/utils';
 import { analytics, AnalyticsTypes, userService, accountService } from '@nangohq/shared';
 import type { WebUser, SignupWithToken } from '@nangohq/types';
+
+import { asyncWrapper } from '../../../utils/asyncWrapper.js';
 
 const logger = getLogger('Server.SignupWithToken');
 

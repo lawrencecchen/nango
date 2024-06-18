@@ -1,5 +1,6 @@
 import { Modal } from '@geist-ui/core';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+
 import Spinner from './Spinner';
 import Button from './button/Button';
 

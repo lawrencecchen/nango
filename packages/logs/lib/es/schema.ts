@@ -1,6 +1,7 @@
 import type { estypes } from '@elastic/elasticsearch';
 import type { MessageRow } from '@nangohq/types';
-import { envs } from '../env.js.js';
+
+import { envs } from '../env.js';
 
 const props: Record<keyof MessageRow, estypes.MappingProperty> = {
     id: { type: 'keyword' },

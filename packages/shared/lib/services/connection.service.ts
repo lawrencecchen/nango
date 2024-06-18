@@ -1,29 +1,30 @@
 import jwt from 'jsonwebtoken';
 import type { Knex } from '@nangohq/database';
 import db, { schema, dbNamespace } from '@nangohq/database';
-import analytics, { AnalyticsTypes } from '../utils/analytics.js.js';
-import type { Config as ProviderConfig, AuthCredentials, OAuth1Credentials, Account, Environment } from '../models/index.js.js';
+import type { Metadata, ActiveLogIds, Template as ProviderTemplate, TemplateOAuth2 as ProviderTemplateOAuth2, AuthModeType } from '@nangohq/types';
+import { getLogger, stringifyError, Ok, Err, axiosInstance as axios } from '@nangohq/utils';
+import type { Result } from '@nangohq/utils';
+import type { LogContext, LogContextGetter } from '@nangohq/logs';
+
+import analytics, { AnalyticsTypes } from '../utils/analytics.js';
+import type { Config as ProviderConfig, AuthCredentials, OAuth1Credentials, Account, Environment } from '../models/index.js';
 import {
     createActivityLogMessageAndEnd,
     updateSuccess as updateSuccessActivityLog,
     createActivityLogAndLogMessage
 } from '../services/activity/activity.service.js';
-import type { ActivityLogMessage, ActivityLog, LogLevel } from '../models/Activity.js.js';
-import { LogActionEnum } from '../models/Activity.js.js';
-import providerClient from '../clients/provider.client.js.js';
-import configService from './config.service.js.js';
-import syncManager from './sync/manager.service.js.js';
-import environmentService from '../services/environment.service.js.js';
-import { getFreshOAuth2Credentials } from '../clients/oauth2.client.js.js';
-import { NangoError } from '../utils/error.js.js';
-
-import type { ConnectionConfig, Connection, StoredConnection, BaseConnection, NangoConnection } from '../models/Connection.js.js';
-import type { Metadata, ActiveLogIds, Template as ProviderTemplate, TemplateOAuth2 as ProviderTemplateOAuth2, AuthModeType } from '@nangohq/types';
-import { getLogger, stringifyError, Ok, Err, axiosInstance as axios } from '@nangohq/utils';
-import type { Result } from '@nangohq/utils';
-import type { ServiceResponse } from '../models/Generic.js.js';
-import encryptionManager from '../utils/encryption.manager.js.js';
-import telemetry, { LogTypes } from '../utils/telemetry.js.js';
+import type { ActivityLogMessage, ActivityLog, LogLevel } from '../models/Activity.js';
+import { LogActionEnum } from '../models/Activity.js';
+import providerClient from '../clients/provider.client.js';
+import configService from './config.service.js';
+import syncManager from './sync/manager.service.js';
+import environmentService from '../services/environment.service.js';
+import { getFreshOAuth2Credentials } from '../clients/oauth2.client.js';
+import { NangoError } from '../utils/error.js';
+import type { ConnectionConfig, Connection, StoredConnection, BaseConnection, NangoConnection } from '../models/Connection.js';
+import type { ServiceResponse } from '../models/Generic.js';
+import encryptionManager from '../utils/encryption.manager.js';
+import telemetry, { LogTypes } from '../utils/telemetry.js';
 import type {
     AppCredentials,
     AppStoreCredentials,
@@ -34,14 +35,13 @@ import type {
     BasicApiCredentials,
     ConnectionUpsertResponse
 } from '../models/Auth.js';
-import { interpolateStringFromObject, parseTokenExpirationDate, isTokenExpired, getRedisUrl } from '../utils/utils.js.js';
-import { Locking } from '../utils/lock/locking.js.js';
-import { InMemoryKVStore } from '../utils/kvstore/InMemoryStore.js.js';
-import { RedisKVStore } from '../utils/kvstore/RedisStore.js.js';
-import type { KVStore } from '../utils/kvstore/KVStore.js.js';
-import type { LogContext, LogContextGetter } from '@nangohq/logs';
-import { CONNECTIONS_WITH_SCRIPTS_CAP_LIMIT } from '../constants.js.js';
-import type { Orchestrator } from '../clients/orchestrator.js.js';
+import { interpolateStringFromObject, parseTokenExpirationDate, isTokenExpired, getRedisUrl } from '../utils/utils.js';
+import { Locking } from '../utils/lock/locking.js';
+import { InMemoryKVStore } from '../utils/kvstore/InMemoryStore.js';
+import { RedisKVStore } from '../utils/kvstore/RedisStore.js';
+import type { KVStore } from '../utils/kvstore/KVStore.js';
+import { CONNECTIONS_WITH_SCRIPTS_CAP_LIMIT } from '../constants.js';
+import type { Orchestrator } from '../clients/orchestrator.js';
 
 const logger = getLogger('Connection');
 const ACTIVE_LOG_TABLE = dbNamespace + 'active_logs';

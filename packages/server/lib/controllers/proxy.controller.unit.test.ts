@@ -1,6 +1,7 @@
 import { expect, describe, it } from 'vitest';
-import { parseHeaders } from './proxy.controller.js.js';
 import type { Request } from 'express';
+
+import { parseHeaders } from './proxy.controller.js';
 
 describe('Proxy Controller Construct URL Tests', () => {
     it('Should parse headers that starts with Nango-Proxy or nango-proxy', () => {

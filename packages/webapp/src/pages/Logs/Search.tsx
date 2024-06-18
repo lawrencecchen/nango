@@ -1,21 +1,4 @@
-import { LeftNavBarItems } from '../../components/LeftNavBar';
-import DashboardLayout from '../../layout/DashboardLayout';
-import { useStore } from '../../store';
-import Info from '../../components/ui/Info';
-import { useSearchOperations } from '../../hooks/useLogs';
-import * as Table from '../../components/ui/Table';
 import { getCoreRowModel, useReactTable, flexRender } from '@tanstack/react-table';
-
-import { MultiSelect } from '../../components/MultiSelect';
-import {
-    columns,
-    connectionsDefaultOptions,
-    integrationsDefaultOptions,
-    statusDefaultOptions,
-    statusOptions,
-    syncsDefaultOptions,
-    typesDefaultOptions
-} from './constants';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type {
     SearchOperations,
@@ -26,12 +9,30 @@ import type {
     SearchOperationsSync,
     SearchOperationsType
 } from '@nangohq/types';
+import { Link, useSearchParams } from 'react-router-dom';
+import { useDebounce, useIntersection, useInterval, usePreviousDistinct } from 'react-use';
+import type { DateRange } from 'react-day-picker';
+
+import { LeftNavBarItems } from '../../components/LeftNavBar';
+import DashboardLayout from '../../layout/DashboardLayout';
+import { useStore } from '../../store';
+import Info from '../../components/ui/Info';
+import { useSearchOperations } from '../../hooks/useLogs';
+import * as Table from '../../components/ui/Table';
+import { MultiSelect } from '../../components/MultiSelect';
+import {
+    columns,
+    connectionsDefaultOptions,
+    integrationsDefaultOptions,
+    statusDefaultOptions,
+    statusOptions,
+    syncsDefaultOptions,
+    typesDefaultOptions
+} from './constants';
 import Spinner from '../../components/ui/Spinner';
 // import { Input } from '../../components/ui/input/Input';
 // import { MagnifyingGlassIcon } from '@radix-ui/react-icons';
 import { formatQuantity, stringArrayEqual } from '../../utils/utils';
-import { Link, useSearchParams } from 'react-router-dom';
-import { useDebounce, useIntersection, useInterval, usePreviousDistinct } from 'react-use';
 import { SearchableMultiSelect } from './components/SearchableMultiSelect';
 import { TypesSelect } from './components/TypesSelect';
 import { DatePicker } from './components/DatePicker';
@@ -39,7 +40,6 @@ import Button from '../../components/ui/button/Button';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { OperationDrawer } from './components/OperationDrawer';
 import { OperationRow } from './components/OperationRow';
-import type { DateRange } from 'react-day-picker';
 import { getPresetRange, matchPresetFromRange, slidePeriod } from '../../utils/logs';
 
 const limit = 20;

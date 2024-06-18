@@ -1,8 +1,9 @@
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useState } from 'react';
-import { baseUrl } from '../utils/utils';
 import Nango, { AuthError } from '@nangohq/frontend';
+
+import { baseUrl } from '../utils/utils';
 
 export default function AuthLink() {
     const [serverErrorMessage, setServerErrorMessage] = useState('');

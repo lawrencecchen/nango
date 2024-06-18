@@ -1,6 +1,7 @@
 import { Outlet, Navigate } from 'react-router-dom';
-import { useMeta } from '../hooks/useMeta';
 import { useEffect, useState } from 'react';
+
+import { useMeta } from '../hooks/useMeta';
 import { useStore } from '../store';
 import { useAnalyticsIdentify } from '../utils/analytics';
 import { useUser } from '../hooks/useUser';

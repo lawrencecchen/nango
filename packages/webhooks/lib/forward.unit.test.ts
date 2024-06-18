@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { vi, expect, describe, it, beforeEach } from 'vitest';
-import { sendAuth } from './auth.js.js';
 import { axiosInstance } from '@nangohq/utils';
 import type { Connection, Environment, ExternalWebhook } from '@nangohq/types';
 import * as logPackage from '@nangohq/logs';
+
+import { sendAuth } from './auth.js';
 
 const spy = vi.spyOn(axiosInstance, 'post');
 

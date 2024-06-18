@@ -1,6 +1,7 @@
 import type { Endpoint } from '@nangohq/types';
 import type { RequestHandler, Request, Response, NextFunction } from 'express';
 import { isAsyncFunction } from 'util/types';
+
 import type { RequestLocals } from './express.js';
 
 export function asyncWrapper<TEndpoint extends Endpoint<any>>(

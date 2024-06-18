@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import debounce from 'lodash/debounce';
 import { useNavigate } from 'react-router-dom';
 import { MagnifyingGlassIcon, BookOpenIcon } from '@heroicons/react/24/outline';
+import { useSWRConfig } from 'swr';
 
 import { useGetIntegrationDetailsAPI, useGetProvidersAPI, useCreateEmptyIntegrationAPI } from '../../utils/api';
 import { LeftNavBarItems } from '../../components/LeftNavBar';
@@ -10,7 +11,6 @@ import DashboardLayout from '../../layout/DashboardLayout';
 import type { AuthModes } from '../../types';
 import IntegrationLogo from '../../components/ui/IntegrationLogo';
 import { useStore } from '../../store';
-import { useSWRConfig } from 'swr';
 
 interface Provider {
     name: string;

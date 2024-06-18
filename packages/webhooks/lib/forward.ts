@@ -1,6 +1,7 @@
 import type { NangoForwardWebhookBody, ExternalWebhook, Account, Environment, IntegrationConfig } from '@nangohq/types';
 import type { LogContextGetter } from '@nangohq/logs';
-import { deliver, shouldSend } from './utils.js.js';
+
+import { deliver, shouldSend } from './utils.js';
 
 export const forwardWebhook = async ({
     integration,

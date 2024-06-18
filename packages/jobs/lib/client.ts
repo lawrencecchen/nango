@@ -1,7 +1,8 @@
 import type { CreateTRPCProxyClient } from '@trpc/client';
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
-import type { AppRouter } from './server.js.js';
 import superjson from 'superjson';
+
+import type { AppRouter } from './server.js';
 
 export function getJobsClient(url: string): CreateTRPCProxyClient<AppRouter> {
     return createTRPCProxyClient<AppRouter>({

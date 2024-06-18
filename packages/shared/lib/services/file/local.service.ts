@@ -3,11 +3,12 @@ import fs from 'fs';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import archiver from 'archiver';
-import errorManager, { ErrorSourceEnum } from '../../utils/error.manager.js.js';
-import { NangoError } from '../../utils/error.js.js';
 import { LogActionEnum } from '@nangohq/models/Activity.js';
 import type { StandardNangoConfig, LayoutMode } from '@nangohq/models/NangoConfig.js';
-import { nangoConfigFile, SYNC_FILE_EXTENSION } from '../nango-config.service.js.js';
+
+import errorManager, { ErrorSourceEnum } from '../../utils/error.manager.js';
+import { NangoError } from '../../utils/error.js';
+import { nangoConfigFile, SYNC_FILE_EXTENSION } from '../nango-config.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

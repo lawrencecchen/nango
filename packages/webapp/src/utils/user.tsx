@@ -1,8 +1,9 @@
+import { useNavigate } from 'react-router-dom';
+import { useSWRConfig } from 'swr';
+
 import storage, { LocalStorageKeys } from '../utils/local-storage';
 import { useLogoutAPI } from '../utils/api';
-import { useNavigate } from 'react-router-dom';
 import { useAnalyticsIdentify, useAnalyticsReset } from './analytics';
-import { useSWRConfig } from 'swr';
 
 export interface User {
     id: number;

@@ -1,11 +1,12 @@
+import { Prism } from '@mantine/prism';
+import { useMemo, useState } from 'react';
+import { CheckCircledIcon } from '@radix-ui/react-icons';
+
 import Button from '../../components/ui/button/Button';
 import { Bloc, Tab } from './Bloc';
 import { Steps, endpointSync, model, providerConfigKey } from './utils';
-import { Prism } from '@mantine/prism';
-import { useMemo, useState } from 'react';
 import { cn } from '../../utils/utils';
 import { useAnalyticsTrack } from '../../utils/analytics';
-import { CheckCircledIcon } from '@radix-ui/react-icons';
 import { apiFetch } from '../../utils/api';
 
 type File = 'github-issues-demo.ts' | 'nango.yaml';

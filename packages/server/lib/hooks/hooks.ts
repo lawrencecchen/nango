@@ -25,14 +25,15 @@ import type {
     RecentlyFailedConnection
 } from '@nangohq/shared';
 import { getLogger, Ok, Err, isHosted } from '@nangohq/utils';
-import { getOrchestrator, getOrchestratorClient } from '../utils/utils.js.js';
 import type { Environment, IntegrationConfig, Template as ProviderTemplate } from '@nangohq/types';
 import type { Result } from '@nangohq/utils';
 import type { LogContext, LogContextGetter } from '@nangohq/logs';
 import { logContextGetter } from '@nangohq/logs';
-import postConnection from './connection/post-connection.js.js';
-import { externalPostConnection } from './connection/external-post-connection.js.js';
 import { sendAuth as sendAuthWebhook } from '@nangohq/webhooks';
+
+import postConnection from './connection/post-connection.js';
+import { externalPostConnection } from './connection/external-post-connection.js';
+import { getOrchestrator, getOrchestratorClient } from '../utils/utils.js';
 
 const logger = getLogger('hooks');
 const orchestrator = getOrchestrator();

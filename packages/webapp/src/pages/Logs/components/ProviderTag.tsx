@@ -1,4 +1,5 @@
 import type { SearchMessagesData } from '@nangohq/types';
+
 import IntegrationLogo from '../../../components/ui/IntegrationLogo';
 
 export const ProviderTag: React.FC<{ msg: SearchMessagesData }> = ({ msg }) => {

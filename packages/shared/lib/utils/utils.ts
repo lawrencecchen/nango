@@ -1,9 +1,10 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { isEnterprise, isStaging, isProd, localhostUrl, cloudHost, stagingHost } from '@nangohq/utils';
-import type { Environment } from '../models/Environment.js.js';
-import environmentService from '../services/environment.service.js.js';
-import type { Connection } from '../models/Connection.js.js';
+
+import type { Environment } from '../models/Environment.js';
+import environmentService from '../services/environment.service.js';
+import type { Connection } from '../models/Connection.js';
 
 export { cloudHost, stagingHost };
 

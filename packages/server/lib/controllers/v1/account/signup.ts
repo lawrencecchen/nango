@@ -1,11 +1,12 @@
 import { z } from 'zod';
-import { asyncWrapper } from '../../../utils/asyncWrapper.js.js';
 import crypto from 'crypto';
 import util from 'util';
-import { sendVerificationEmail } from '../../../helpers/email.js.js';
 import { getLogger, requireEmptyQuery, zodErrorToHTTP } from '@nangohq/utils';
 import { userService, accountService } from '@nangohq/shared';
 import type { Signup } from '@nangohq/types';
+
+import { sendVerificationEmail } from '../../../helpers/email.js';
+import { asyncWrapper } from '../../../utils/asyncWrapper.js';
 
 const logger = getLogger('Server.Signup');
 

@@ -4,14 +4,15 @@ import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import type { DumpOptions } from 'js-yaml';
 import { SyncConfigType } from '@nangohq/shared';
-import { init, generate } from './cli.js.js';
-import { exampleSyncName } from './constants.js.js';
-import configService from './services/config.service.js.js';
-import { compileAllFiles, compileSingleFile, getFileToCompile } from './services/compile.service.js.js';
-import { getNangoRootPath, printDebug } from './utils.js.js';
-import parserService from './services/parser.service.js.js';
-import { copyDirectoryAndContents } from './tests/helpers.js.js';
-import modelService from './services/model.service.js.js';
+
+import { init, generate } from './cli.js';
+import { exampleSyncName } from './constants.js';
+import configService from './services/config.service.js';
+import { compileAllFiles, compileSingleFile, getFileToCompile } from './services/compile.service.js';
+import { getNangoRootPath, printDebug } from './utils.js';
+import parserService from './services/parser.service.js';
+import { copyDirectoryAndContents } from './tests/helpers.js';
+import modelService from './services/model.service.js';
 
 interface Integration {
     type: string;
@@ -597,7 +598,6 @@ describe('generate function tests', () => {
         expect(true).toBe(true);
         const modelsFile = await fs.promises.readFile(`${dir}/models.ts`, 'utf8');
         expect(modelsFile).toContain(`gender: 'male' | Other`);
-        
     });
 
     it('should correctly interpret a union types, array types, and record types', async () => {

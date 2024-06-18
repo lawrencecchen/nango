@@ -2,9 +2,10 @@ import md5 from 'md5';
 import * as uuid from 'uuid';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc.js';
-import type { FormattedRecord, UnencryptedRecordData } from '../types.js.js';
 import { Err, Ok } from '@nangohq/utils';
 import type { Result } from '@nangohq/utils';
+
+import type { FormattedRecord, UnencryptedRecordData } from '../types.js';
 
 dayjs.extend(utc);
 

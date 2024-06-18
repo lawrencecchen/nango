@@ -1,0 +1,1 @@
+{"version":3,"file":"failing-sync.js","sourceRoot":"","sources":["failing-sync.ts"],"names":[],"mappings":";;;;;;;;;AAEA,MAAM,CAAC,OAAO,UAAgB,SAAS,CAAC,KAAgB;;QACpD,MAAM,MAAM,GAAG,KAAK,CAAC,GAAG,CAAC;YACrB,QAAQ,EAAE,KAAK;SAClB,CAAC,CAAC;QAEH,OAAO,MAAM,CAAC;IAClB,CAAC;CAAA"}

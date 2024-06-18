@@ -1,4 +1,4 @@
-import { DatabaseClient } from './client.js.js';
+import { DatabaseClient } from './client.js';
 
 export const getTestDbClient = () =>
     new DatabaseClient({

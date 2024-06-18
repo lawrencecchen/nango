@@ -1,6 +1,7 @@
-import Button from '../../../components/ui/button/Button';
 import { useMemo, useState } from 'react';
 import { CrossCircledIcon } from '@radix-ui/react-icons';
+
+import Button from '../../../components/ui/button/Button';
 import { Popover, PopoverContent, PopoverTrigger } from '../../../components/ui/Popover';
 import { Command, CommandCheck, CommandEmpty, CommandGroup, CommandItem, CommandList } from '../../../components/ui/Command';
 import { typesOptions } from '../constants';

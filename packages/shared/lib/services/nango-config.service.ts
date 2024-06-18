@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import yaml from 'js-yaml';
 import type { StringValue } from 'ms';
 import ms from 'ms';
+
 import type {
     NangoConfig,
     NangoConfigV1,
@@ -17,11 +18,11 @@ import type {
     NangoIntegrationDataV2,
     LayoutMode
 } from '../models/NangoConfig.js';
-import type { HTTP_VERB, ServiceResponse } from '../models/Generic.js.js';
-import { SyncType, SyncConfigType } from '../models/Sync.js.js';
-import localFileService from './file/local.service.js.js';
-import { NangoError } from '../utils/error.js.js';
-import { isJsOrTsType } from '../utils/utils.js.js';
+import type { HTTP_VERB, ServiceResponse } from '../models/Generic.js';
+import { SyncType, SyncConfigType } from '../models/Sync.js';
+import localFileService from './file/local.service.js';
+import { NangoError } from '../utils/error.js';
+import { isJsOrTsType } from '../utils/utils.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

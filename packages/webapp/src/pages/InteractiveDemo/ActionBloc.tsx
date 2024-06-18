@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Prism } from '@mantine/prism';
+import { CheckCircledIcon, ExternalLinkIcon } from '@radix-ui/react-icons';
+
 import { Language, Steps, actionName, endpointAction } from './utils';
 import Button from '../../components/ui/button/Button';
 import { Bloc, Tab } from './Bloc';
 import { cn } from '../../utils/utils';
 import CopyButton from '../../components/ui/button/CopyButton';
 import { useAnalyticsTrack } from '../../utils/analytics';
-import { CheckCircledIcon, ExternalLinkIcon } from '@radix-ui/react-icons';
 import { curlSnippet, nodeActionSnippet } from '../../utils/language-snippets';
 import { useStore } from '../../store';
 import { useMeta } from '../../hooks/useMeta';

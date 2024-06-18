@@ -7,11 +7,11 @@ interface Params {
 }
 
 export default async function fetchData(nango: NangoSync) {
-    const MAX_IN_PAGE: number = 10;
+    const MAX_IN_PAGE = 10;
 
-    let page: number = 1;
-    let allPages: number = 1;
-    let start: number = 0;
+    let page = 1;
+    let allPages = 1;
+    let start = 0;
 
     const connection = await nango.getConnection();
 

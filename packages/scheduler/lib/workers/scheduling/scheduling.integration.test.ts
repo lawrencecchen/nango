@@ -1,11 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { dueSchedules } from './scheduling.js.js';
-import { getTestDbClient } from '../../db/helpers.test.js.js';
 import { DbSchedule, SCHEDULES_TABLE } from '@nangohq/models/schedules.js';
 import { uuidv7 } from 'uuidv7';
 import type knex from 'knex';
-import type { Schedule, ScheduleState, Task, TaskState } from '../../types.js.js';
 import { TASKS_TABLE, DbTask } from '@nangohq/models/tasks.js';
+
+import type { Schedule, ScheduleState, Task, TaskState } from '../../types.js';
+import { getTestDbClient } from '../../db/helpers.test.js';
+import { dueSchedules } from './scheduling.js';
 
 describe('dueSchedules', () => {
     const dbClient = getTestDbClient();

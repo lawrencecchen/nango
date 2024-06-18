@@ -1,6 +1,7 @@
 import type { JsonValue } from 'type-fest';
-import type { TaskProps } from './models/tasks.js.js';
-import type { ScheduleProps } from './models/schedules.js.js';
+
+import type { TaskProps } from './models/tasks.js';
+import type { ScheduleProps } from './models/schedules.js';
 
 export const taskStates = ['CREATED', 'STARTED', 'SUCCEEDED', 'FAILED', 'EXPIRED', 'CANCELLED'] as const;
 export type TaskState = (typeof taskStates)[number];

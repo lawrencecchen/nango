@@ -1,6 +1,6 @@
-import type { ApiError, Endpoint } from '../../api.js.js';
-import type { Connection } from '../db.js.js';
-import type { ActiveLog } from '../../notification/active-logs/db.js.js';
+import type { ApiError, Endpoint } from '../../api.js';
+import type { Connection } from '../db.js';
+import type { ActiveLog } from '../../notification/active-logs/db.js';
 
 export type GetConnection = Endpoint<{
     Method: 'GET';

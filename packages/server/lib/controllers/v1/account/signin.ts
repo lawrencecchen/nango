@@ -1,8 +1,9 @@
 import { z } from 'zod';
-import { asyncWrapper } from '../../../utils/asyncWrapper.js.js';
 import { requireEmptyQuery, zodErrorToHTTP } from '@nangohq/utils';
-import { getUserFromSession } from '../../../utils/utils.js.js';
 import type { WebUser, Signin } from '@nangohq/types';
+
+import { asyncWrapper } from '../../../utils/asyncWrapper.js';
+import { getUserFromSession } from '../../../utils/utils.js';
 
 const validation = z
     .object({

@@ -1,6 +1,7 @@
 import type { AuthModeType, AuthOperationType } from '@nangohq/types';
-import type { SyncResult, SyncType } from './Sync.js.js';
-import type { FailedConnectionError } from './Connection.js.js';
+
+import type { SyncResult, SyncType } from './Sync.js';
+import type { FailedConnectionError } from './Connection.js';
 
 export enum WebhookType {
     SYNC = 'sync',

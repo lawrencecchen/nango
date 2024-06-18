@@ -2,13 +2,6 @@ import type { Request, Response, NextFunction } from 'express';
 import * as crypto from 'node:crypto';
 import * as uuid from 'uuid';
 import simpleOauth2 from 'simple-oauth2';
-import { OAuth1Client } from '../clients/oauth1.client.js.js';
-import {
-    getAdditionalAuthorizationParams,
-    getConnectionMetadataFromCallbackRequest,
-    missesInterpolationParam,
-    getConnectionMetadataFromTokenResponse
-} from '../utils/utils.js';
 import type {
     LogLevel,
     Config as ProviderConfig,
@@ -47,14 +40,22 @@ import {
     ErrorSourceEnum
 } from '@nangohq/shared';
 import type { Template as ProviderTemplate, TemplateOAuth2 as ProviderTemplateOAuth2 } from '@nangohq/types';
-import publisher from '../clients/publisher.client.js.js';
-import * as WSErrBuilder from '../utils/web-socket-error.js.js';
-import oAuthSessionService from '../services/oauth-session.service.js.js';
 import type { LogContext } from '@nangohq/logs';
 import { defaultOperationExpiration, logContextGetter } from '@nangohq/logs';
 import { errorToObject, stringifyError } from '@nangohq/utils';
-import type { RequestLocals } from '../utils/express.js.js';
-import { connectionCreated as connectionCreatedHook, connectionCreationFailed as connectionCreationFailedHook } from '../hooks/hooks.js.js';
+
+import publisher from '../clients/publisher.client.js';
+import * as WSErrBuilder from '../utils/web-socket-error.js';
+import oAuthSessionService from '../services/oauth-session.service.js';
+import {
+    getAdditionalAuthorizationParams,
+    getConnectionMetadataFromCallbackRequest,
+    missesInterpolationParam,
+    getConnectionMetadataFromTokenResponse
+} from '../utils/utils.js';
+import { OAuth1Client } from '../clients/oauth1.client.js';
+import type { RequestLocals } from '../utils/express.js';
+import { connectionCreated as connectionCreatedHook, connectionCreationFailed as connectionCreationFailedHook } from '../hooks/hooks.js';
 
 class OAuthController {
     public async oauthRequest(req: Request, res: Response<any, Required<RequestLocals>>, _next: NextFunction) {

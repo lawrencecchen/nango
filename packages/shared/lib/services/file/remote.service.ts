@@ -4,12 +4,13 @@ import { CopyObjectCommand, PutObjectCommand, GetObjectCommand, S3Client, Delete
 import { Readable } from 'stream';
 import archiver from 'archiver';
 import { isCloud, isEnterprise, isLocal, isTest } from '@nangohq/utils';
-import { NangoError } from '../../utils/error.js.js';
-import errorManager, { ErrorSourceEnum } from '../../utils/error.manager.js.js';
 import { LogActionEnum } from '@nangohq/models/Activity.js';
 import type { ServiceResponse } from '@nangohq/models/Generic.js';
-import { nangoConfigFile } from '../nango-config.service.js.js';
-import localFileService from './local.service.js.js';
+
+import { NangoError } from '../../utils/error.js';
+import errorManager, { ErrorSourceEnum } from '../../utils/error.manager.js';
+import { nangoConfigFile } from '../nango-config.service.js';
+import localFileService from './local.service.js';
 
 let client: S3Client | null = null;
 let useS3 = !isLocal && !isTest;

@@ -1,10 +1,11 @@
 import { externalWebhookService, configService, environmentService, telemetry, LogTypes, LogActionEnum } from '@nangohq/shared';
-import { internalNango } from './internal-nango.js.js';
 import { getLogger } from '@nangohq/utils';
-import * as webhookHandlers from './index.js.js';
-import type { WebhookHandlersMap, WebhookResponse } from './types.js.js';
 import type { LogContextGetter } from '@nangohq/logs';
 import { forwardWebhook } from '@nangohq/webhooks';
+
+import { internalNango } from './internal-nango.js';
+import * as webhookHandlers from './index.js';
+import type { WebhookHandlersMap, WebhookResponse } from './types.js';
 
 const logger = getLogger('Webhook.Manager');
 

@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
+import { Cross1Icon } from '@radix-ui/react-icons';
+
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from '../../../components/ui/Drawer';
 import { ShowOperation } from '../ShowOperation';
-import { Cross1Icon } from '@radix-ui/react-icons';
 
 const drawerWidth = '1034px';
 export const OperationDrawer: React.FC<{ operationId: string; onClose: (open: boolean, operationId: string) => void }> = ({ operationId, onClose }) => {

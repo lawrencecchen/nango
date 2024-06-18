@@ -1,6 +1,7 @@
 import { forwardRef, useCallback, useState } from 'react';
 import { EyeIcon, EyeSlashIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import classNames from 'classnames';
+
 import CopyButton from '../button/CopyButton';
 
 type SecretInputProps = Omit<JSX.IntrinsicElements['input'], 'defaultValue'> & {

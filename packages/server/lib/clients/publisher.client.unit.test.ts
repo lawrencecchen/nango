@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { WebSocketClientId } from './publisher.client.js';
-import { Publisher } from './publisher.client.js';
 import type { WebSocket } from 'ws';
 import * as uuid from 'uuid';
+
+import type { WebSocketClientId } from './publisher.client.js';
+import { Publisher } from './publisher.client.js';
 
 const mockWebsocket = () => {
     const mock = {} as any;

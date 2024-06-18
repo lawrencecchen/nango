@@ -1,4 +1,4 @@
-import type { NangoError } from '../utils/error.js.js';
+import type { NangoError } from '../utils/error.js';
 
 export type HTTP_VERB = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 

@@ -1,6 +1,7 @@
-import type { AsanaTask } from '@nangohq/types/lib/integration/asana';
-import { toTask } from '../mappers/to-task.js.js';
-import { ActionError, NangoAction } from '@nangohq/shared/lib/sdk/sync';
+import type { AsanaTask } from '@nangohq/types/lib/integration/asana.js';
+import { ActionError, NangoAction } from '@nangohq/shared/lib/sdk/sync.js';
+
+import { toTask } from '../mappers/to-task.js';
 
 export default async function runAction(nango: NangoAction, input: any): Promise<AsanaTask> {
     if (!input.parent && !input.projects) {

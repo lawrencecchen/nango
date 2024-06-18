@@ -10,12 +10,12 @@ import {
     UserGroupIcon,
     ArrowRightOnRectangleIcon as LogoutIcon
 } from '@heroicons/react/24/outline';
+import { RocketIcon } from '@radix-ui/react-icons';
 
 import { useStore } from '../store';
 import { isLocal, isCloud, isEnterprise } from '../utils/utils';
 import { useMeta } from '../hooks/useMeta';
 import { useSignout } from '../utils/user';
-import { RocketIcon } from '@radix-ui/react-icons';
 import { useEnvironment } from '../hooks/useEnvironment';
 import { useConnections } from '../hooks/useConnections';
 

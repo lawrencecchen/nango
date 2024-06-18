@@ -1,22 +1,23 @@
 import { expect, describe, it, beforeAll, afterAll } from 'vitest';
 import db, { multipleMigrations } from '@nangohq/database';
-import type { SyncRunConfig } from './run.service.js.js';
-import SyncRun from './run.service.js.js';
 import { SyncStatus, SyncType } from '@nangohq/models/Sync.js';
-import * as jobService from './job.service.js.js';
 import type { IntegrationServiceInterface, Sync, Job as SyncJob, SyncResult } from '@nangohq/models/Sync.js';
 import type { Connection } from '@nangohq/models/Connection.js';
 import type { SendSyncParams } from '@nangohq/webhooks';
 import { LogContext, logContextGetter } from '@nangohq/logs';
 import type { UnencryptedRecordData, ReturnedRecord } from '@nangohq/records';
 import { records as recordsService, format as recordsFormatter, migrate as migrateRecords, clearDbTestsOnly as clearRecordsDb } from '@nangohq/records';
-import { createEnvironmentSeed } from '../../seeders/environment.seeder.js.js';
-import { createConnectionSeeds } from '../../seeders/connection.seeder.js.js';
-import { createSyncSeeds } from '../../seeders/sync.seeder.js.js';
-import { createSyncJobSeeds } from '../../seeders/sync-job.seeder.js.js';
-import connectionService from '../connection.service.js.js';
-import { createActivityLog } from '../activity/activity.service.js.js';
-import { SlackService } from '../notification/slack.service.js.js';
+
+import * as jobService from './job.service.js';
+import SyncRun from './run.service.js';
+import type { SyncRunConfig } from './run.service.js';
+import { createEnvironmentSeed } from '../../seeders/environment.seeder.js';
+import { createConnectionSeeds } from '../../seeders/connection.seeder.js';
+import { createSyncSeeds } from '../../seeders/sync.seeder.js';
+import { createSyncJobSeeds } from '../../seeders/sync-job.seeder.js';
+import connectionService from '../connection.service.js';
+import { createActivityLog } from '../activity/activity.service.js';
+import { SlackService } from '../notification/slack.service.js';
 
 class integrationServiceMock implements IntegrationServiceInterface {
     async runScript() {
@@ -320,7 +321,7 @@ const verifySyncRun = async (
     newRecords: UnencryptedRecordData[],
     trackDeletes: boolean,
     expectedResult: SyncResult,
-    softDelete: boolean = false
+    softDelete = false
 ): Promise<{ connection: Connection; model: string; sync: Sync; activityLogId: number; records: ReturnedRecord[] }> => {
     // Write initial records
     const { connection, model, sync, activityLogId } = await populateRecords(initialRecords);

@@ -1,5 +1,5 @@
 import type { NangoSync, AsanaWorkspace, AsanaUser, User } from '../../types/lib/integration/asana.js';
-import { toUser } from '../mappers/to-user.js.js';
+import { toUser } from '../mappers/to-user.js';
 
 export default async function fetchData(nango: NangoSync): Promise<void> {
     for await (const workspaces of nango.paginate<AsanaWorkspace>({

@@ -1,8 +1,9 @@
 import useSWR from 'swr';
-import { swrFetcher } from '../utils/api';
 import type { GetUser } from '@nangohq/server';
 
-export function useUser(enabled: boolean = true) {
+import { swrFetcher } from '../utils/api';
+
+export function useUser(enabled = true) {
     const { data, error, mutate } = useSWR<GetUser>(enabled ? '/api/v1/user' : null, swrFetcher);
 
     const loading = !data && !error;

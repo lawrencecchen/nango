@@ -1,9 +1,9 @@
-import type { WebhookHandler } from './types.js.js';
 import type { Config as ProviderConfig } from '@nangohq/shared';
 import { getLogger } from '@nangohq/utils';
-
 import crypto from 'crypto';
 import type { LogContextGetter } from '@nangohq/logs';
+
+import type { WebhookHandler } from './types.js';
 
 const logger = getLogger('Webook.GithubApp');
 

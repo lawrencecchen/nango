@@ -1,7 +1,8 @@
 import type { AuthModeType } from '@nangohq/types';
-import type { NangoConnection } from './Connection.js.js';
-import type { TimestampsAndDeleted } from './Generic.js.js';
-import type { SyncConfig, Action } from './Sync.js.js';
+
+import type { NangoConnection } from './Connection.js';
+import type { TimestampsAndDeleted } from './Generic.js';
+import type { SyncConfig, Action } from './Sync.js';
 
 export interface Config extends TimestampsAndDeleted {
     id?: number;

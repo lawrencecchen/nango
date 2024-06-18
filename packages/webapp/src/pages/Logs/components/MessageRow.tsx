@@ -1,11 +1,11 @@
 import type { Row } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 import type { SearchOperationsData } from '@nangohq/types';
+import { ArrowLeftIcon } from '@radix-ui/react-icons';
 
 import { Drawer, DrawerContent, DrawerTrigger, DrawerClose } from '../../../components/ui/Drawer';
 import * as Table from '../../../components/ui/Table';
 import { ShowMessage } from '../ShowMessage';
-import { ArrowLeftIcon } from '@radix-ui/react-icons';
 import { cn } from '../../../utils/utils';
 
 const drawerWidth = '834px';

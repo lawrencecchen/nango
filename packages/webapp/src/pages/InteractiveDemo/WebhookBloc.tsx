@@ -1,9 +1,10 @@
-import { Steps, model } from './utils';
-import Button from '../../components/ui/button/Button';
 import { Prism } from '@mantine/prism';
 import { useMemo } from 'react';
-import { Bloc } from './Bloc';
 import { CheckCircledIcon } from '@radix-ui/react-icons';
+
+import { Steps, model } from './utils';
+import Button from '../../components/ui/button/Button';
+import { Bloc } from './Bloc';
 
 export const WebhookBloc: React.FC<{ step: Steps; connectionId: string; records: Record<string, unknown>[]; onProgress: () => void }> = ({
     step,

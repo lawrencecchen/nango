@@ -5,11 +5,12 @@ import { AxiosError } from 'axios';
 import type { SyncType, SyncDeploymentResult, StandardNangoConfig, IncomingFlowConfig, NangoConfigMetadata } from '@nangohq/shared';
 import type { PostConnectionScriptByProvider } from '@nangohq/types';
 import { SyncConfigType, localFileService, getInterval, stagingHost, cloudHost } from '@nangohq/shared';
-import configService from './config.service.js.js';
-import { compileAllFiles } from './compile.service.js.js';
-import verificationService from './verification.service.js.js';
-import { printDebug, parseSecretKey, port, enrichHeaders, http } from '../utils.js.js';
-import type { DeployOptions } from '../types.js.js';
+
+import configService from './config.service.js';
+import { compileAllFiles } from './compile.service.js';
+import verificationService from './verification.service.js';
+import { printDebug, parseSecretKey, port, enrichHeaders, http } from '../utils.js';
+import type { DeployOptions } from '../types.js';
 
 class DeployService {
     public async admin({ fullPath, environmentName, debug = false }: { fullPath: string; environmentName: string; debug?: boolean }): Promise<void> {

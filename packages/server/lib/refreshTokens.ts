@@ -3,8 +3,9 @@ import db from '@nangohq/database';
 import { errorManager, ErrorSourceEnum, connectionService } from '@nangohq/shared';
 import { stringifyError, getLogger, metrics, stringToHash } from '@nangohq/utils';
 import { logContextGetter } from '@nangohq/logs';
-import { connectionRefreshFailed as connectionRefreshFailedHook, connectionRefreshSuccess as connectionRefreshSuccessHook } from './hooks/hooks.js.js';
 import tracer from 'dd-trace';
+
+import { connectionRefreshFailed as connectionRefreshFailedHook, connectionRefreshSuccess as connectionRefreshSuccessHook } from './hooks/hooks.js';
 
 const logger = getLogger('Server');
 const cronName = '[refreshTokens]';

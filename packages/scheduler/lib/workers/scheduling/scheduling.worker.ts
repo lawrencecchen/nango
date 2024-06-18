@@ -4,9 +4,10 @@ import { Worker, isMainThread } from 'node:worker_threads';
 import { stringifyError } from '@nangohq/utils';
 import { setTimeout } from 'node:timers/promises';
 import type knex from 'knex';
-import { logger } from '../../utils/logger.js.js';
-import { dueSchedules } from './scheduling.js.js';
 import * as tasks from '@nangohq/models/tasks.js';
+
+import { logger } from '../../utils/logger.js';
+import { dueSchedules } from './scheduling.js';
 
 interface CreatedTasksMessage {
     ids: string[];
@@ -56,7 +57,7 @@ export class SchedulingWorker {
 export class SchedulingChild {
     private db: knex.Knex;
     private parent: MessagePort;
-    private cancelled: boolean = false;
+    private cancelled = false;
     private tickIntervalMs = 100;
 
     constructor(parent: MessagePort, db: knex.Knex) {

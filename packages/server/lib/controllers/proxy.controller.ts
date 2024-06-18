@@ -34,9 +34,10 @@ import {
 } from '@nangohq/shared';
 import { metrics, getLogger, axiosInstance as axios } from '@nangohq/utils';
 import { logContextGetter, oldLevelToNewLevel } from '@nangohq/logs';
-import { connectionRefreshFailed as connectionRefreshFailedHook, connectionRefreshSuccess as connectionRefreshSuccessHook } from '../hooks/hooks.js.js';
 import type { LogContext } from '@nangohq/logs';
-import type { RequestLocals } from '../utils/express.js.js';
+
+import { connectionRefreshFailed as connectionRefreshFailedHook, connectionRefreshSuccess as connectionRefreshSuccessHook } from '../hooks/hooks.js';
+import type { RequestLocals } from '../utils/express.js';
 
 type ForwardedHeaders = Record<string, string>;
 

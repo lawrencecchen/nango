@@ -1,0 +1,17 @@
+import { NodeEnv } from './constants.js';
+export declare const baseUrl: string;
+export declare const basePublicUrl: string;
+export declare const isDocker: boolean;
+export declare const isStaging: boolean;
+export declare const isProd: boolean;
+export declare const isCloud: boolean;
+export declare const isEnterprise: boolean;
+export declare const isLocal: boolean;
+export declare const isTest: boolean;
+export declare const isBasicAuthEnabled: string;
+export declare const isHosted: boolean;
+export declare const AUTH_ENABLED: boolean;
+export declare const MANAGED_AUTH_ENABLED: boolean;
+export declare const env: NodeEnv;
+export declare const useS3: boolean;
+export declare const integrationFilesAreRemote: boolean;

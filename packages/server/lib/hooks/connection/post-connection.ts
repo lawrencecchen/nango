@@ -1,10 +1,11 @@
 import type { AxiosError, AxiosResponse } from 'axios';
 import type { RecentlyCreatedConnection, Connection, ConnectionConfig, HTTP_VERB, UserProvidedProxyConfiguration } from '@nangohq/shared';
 import { LogActionEnum, LogTypes, proxyService, connectionService, telemetry } from '@nangohq/shared';
-import * as postConnectionHandlers from './index.js.js';
 import type { LogContext, LogContextGetter } from '@nangohq/logs';
 import { stringifyError } from '@nangohq/utils';
-import { connectionRefreshFailed as connectionRefreshFailedHook, connectionRefreshSuccess as connectionRefreshSuccessHook } from '../hooks.js.js';
+
+import * as postConnectionHandlers from './index.js';
+import { connectionRefreshFailed as connectionRefreshFailedHook, connectionRefreshSuccess as connectionRefreshSuccessHook } from '../hooks.js';
 
 type PostConnectionHandler = (internalNango: InternalNango) => Promise<void>;
 

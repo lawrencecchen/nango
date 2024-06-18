@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import type { EnvironmentAndAccount } from '@nangohq/server';
+
 import { swrFetcher } from '../utils/api';
 
 export function useEnvironment(env: string) {

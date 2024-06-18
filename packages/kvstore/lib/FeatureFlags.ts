@@ -1,5 +1,6 @@
 import { getLogger } from '@nangohq/utils';
-import type { KVStore } from './KVStore.js.js';
+
+import type { KVStore } from './KVStore.js';
 
 const logger = getLogger('FeatureFlags');
 

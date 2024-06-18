@@ -1,5 +1,6 @@
 import { Tooltip } from '@geist-ui/core';
 import { BoltIcon, ArrowPathRoundedSquareIcon } from '@heroicons/react/24/outline';
+
 import type { EndpointResponse, FlowConfiguration } from './Show';
 import { SubTabs } from './Show';
 import type { IntegrationConfig, Flow } from '../../types';

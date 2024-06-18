@@ -1,13 +1,14 @@
 import * as uuid from 'uuid';
 import db from '@nangohq/database';
-import encryptionManager, { pbkdf2 } from '../utils/encryption.manager.js.js';
-import type { Environment } from '../models/Environment.js.js';
 import type { EnvironmentVariable } from '@nangohq/types';
-import type { Account } from '../models/Admin.js.js';
-import { LogActionEnum } from '../models/Activity.js.js';
-import accountService from './account.service.js.js';
-import errorManager, { ErrorSourceEnum } from '../utils/error.manager.js.js';
 import { isCloud } from '@nangohq/utils';
+
+import encryptionManager, { pbkdf2 } from '../utils/encryption.manager.js';
+import type { Environment } from '../models/Environment.js';
+import type { Account } from '../models/Admin.js';
+import { LogActionEnum } from '../models/Activity.js';
+import accountService from './account.service.js';
+import errorManager, { ErrorSourceEnum } from '../utils/error.manager.js';
 
 const TABLE = '_nango_environments';
 

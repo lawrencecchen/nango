@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Signup } from '@nangohq/types';
 import { Link, useNavigate } from 'react-router-dom';
+
 import { MANAGED_AUTH_ENABLED } from '../../utils/utils';
 import { apiFetch, useSignupAPI } from '../../utils/api';
 import DefaultLayout from '../../layout/DefaultLayout';

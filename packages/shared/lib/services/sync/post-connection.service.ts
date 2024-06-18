@@ -1,11 +1,12 @@
 import db from '@nangohq/database';
-import remoteFileService from '../file/remote.service.js.js';
 import type { Account } from '@nangohq/models/Admin.js';
 import type { Environment } from '@nangohq/models/Environment.js';
 import { env } from '@nangohq/utils';
 import type { PostConnectionScriptByProvider, PostConnectionScript } from '@nangohq/types';
-import { increment } from './config/config.service.js.js';
-import configService from '../config.service.js.js';
+
+import remoteFileService from '../file/remote.service.js';
+import { increment } from './config/config.service.js';
+import configService from '../config.service.js';
 
 const TABLE = '_nango_post_connection_scripts';
 

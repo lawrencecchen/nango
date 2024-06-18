@@ -2,8 +2,9 @@ import { z } from 'zod';
 import { userService } from '@nangohq/shared';
 import type { ResendVerificationEmailByUuid } from '@nangohq/types';
 import { requireEmptyQuery, zodErrorToHTTP } from '@nangohq/utils';
-import { sendVerificationEmail } from '../../../helpers/email.js.js';
-import { asyncWrapper } from '../../../utils/asyncWrapper.js.js';
+
+import { sendVerificationEmail } from '../../../helpers/email.js';
+import { asyncWrapper } from '../../../utils/asyncWrapper.js';
 
 const validation = z
     .object({

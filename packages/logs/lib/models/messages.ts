@@ -1,4 +1,3 @@
-import { client } from '../es/client.js.js';
 import type {
     MessageRow,
     OperationRow,
@@ -9,12 +8,14 @@ import type {
     SearchOperationsSync,
     SearchOperationsType
 } from '@nangohq/types';
-import { indexMessages } from '../es/schema.js.js';
 import type { estypes } from '@elastic/elasticsearch';
 import { errors } from '@elastic/elasticsearch';
 import type { SetRequired } from 'type-fest';
-import { getFullIndexName, createCursor, parseCursor } from './helpers.js.js';
 import { isTest } from '@nangohq/utils';
+
+import { getFullIndexName, createCursor, parseCursor } from './helpers.js';
+import { indexMessages } from '../es/schema.js';
+import { client } from '../es/client.js';
 
 export interface ListOperations {
     count: number;

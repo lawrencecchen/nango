@@ -1,20 +1,21 @@
 import express from 'express';
 import type { Express, Request, Response, NextFunction } from 'express';
-import { routeHandler as postImmediateHandler } from './routes/v1/postImmediate.js.js';
-import { routeHandler as postRecurringHandler } from './routes/v1/postRecurring.js.js';
-import { routeHandler as putRecurringHandler } from './routes/v1/putRecurring.js.js';
-import { routeHandler as postScheduleRunHandler } from './routes/v1/schedules/postRun.js.js';
-import { routeHandler as postTasksSearchHandler } from './routes/v1/tasks/postSearch.js.js';
-import { routeHandler as postSchedulesSearchHandler } from './routes/v1/schedules/postSearch.js.js';
-import { routeHandler as postDequeueHandler } from './routes/v1/postDequeue.js.js';
-import { routeHandler as putTaskHandler } from './routes/v1/tasks/putTaskId.js.js';
-import { routeHandler as getHealthHandler } from './routes/getHealth.js.js';
-import { routeHandler as getOutputHandler } from './routes/v1/tasks/taskId/getOutput.js.js';
-import { routeHandler as postHeartbeatHandler } from './routes/v1/tasks/taskId/postHeartbeat.js.js';
 import { getLogger, createRoute } from '@nangohq/utils';
 import type { Scheduler } from '@nangohq/scheduler';
 import type { ApiError } from '@nangohq/types';
 import type EventEmitter from 'node:events';
+
+import { routeHandler as postImmediateHandler } from './routes/v1/postImmediate.js';
+import { routeHandler as postRecurringHandler } from './routes/v1/postRecurring.js';
+import { routeHandler as putRecurringHandler } from './routes/v1/putRecurring.js';
+import { routeHandler as postScheduleRunHandler } from './routes/v1/schedules/postRun.js';
+import { routeHandler as postTasksSearchHandler } from './routes/v1/tasks/postSearch.js';
+import { routeHandler as postSchedulesSearchHandler } from './routes/v1/schedules/postSearch.js';
+import { routeHandler as postDequeueHandler } from './routes/v1/postDequeue.js';
+import { routeHandler as putTaskHandler } from './routes/v1/tasks/putTaskId.js';
+import { routeHandler as getHealthHandler } from './routes/getHealth.js';
+import { routeHandler as getOutputHandler } from './routes/v1/tasks/taskId/getOutput.js';
+import { routeHandler as postHeartbeatHandler } from './routes/v1/tasks/taskId/postHeartbeat.js';
 
 const logger = getLogger('Orchestrator.server');
 

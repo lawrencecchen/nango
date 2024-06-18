@@ -3,8 +3,9 @@ import type { Request, Response, NextFunction } from 'express';
 import type { Environment, Account, User } from '@nangohq/shared';
 import { NangoError, configService } from '@nangohq/shared';
 import db, { multipleMigrations } from '@nangohq/database';
+
 import configController from './config.controller.js';
-import type { RequestLocals } from '../utils/express.js.js';
+import type { RequestLocals } from '../utils/express.js';
 
 const locals: Required<RequestLocals> = {
     authType: 'secretKey',

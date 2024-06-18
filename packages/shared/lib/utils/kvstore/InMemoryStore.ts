@@ -1,4 +1,4 @@
-import type { KVStore } from './KVStore.js.js';
+import type { KVStore } from './KVStore.js';
 
 interface Value {
     value: string;
@@ -25,7 +25,7 @@ export class InMemoryKVStore implements KVStore {
         return Promise.resolve(res.value);
     }
 
-    public async set(key: string, value: string, canOverride: boolean = true, ttlInMs: number = 0): Promise<void> {
+    public async set(key: string, value: string, canOverride = true, ttlInMs = 0): Promise<void> {
         const res = this.store.get(key);
         const isExpired = res && this.isExpired(res);
         if (isExpired || canOverride || res === undefined) {

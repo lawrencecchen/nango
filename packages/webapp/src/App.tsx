@@ -2,13 +2,14 @@ import { useEffect } from 'react';
 import { SWRConfig } from 'swr';
 import { Route, Navigate } from 'react-router-dom';
 import { MantineProvider, createTheme } from '@mantine/core';
-import { useSignout } from './utils/user';
 import { ToastContainer } from 'react-toastify';
+import { TooltipProvider } from '@radix-ui/react-tooltip';
+
+import { useSignout } from './utils/user';
 import 'react-toastify/dist/ReactToastify.css';
 import { AUTH_ENABLED, isCloud, isLocal } from './utils/utils';
 import { fetcher } from './utils/api';
 import { useStore } from './store';
-
 import Signup from './pages/Account/Signup';
 import InviteSignup from './pages/Account/InviteSignup';
 import Signin from './pages/Account/Signin';
@@ -32,7 +33,6 @@ import UserSettings from './pages/UserSettings';
 import { Homepage } from './pages/Homepage';
 import { NotFound } from './pages/NotFound';
 import { LogsSearch } from './pages/Logs/Search';
-import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { SentryRoutes } from './utils/sentry';
 
 const theme = createTheme({

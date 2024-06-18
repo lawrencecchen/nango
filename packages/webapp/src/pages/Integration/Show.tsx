@@ -2,6 +2,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Loading } from '@geist-ui/core';
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
+import { LinkIcon, BookOpenIcon } from '@heroicons/react/24/outline';
 
 import { LeftNavBarItems } from '../../components/LeftNavBar';
 import DashboardLayout from '../../layout/DashboardLayout';
@@ -9,7 +10,6 @@ import APIReference from './APIReference';
 import EndpointReference from './EndpointReference';
 import FlowPage from './FlowPage';
 import Button from '../../components/ui/button/Button';
-import { LinkIcon, BookOpenIcon } from '@heroicons/react/24/outline';
 import IntegrationLogo from '../../components/ui/IntegrationLogo';
 import Scripts from './Scripts';
 import AuthSettings from './AuthSettings';

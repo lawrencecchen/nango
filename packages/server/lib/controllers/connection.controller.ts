@@ -10,17 +10,18 @@ import type {
 import db from '@nangohq/database';
 import type { Template as ProviderTemplate } from '@nangohq/types';
 import { configService, connectionService, errorManager, analytics, AnalyticsTypes, NangoError, accountService, SlackService } from '@nangohq/shared';
-import { NANGO_ADMIN_UUID } from './account.controller.js.js';
 import { metrics } from '@nangohq/utils';
 import { logContextGetter } from '@nangohq/logs';
-import type { RequestLocals } from '../utils/express.js.js';
+
+import { NANGO_ADMIN_UUID } from './account.controller.js';
+import type { RequestLocals } from '../utils/express.js';
 import {
     connectionCreated as connectionCreatedHook,
     connectionCreationStartCapCheck as connectionCreationStartCapCheckHook,
     connectionRefreshSuccess as connectionRefreshSuccessHook,
     connectionRefreshFailed as connectionRefreshFailedHook
 } from '../hooks/hooks.js';
-import { getOrchestrator, getOrchestratorClient } from '../utils/utils.js.js';
+import { getOrchestrator, getOrchestratorClient } from '../utils/utils.js';
 
 export type { ConnectionList };
 

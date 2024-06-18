@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import type { ConnectionList } from '@nangohq/server';
+
 import { swrFetcher } from '../utils/api';
 
 export function useConnections(env: string) {

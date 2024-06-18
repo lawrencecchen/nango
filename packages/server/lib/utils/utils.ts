@@ -5,9 +5,10 @@ import type { User } from '@nangohq/shared';
 import type { Template as ProviderTemplate } from '@nangohq/types';
 import type { Result } from '@nangohq/utils';
 import { getLogger, Err, Ok } from '@nangohq/utils';
-import type { WSErr } from './web-socket-error.js.js';
 import { NangoError, userService, interpolateString, Orchestrator, getOrchestratorUrl } from '@nangohq/shared';
 import { OrchestratorClient } from '@nangohq/nango-orchestrator';
+
+import type { WSErr } from './web-socket-error.js';
 
 const logger = getLogger('Server.Utils');
 

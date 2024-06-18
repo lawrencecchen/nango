@@ -1,11 +1,12 @@
 import { schema, dbNamespace } from '@nangohq/database';
-import configService from '../../config.service.js.js';
-import type { SyncConfig } from '../@nangohq/models/Sync.js.js';
-import { SyncConfigType } from '../@nangohq/models/Sync.js.js';
-import type { NangoConnection } from '../@nangohq/models/Connection.js.js';
-import type { HTTP_VERB } from '../@nangohq/models/Generic.js.js';
 import { OpenApiBuilder } from 'openapi3-ts/oas31';
 import type { ParameterObject } from 'openapi3-ts/oas31';
+
+import configService from '../../config.service.js';
+import type { SyncConfig } from '../@nangohq/models/Sync.js';
+import { SyncConfigType } from '../@nangohq/models/Sync.js';
+import type { NangoConnection } from '../@nangohq/models/Connection.js';
+import type { HTTP_VERB } from '../@nangohq/models/Generic.js';
 
 const ENDPOINT_TABLE = dbNamespace + 'sync_endpoints';
 const SYNC_CONFIG_TABLE = dbNamespace + 'sync_configs';

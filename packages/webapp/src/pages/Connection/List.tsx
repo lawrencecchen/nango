@@ -3,10 +3,11 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Loading } from '@geist-ui/core';
 import debounce from 'lodash/debounce';
 import uniq from 'lodash/uniq';
+import { PlusIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import type { ConnectionList as Connection } from '@nangohq/server';
 
 import { Input } from '../../components/ui/input/Input';
 import { useConnections } from '../../hooks/useConnections';
-import { PlusIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import IntegrationLogo from '../../components/ui/IntegrationLogo';
 import { ErrorCircle } from '../../components/ui/label/error-circle';
 import DashboardLayout from '../../layout/DashboardLayout';
@@ -14,8 +15,6 @@ import { LeftNavBarItems } from '../../components/LeftNavBar';
 import CopyButton from '../../components/ui/button/CopyButton';
 import { requestErrorToast } from '../../utils/api';
 import { MultiSelect } from '../../components/MultiSelect';
-import type { ConnectionList as Connection } from '@nangohq/server';
-
 import { useStore } from '../../store';
 
 const defaultFilter = ['all'];

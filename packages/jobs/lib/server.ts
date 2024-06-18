@@ -2,8 +2,9 @@ import { initTRPC } from '@trpc/server';
 import { createHTTPServer } from '@trpc/server/adapters/standalone';
 import superjson from 'superjson';
 import { z } from 'zod';
-import { suspendRunner } from './runner/runner.js.js';
 import { getLogger } from '@nangohq/utils';
+
+import { suspendRunner } from './runner/runner.js';
 
 const logger = getLogger('Jobs');
 

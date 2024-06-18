@@ -1,4 +1,4 @@
-import type { Timestamps } from '../../db.js.js';
+import type { Timestamps } from '../../db.js';
 
 export interface PostConnectionScript extends Timestamps {
     id: number;

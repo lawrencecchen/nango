@@ -1,10 +1,11 @@
 import './tracer.js';
 import { getLogger, stringifyError } from '@nangohq/utils';
-import { getServer } from './server.js.js';
-import { envs } from './env.js.js';
 import type { Task } from '@nangohq/scheduler';
 import { Scheduler, DatabaseClient, stringifyTask } from '@nangohq/scheduler';
-import { EventsHandler } from './events.js.js';
+
+import { getServer } from './server.js';
+import { envs } from './env.js';
+import { EventsHandler } from './events.js';
 
 const logger = getLogger('Orchestrator');
 

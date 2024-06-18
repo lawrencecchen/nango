@@ -1,11 +1,12 @@
 import { expect, describe, it, beforeAll, afterAll } from 'vitest';
 import type { Task } from '@nangohq/scheduler';
 import { getTestDbClient, Scheduler } from '@nangohq/scheduler';
-import { getServer } from '../server.js.js';
-import { OrchestratorClient } from './client.js.js';
 import getPort from 'get-port';
-import { EventsHandler } from '../events.js.js';
 import { nanoid } from '@nangohq/utils';
+
+import { getServer } from '../server.js';
+import { OrchestratorClient } from './client.js';
+import { EventsHandler } from '../events.js';
 
 const dbClient = getTestDbClient();
 const eventsHandler = new EventsHandler({

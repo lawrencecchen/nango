@@ -1,8 +1,9 @@
 import { z } from 'zod';
-import { asyncWrapper } from '../../../../utils/asyncWrapper.js.js';
 import type { UpdateSecondaryUrl } from '@nangohq/types';
 import { requireEmptyQuery, zodErrorToHTTP } from '@nangohq/utils';
 import { externalWebhookService } from '@nangohq/shared';
+
+import { asyncWrapper } from '../../../../utils/asyncWrapper.js';
 
 const validation = z
     .object({

@@ -5,7 +5,8 @@ import { stringifyError } from '@nangohq/utils';
 import * as tasks from '@nangohq/models/tasks.js';
 import { setTimeout } from 'node:timers/promises';
 import type knex from 'knex';
-import { logger } from '../../utils/logger.js.js';
+
+import { logger } from '../../utils/logger.js';
 
 interface ExpiredTasksMessage {
     ids: string[];
@@ -55,7 +56,7 @@ export class MonitorWorker {
 export class MonitorChild {
     private db: knex.Knex;
     private parent: MessagePort;
-    private cancelled: boolean = false;
+    private cancelled = false;
     private tickIntervalMs = 100;
 
     constructor(parent: MessagePort, db: knex.Knex) {

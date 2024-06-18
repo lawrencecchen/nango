@@ -1,6 +1,7 @@
 import { isMainThread, parentPort, workerData } from 'node:worker_threads';
 import { getLogger } from '@nangohq/utils';
-import { ProcessorChild } from './processor.worker.js.js';
+
+import { ProcessorChild } from './processor.worker.js';
 
 const logger = getLogger('processor.worker.boot');
 

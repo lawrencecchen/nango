@@ -1,4 +1,5 @@
 import { toast } from 'react-toastify';
+
 import { useSignout } from './user';
 import type { AuthModes, RunSyncCommand, PreBuiltFlow } from '../types';
 
