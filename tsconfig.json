@@ -7,7 +7,7 @@
     "baseUrl": ".",
     "paths": {
       "@nangohq/shared": ["./packages/shared/lib"],
-      "@nangohq/models": ["./packages/shared/lib/models"]
+      "@nangohq/models": ["./packages/server/lib/models"]
     },
     "lib": ["es2015", "dom"]
   }
