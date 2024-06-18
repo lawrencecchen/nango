@@ -21,11 +21,11 @@ export default defineConfig({
     },
     resolve: {
         alias: {
-            '@nangohq/shared': '/packages/shared/lib',
-            '@nangohq/models': '/packages/server/lib/models',
-            '@nangohq/types': '/packages/types/lib',
-            '@nangohq/logs': '/packages/logs/lib',
-            '@nangohq/utils': '/packages/utils/lib'
+            '@nangohq/shared': './packages/shared/lib',
+            '@nangohq/models': './packages/server/lib/models',
+            '@nangohq/types': './packages/types/lib',
+            '@nangohq/logs': './packages/logs/lib',
+            '@nangohq/utils': './packages/utils/lib'
         }
     }
 });
