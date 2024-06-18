@@ -8,7 +8,6 @@
     "paths": {
       "@nangohq/shared": ["./packages/shared/lib"],
       "@nangohq/models": ["./packages/shared/lib/models"]
-    },
-    "ignoreDeprecations": "5.0"
+    }
   }
 }
