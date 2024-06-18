@@ -177,19 +177,29 @@ class ModelService {
 
     public async createModelFile({ fullPath }: { fullPath: string }) {
         try {
+            printDebug(`Starting createModelFile with fullPath: ${fullPath}`);
+
             const configContents = await fs.promises.readFile(path.join(fullPath, nangoConfigFile), 'utf8');
+            printDebug(`Read configContents: ${configContents}`);
+
             const configData: NangoConfig = yaml.load(configContents) as NangoConfig;
+            printDebug(`Parsed configData: ${JSON.stringify(configData, null, 2)}`);
+
             const { models, integrations } = configData;
             const interfaceDefinitions = modelService.build(models, integrations);
 
             if (interfaceDefinitions) {
+                printDebug(`Generated interfaceDefinitions: ${interfaceDefinitions.join('\n')}`);
                 await fs.promises.writeFile(path.join(fullPath, TYPES_FILE_NAME), interfaceDefinitions.join('\n'));
                 printDebug(
                     `Contents of ${TYPES_FILE_NAME} after writing interface definitions: ${await fs.promises.readFile(path.join(fullPath, TYPES_FILE_NAME), 'utf8')}`
                 );
+            } else {
+                printDebug('No interface definitions were generated.');
             }
 
             const { success, response: config } = await configService.load(fullPath);
+            printDebug(`Loaded config: ${JSON.stringify(config, null, 2)}`);
 
             if (!success || !config) {
                 printDebug('Failed to load config');
@@ -201,6 +211,8 @@ class ModelService {
             printDebug(
                 `Contents of ${TYPES_FILE_NAME} after appending flow config: ${await fs.promises.readFile(path.join(fullPath, TYPES_FILE_NAME), 'utf8')}`
             );
+
+            printDebug(`Completed createModelFile for fullPath: ${fullPath}`);
         } catch (error) {
             const err = error as Error;
             printDebug(`Error in createModelFile: ${err.message}`);
