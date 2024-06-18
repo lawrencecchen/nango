@@ -192,7 +192,7 @@ class ModelService {
                 printDebug(`Generated interfaceDefinitions: ${interfaceDefinitions.join('\n')}`);
                 await fs.promises.writeFile(path.join(fullPath, TYPES_FILE_NAME), interfaceDefinitions.join('\n'));
                 printDebug(
-                    `Contents of ${TYPES_FILE_NAME} after writing interface definitions: ${await fs.promises.readFile(path.join(fullPath, TYPES_FILE_NAME), 'utf8')}`
+                    `Contents of ${TYPES_FILE_NAME} immediately after writing interface definitions: ${await fs.promises.readFile(path.join(fullPath, TYPES_FILE_NAME), 'utf8')}`
                 );
             } else {
                 printDebug('No interface definitions were generated.');
@@ -209,7 +209,7 @@ class ModelService {
             const flowConfig = `export const NangoFlows = ${JSON.stringify(config, null, 2)} as const; \n`;
             await fs.promises.appendFile(path.join(fullPath, TYPES_FILE_NAME), flowConfig);
             printDebug(
-                `Contents of ${TYPES_FILE_NAME} after appending flow config: ${await fs.promises.readFile(path.join(fullPath, TYPES_FILE_NAME), 'utf8')}`
+                `Contents of ${TYPES_FILE_NAME} immediately after appending flow config: ${await fs.promises.readFile(path.join(fullPath, TYPES_FILE_NAME), 'utf8')}`
             );
 
             printDebug(`Completed createModelFile for fullPath: ${fullPath}`);
