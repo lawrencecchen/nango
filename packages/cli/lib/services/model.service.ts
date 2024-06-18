@@ -2,8 +2,8 @@ import fs from 'fs';
 import yaml from 'js-yaml';
 import type { NangoConfig, NangoModel, NangoIntegration, NangoIntegrationData } from '@nangohq/shared';
 import { isJsOrTsType, SyncConfigType, nangoConfigFile } from '@nangohq/shared';
-import { printDebug, getNangoRootPath } from '../utils.js';
-import { TYPES_FILE_NAME, NangoSyncTypesFileLocation } from '../constants.js';
+import { printDebug } from '../utils.js';
+import { TYPES_FILE_NAME } from '../constants.js';
 import configService from './config.service.js';
 import path from 'path';
 
@@ -78,7 +78,7 @@ class ModelService {
             return interfaceDefinition;
         });
 
-        console.log(`Generated interface definitions: ${interfaceDefinitions.join('\n')}`);
+        printDebug(`Generated interface definitions: ${interfaceDefinitions.join('\n')}`);
         return interfaceDefinitions;
     }
 
@@ -176,26 +176,36 @@ class ModelService {
     }
 
     public async createModelFile({ fullPath }: { fullPath: string }) {
-        const configContents = fs.readFileSync(path.join(fullPath, nangoConfigFile), 'utf8');
-        const configData: NangoConfig = yaml.load(configContents) as NangoConfig;
-        const { models, integrations } = configData;
-        const interfaceDefinitions = modelService.build(models, integrations);
+        try {
+            const configContents = await fs.promises.readFile(path.join(fullPath, nangoConfigFile), 'utf8');
+            const configData: NangoConfig = yaml.load(configContents) as NangoConfig;
+            const { models, integrations } = configData;
+            const interfaceDefinitions = modelService.build(models, integrations);
 
-        if (interfaceDefinitions) {
-            fs.writeFileSync(path.join(fullPath, TYPES_FILE_NAME), interfaceDefinitions.join('\n'));
-            console.log(`Contents of ${TYPES_FILE_NAME} after writing interface definitions: ${fs.readFileSync(path.join(fullPath, TYPES_FILE_NAME), 'utf8')}`);
+            if (interfaceDefinitions) {
+                await fs.promises.writeFile(path.join(fullPath, TYPES_FILE_NAME), interfaceDefinitions.join('\n'));
+                printDebug(
+                    `Contents of ${TYPES_FILE_NAME} after writing interface definitions: ${await fs.promises.readFile(path.join(fullPath, TYPES_FILE_NAME), 'utf8')}`
+                );
+            }
+
+            const { success, response: config } = await configService.load(fullPath);
+
+            if (!success || !config) {
+                printDebug('Failed to load config');
+                throw new Error('Failed to load config');
+            }
+
+            const flowConfig = `export const NangoFlows = ${JSON.stringify(config, null, 2)} as const; \n`;
+            await fs.promises.appendFile(path.join(fullPath, TYPES_FILE_NAME), flowConfig);
+            printDebug(
+                `Contents of ${TYPES_FILE_NAME} after appending flow config: ${await fs.promises.readFile(path.join(fullPath, TYPES_FILE_NAME), 'utf8')}`
+            );
+        } catch (error) {
+            const err = error as Error;
+            printDebug(`Error in createModelFile: ${err.message}`);
+            throw err;
         }
-
-        const { success, response: config } = await configService.load(fullPath);
-
-        if (!success || !config) {
-            console.log('Failed to load config');
-            throw new Error('Failed to load config');
-        }
-
-        const flowConfig = `export const NangoFlows = ${JSON.stringify(config, null, 2)} as const; \n`;
-        fs.writeFileSync(path.join(fullPath, TYPES_FILE_NAME), flowConfig, { flag: 'a' });
-        console.log(`Contents of ${TYPES_FILE_NAME} after appending flow config: ${fs.readFileSync(path.join(fullPath, TYPES_FILE_NAME), 'utf8')}`);
     }
 }
 
