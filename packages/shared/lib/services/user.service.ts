@@ -2,7 +2,7 @@ import db from '@nangohq/database';
 import * as uuid from 'uuid';
 import type { Result } from '@nangohq/utils';
 import { isEnterprise, Ok, Err } from '@nangohq/utils';
-import type { User, InviteUser, Account } from '../models/Admin.js';
+import type { User, InviteUser, Account } from '../models/Admin.js.js';
 
 const VERIFICATION_EMAIL_EXPIRATION = 3 * 24 * 60 * 60 * 1000;
 const INVITE_EMAIL_EXPIRATION = 7 * 24 * 60 * 60 * 1000;

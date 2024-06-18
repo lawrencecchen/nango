@@ -1,8 +1,8 @@
-import { deleteSyncConfig, deleteSyncFilesForConfig, getSyncConfig } from './config/config.service.js';
-import connectionService from '../connection.service.js';
-import { deleteScheduleForSync, getSchedule, updateScheduleStatus } from './schedule.service.js';
-import { getLatestSyncJob } from './job.service.js';
-import telemetry, { LogTypes } from '../../utils/telemetry.js';
+import { deleteSyncConfig, deleteSyncFilesForConfig, getSyncConfig } from './config/config.service.js.js';
+import connectionService from '../connection.service.js.js';
+import { deleteScheduleForSync, getSchedule, updateScheduleStatus } from './schedule.service.js.js';
+import { getLatestSyncJob } from './job.service.js.js';
+import telemetry, { LogTypes } from '../../utils/telemetry.js.js';
 import {
     createSync,
     getSyncsByConnectionId,
@@ -18,25 +18,25 @@ import {
     createActivityLogMessage,
     updateSuccess as updateSuccessActivityLog
 } from '../activity/activity.service.js';
-import { errorNotificationService } from '../notification/error.service.js';
-import SyncClient from '../../clients/sync.client.js';
-import configService from '../config.service.js';
+import { errorNotificationService } from '../notification/error.service.js.js';
+import SyncClient from '../../clients/sync.client.js.js';
+import configService from '../config.service.js.js';
 import type { LogLevel } from '@nangohq/models/Activity.js';
 import type { Connection, NangoConnection } from '@nangohq/models/Connection.js';
 import type { SyncDeploymentResult, IncomingFlowConfig, Sync, SyncType, ReportedSyncJobStatus } from '@nangohq/models/Sync.js';
-import { NangoError } from '../../utils/error.js';
+import { NangoError } from '../../utils/error.js.js';
 import type { Config as ProviderConfig } from '@nangohq/models/Provider.js';
 import type { ServiceResponse } from '@nangohq/models/Generic.js';
 import { SyncStatus, ScheduleStatus, SyncConfigType, SyncCommand, CommandToActivityLog } from '@nangohq/models/Sync.js';
 import type { LogContext, LogContextGetter } from '@nangohq/logs';
-import type { RecordsServiceInterface } from '../../clients/sync.client.js';
+import type { RecordsServiceInterface } from '../../clients/sync.client.js.js';
 import { LogActionEnum } from '@nangohq/models/Activity.js';
 import { getLogger, stringifyError } from '@nangohq/utils';
-import environmentService from '../environment.service.js';
+import environmentService from '../environment.service.js.js';
 import type { Environment } from '@nangohq/models/Environment.js';
-import type { Orchestrator } from '../../clients/orchestrator.js';
+import type { Orchestrator } from '../../clients/orchestrator.js.js';
 import type { NangoConfig, NangoIntegration, NangoIntegrationData } from '@nangohq/models/NangoConfig.js';
-import { featureFlags } from '../../index.js';
+import { featureFlags } from '../../index.js.js';
 
 // Should be in "logs" package but impossible thanks to CLI
 export const syncCommandToOperation = {

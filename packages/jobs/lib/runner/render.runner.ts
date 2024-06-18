@@ -1,10 +1,10 @@
-import type { Runner } from './runner.js';
-import { RunnerType } from './runner.js';
+import type { Runner } from './runner.js.js';
+import { RunnerType } from './runner.js.js';
 import type { ProxyAppRouter } from '@nangohq/nango-runner';
 import { getRunnerClient } from '@nangohq/nango-runner';
 import { env, stringifyError } from '@nangohq/utils';
 import { NodeEnv, getPersistAPIUrl } from '@nangohq/shared';
-import { RenderAPI } from './render.api.js';
+import { RenderAPI } from './render.api.js.js';
 import tracer from 'dd-trace';
 
 const jobsServiceUrl = process.env['JOBS_SERVICE_URL'] || 'http://localhost:3005';

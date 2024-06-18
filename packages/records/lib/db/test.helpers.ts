@@ -1,5 +1,5 @@
-import { db } from './client.js';
-import { schema } from './config.js';
+import { db } from './client.js.js';
+import { schema } from './config.js.js';
 
 // WARNING: to use only in tests
 export async function clearDb(): Promise<void> {

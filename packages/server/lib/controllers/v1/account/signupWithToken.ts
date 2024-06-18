@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { asyncWrapper } from '../../../utils/asyncWrapper.js';
+import { asyncWrapper } from '../../../utils/asyncWrapper.js.js';
 import crypto from 'crypto';
 import util from 'util';
 import { getLogger, isCloud, requireEmptyQuery, zodErrorToHTTP } from '@nangohq/utils';

@@ -27,8 +27,8 @@ import { sendSync } from '@nangohq/webhooks';
 import type { LogContext } from '@nangohq/logs';
 import { logContextGetter } from '@nangohq/logs';
 import { records as recordsService } from '@nangohq/records';
-import integrationService from '../integration.service.js';
-import { bigQueryClient, slackService } from '../clients.js';
+import integrationService from '../integration.service.js.js';
+import { bigQueryClient, slackService } from '../clients.js.js';
 
 export async function handler(task: OrchestratorTask): Promise<Result<JsonValue>> {
     task.abortController.signal.onabort = () => {

@@ -2,7 +2,7 @@ import { inspect } from 'node:util';
 import winston from 'winston';
 import type { Logform, Logger } from 'winston';
 import colors from '@colors/colors';
-import { isCloud, isEnterprise, isTest } from './environment/detection.js';
+import { isCloud, isEnterprise, isTest } from './environment/detection.js.js';
 
 const SPLAT = Symbol.for('splat');
 const level = process.env['LOG_LEVEL'] ? process.env['LOG_LEVEL'] : isTest ? 'error' : 'info';

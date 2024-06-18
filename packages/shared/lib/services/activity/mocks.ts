@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import * as ActivityService from './activity.service.js';
+import * as ActivityService from './activity.service.js.js';
 
 export function mockCreateActivityLog() {
     return vi.spyOn(ActivityService, 'createActivityLog').mockImplementation(() => {

@@ -2,10 +2,10 @@ import { Worker, NativeConnection } from '@temporalio/worker';
 import fs from 'fs-extra';
 import * as dotenv from 'dotenv';
 import { createRequire } from 'module';
-import * as activities from './activities.js';
+import * as activities from './activities.js.js';
 import { SYNC_TASK_QUEUE, WEBHOOK_TASK_QUEUE } from '@nangohq/shared';
 import { isProd, isEnterprise, getLogger } from '@nangohq/utils';
-import { envs } from './env.js';
+import { envs } from './env.js.js';
 
 const logger = getLogger('Jobs.Temporal');
 

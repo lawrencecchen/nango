@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { vi, expect, describe, it, beforeEach } from 'vitest';
-import { sendSync } from './sync.js';
+import { sendSync } from './sync.js.js';
 import { axiosInstance } from '@nangohq/utils';
 import type { NangoSyncWebhookBodySuccess, Connection, Environment, ExternalWebhook } from '@nangohq/types';
 import * as logPackage from '@nangohq/logs';

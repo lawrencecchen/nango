@@ -1,8 +1,8 @@
 import { expect, describe, it, beforeEach, afterEach } from 'vitest';
-import * as tasks from './tasks.js';
-import { taskStates } from '../types.js';
-import type { TaskState, Task } from '../types.js';
-import { getTestDbClient } from '../db/helpers.test.js';
+import * as tasks from './tasks.js.js';
+import { taskStates } from '../types.js.js';
+import type { TaskState, Task } from '../types.js.js';
+import { getTestDbClient } from '../db/helpers.test.js.js';
 import type { knex } from 'knex';
 import { nanoid } from '@nangohq/utils';
 

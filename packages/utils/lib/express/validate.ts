@@ -1,7 +1,7 @@
 import type { Request, NextFunction } from 'express';
 import { z } from 'zod';
 import type { ValidationError, Endpoint } from '@nangohq/types';
-import type { EndpointRequest, EndpointResponse } from './route.js';
+import type { EndpointRequest, EndpointResponse } from './route.js.js';
 
 interface RequestParser<E extends Endpoint<any>> {
     parseBody?: (data: unknown) => E['Body'];

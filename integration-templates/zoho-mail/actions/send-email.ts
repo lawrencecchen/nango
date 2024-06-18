@@ -1,4 +1,4 @@
-import type { NangoAction, ZohoMailSendEmailOutput, ZohoMailSendEmailInput } from '../../types/lib/integration/asana';
+import type { NangoAction, ZohoMailSendEmailOutput, ZohoMailSendEmailInput } from '../../types/lib/integration/asana.js';
 
 export default async function runAction(nango: NangoAction, input: ZohoMailSendEmailInput): Promise<ZohoMailSendEmailOutput> {
     //we need to enforce accountId to be of type string since accountId contains bigint values 6984040000000000000

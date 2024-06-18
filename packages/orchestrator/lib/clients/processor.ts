@@ -1,7 +1,7 @@
 import type { Result } from '@nangohq/utils';
 import { Err, stringifyError, getLogger } from '@nangohq/utils';
-import type { OrchestratorClient } from './client.js';
-import type { OrchestratorTask } from './types.js';
+import type { OrchestratorClient } from './client.js.js';
+import type { OrchestratorTask } from './types.js.js';
 import type { JsonValue } from 'type-fest';
 import PQueue from 'p-queue';
 import type { Tracer } from 'dd-trace';

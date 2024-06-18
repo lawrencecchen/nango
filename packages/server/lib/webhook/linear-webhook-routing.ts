@@ -2,7 +2,7 @@ import crypto from 'node:crypto';
 
 import type { Config as ProviderConfig } from '@nangohq/shared';
 import { getLogger } from '@nangohq/utils';
-import type { WebhookHandler } from './types.js';
+import type { WebhookHandler } from './types.js.js';
 import type { LogContextGetter } from '@nangohq/logs';
 
 const logger = getLogger('Webhook.Linear');

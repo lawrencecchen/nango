@@ -4,8 +4,8 @@ import { Worker, isMainThread } from 'node:worker_threads';
 import { stringifyError } from '@nangohq/utils';
 import { setTimeout } from 'node:timers/promises';
 import type knex from 'knex';
-import { logger } from '../../utils/logger.js';
-import { dueSchedules } from './scheduling.js';
+import { logger } from '../../utils/logger.js.js';
+import { dueSchedules } from './scheduling.js.js';
 import * as tasks from '@nangohq/models/tasks.js';
 
 interface CreatedTasksMessage {

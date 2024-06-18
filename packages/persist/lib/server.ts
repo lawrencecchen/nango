@@ -3,9 +3,9 @@ import type { Request, Response, NextFunction } from 'express';
 import { validateRequest } from 'zod-express';
 import { z } from 'zod';
 import { getLogger } from '@nangohq/utils';
-import persistController from './controllers/persist.controller.js';
+import persistController from './controllers/persist.controller.js.js';
 import { logLevelValues } from '@nangohq/shared';
-import { authMiddleware } from './middleware/auth.middleware.js';
+import { authMiddleware } from './middleware/auth.middleware.js.js';
 
 const logger = getLogger('Persist');
 const maxSizeJsonLog = '100kb';

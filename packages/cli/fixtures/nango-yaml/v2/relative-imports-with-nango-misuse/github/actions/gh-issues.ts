@@ -1,5 +1,5 @@
-import { getGreeting } from './helper';
-import { otherWelcome } from './welcomer';
+import { getGreeting } from './helper.js';
+import { otherWelcome } from './welcomer.js';
 
 export default function runAction(nango: any): string {
     otherWelcome(nango);

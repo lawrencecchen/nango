@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { Nango } from '@nangohq/node';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { mockErrorManagerReport } from '../utils/error.manager.mocks.js';
-import type { Config } from '../models/index.js';
+import { mockErrorManagerReport } from '../utils/error.manager.mocks.js.js';
+import type { Config } from '../models/index.js.js';
 import type { Template } from '@nangohq/types';
-import configService from '../services/config.service.js';
-import type { CursorPagination, LinkPagination, OffsetPagination } from '../models/Proxy.js';
-import type { NangoProps } from './sync.js';
-import { NangoAction } from './sync.js';
-import { isValidHttpUrl } from '../utils/utils.js';
-import proxyService from '../services/proxy.service.js';
+import configService from '../services/config.service.js.js';
+import type { CursorPagination, LinkPagination, OffsetPagination } from '../models/Proxy.js.js';
+import type { NangoProps } from './sync.js.js';
+import { NangoAction } from './sync.js.js';
+import { isValidHttpUrl } from '../utils/utils.js.js';
+import proxyService from '../services/proxy.service.js.js';
 import type { AxiosResponse } from 'axios';
 
 const nangoProps: NangoProps = {

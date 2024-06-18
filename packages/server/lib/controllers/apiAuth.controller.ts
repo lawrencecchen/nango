@@ -20,7 +20,7 @@ import {
 import type { LogContext } from '@nangohq/logs';
 import { defaultOperationExpiration, logContextGetter } from '@nangohq/logs';
 import { stringifyError } from '@nangohq/utils';
-import type { RequestLocals } from '../utils/express.js';
+import type { RequestLocals } from '../utils/express.js.js';
 import {
     connectionCreated as connectionCreatedHook,
     connectionCreationFailed as connectionCreationFailedHook,

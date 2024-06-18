@@ -1,6 +1,6 @@
 import { expect, describe, it, vi, afterEach } from 'vitest';
-import type { Config } from './flow.service.js';
-import FlowService from './flow.service.js';
+import type { Config } from './flow.service.js.js';
+import FlowService from './flow.service.js.js';
 
 const flows = {
     integrations: {

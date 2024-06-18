@@ -1,4 +1,4 @@
-import type { NangoSync, GmailEmail } from '../../types/lib/integration/asana';
+import type { NangoSync, GmailEmail } from '../../types/lib/integration/asana.js';
 
 export default async function fetchData(nango: NangoSync) {
     const backfillPeriod = new Date(Date.now() - 24 * 60 * 60 * 1000); // 24 hours ago.

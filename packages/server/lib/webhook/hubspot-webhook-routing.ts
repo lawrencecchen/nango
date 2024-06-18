@@ -1,7 +1,7 @@
 import type { Config as ProviderConfig } from '@nangohq/shared';
 import { getLogger } from '@nangohq/utils';
 import crypto from 'crypto';
-import type { WebhookHandler } from './types.js';
+import type { WebhookHandler } from './types.js.js';
 import type { LogContextGetter } from '@nangohq/logs';
 
 const logger = getLogger('Webhook.Hubspot');

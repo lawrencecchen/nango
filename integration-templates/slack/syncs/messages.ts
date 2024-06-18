@@ -1,4 +1,4 @@
-import type { NangoSync, SlackMessage, SlackMessageReaction, SlackMessageReply } from '../../types/lib/integration/asana';
+import type { NangoSync, SlackMessage, SlackMessageReaction, SlackMessageReply } from '../../types/lib/integration/asana.js';
 import { createHash } from 'crypto';
 
 export default async function fetchData(nango: NangoSync) {

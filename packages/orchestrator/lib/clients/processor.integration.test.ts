@@ -1,14 +1,14 @@
 import { expect, describe, it, beforeAll, afterAll, vi } from 'vitest';
 import { getTestDbClient, Scheduler } from '@nangohq/scheduler';
-import { getServer } from '../server.js';
-import { OrchestratorClient } from './client.js';
-import { OrchestratorProcessor } from './processor.js';
+import { getServer } from '../server.js.js';
+import { OrchestratorClient } from './client.js.js';
+import { OrchestratorProcessor } from './processor.js.js';
 import getPort from 'get-port';
-import { EventsHandler } from '../events.js';
+import { EventsHandler } from '../events.js.js';
 import { Ok, Err, nanoid } from '@nangohq/utils';
 import type { Result } from '@nangohq/utils';
 import type { JsonValue } from 'type-fest';
-import type { OrchestratorTask } from './types.js';
+import type { OrchestratorTask } from './types.js.js';
 import { tracer } from 'dd-trace';
 
 const dbClient = getTestDbClient();

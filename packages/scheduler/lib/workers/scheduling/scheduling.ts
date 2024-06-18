@@ -1,5 +1,5 @@
 import type knex from 'knex';
-import type { Schedule } from '../../types.js';
+import type { Schedule } from '../../types.js.js';
 import { DbSchedule, SCHEDULES_TABLE } from '@nangohq/models/schedules.js';
 import type { Result } from '@nangohq/utils';
 import { Err, Ok, stringifyError } from '@nangohq/utils';

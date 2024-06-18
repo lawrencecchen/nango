@@ -1,4 +1,4 @@
-import type { KVStore } from './KVStore.js';
+import type { KVStore } from './KVStore.js.js';
 
 interface Value {
     value: string;

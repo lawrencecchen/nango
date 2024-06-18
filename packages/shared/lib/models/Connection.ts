@@ -1,7 +1,7 @@
-import type { AppStoreCredentials, AuthCredentials, ApiKeyCredentials, BasicApiCredentials, AppCredentials, UnauthCredentials } from './Auth.js';
-import type { Account } from './Admin.js';
-import type { Environment } from './Environment.js';
-import type { TimestampsAndDeleted } from './Generic.js';
+import type { AppStoreCredentials, AuthCredentials, ApiKeyCredentials, BasicApiCredentials, AppCredentials, UnauthCredentials } from './Auth.js.js';
+import type { Account } from './Admin.js.js';
+import type { Environment } from './Environment.js.js';
+import type { TimestampsAndDeleted } from './Generic.js.js';
 import type { AuthModeType, Metadata, ActiveLogIds, AuthOperationType } from '@nangohq/types';
 
 export type ConnectionConfig = Record<string, any>;

@@ -1,4 +1,4 @@
-import type { AsanaUser, User } from '../../types/lib/integration/asana';
+import type { AsanaUser, User } from '../../types/lib/integration/asana.js';
 
 export function toUser(user: AsanaUser): User {
     return {

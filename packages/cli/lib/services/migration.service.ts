@@ -4,7 +4,7 @@ import chalk from 'chalk';
 import { exec } from 'child_process';
 
 import { nangoConfigFile, loadLocalNangoConfig, determineVersion } from '@nangohq/shared';
-import { printDebug, getNangoRootPath } from '../utils.js';
+import { printDebug, getNangoRootPath } from '../utils.js.js';
 
 export const v1toV2Migration = async (loadLocation: string): Promise<void> => {
     if (process.env['NANGO_CLI_UPGRADE_MODE'] === 'ignore') {

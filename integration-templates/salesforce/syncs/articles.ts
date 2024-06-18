@@ -1,4 +1,4 @@
-import type { NangoSync, SalesforceArticle } from '../../types/lib/integration/asana';
+import type { NangoSync, SalesforceArticle } from '../../types/lib/integration/asana.js';
 
 interface Metadata {
     customFields: string[];

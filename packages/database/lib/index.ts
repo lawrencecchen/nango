@@ -2,7 +2,7 @@ import knex from 'knex';
 import type { Knex } from 'knex';
 import { metrics, retry } from '@nangohq/utils';
 import type { Pool } from 'tarn';
-import { defaultSchema, getDbConfig } from './getConfig.js';
+import { defaultSchema, getDbConfig } from './getConfig.js.js';
 
 export class KnexDatabase {
     knex: Knex;

@@ -1,4 +1,4 @@
-import type { WorkableJobQuestion, NangoSync } from '../../types/lib/integration/asana';
+import type { WorkableJobQuestion, NangoSync } from '../../types/lib/integration/asana.js';
 
 const CHUNK_SIZE = 100;
 

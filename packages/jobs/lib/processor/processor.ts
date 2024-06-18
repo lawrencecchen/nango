@@ -1,5 +1,5 @@
 import { getLogger } from '@nangohq/utils';
-import { ProcessorWorker } from './processor.worker.js';
+import { ProcessorWorker } from './processor.worker.js.js';
 
 const logger = getLogger('jobs.processor');
 

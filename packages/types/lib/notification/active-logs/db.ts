@@ -1,4 +1,4 @@
-import type { Timestamps } from '../../db.js';
+import type { Timestamps } from '../../db.js.js';
 
 export interface ActiveLog extends Timestamps {
     id: number;

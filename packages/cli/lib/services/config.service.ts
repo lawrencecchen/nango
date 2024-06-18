@@ -4,7 +4,7 @@ import addErrors from 'ajv-errors';
 import chalk from 'chalk';
 import type { NangoConfig, StandardNangoConfig, ServiceResponse } from '@nangohq/shared';
 import { loadLocalNangoConfig, loadStandardConfig, nangoConfigFile, determineVersion, NangoError } from '@nangohq/shared';
-import { getNangoRootPath, printDebug } from '../utils.js';
+import { getNangoRootPath, printDebug } from '../utils.js.js';
 
 class ConfigService {
     public async load(fullPath: string, debug = false): Promise<ServiceResponse<StandardNangoConfig[]>> {

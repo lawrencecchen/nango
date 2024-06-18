@@ -1,7 +1,7 @@
 import type { DBOnboarding } from '@nangohq/types';
-import type { Config } from '../models/index.js';
+import type { Config } from '../models/index.js.js';
 import db, { dbNamespace } from '@nangohq/database';
-import configService from './config.service.js';
+import configService from './config.service.js.js';
 
 export const DEFAULT_GITHUB_CLIENT_ID = process.env['DEFAULT_GITHUB_CLIENT_ID'] || '';
 export const DEFAULT_GITHUB_CLIENT_SECRET = process.env['DEFAULT_GITHUB_CLIENT_SECRET'] || '';

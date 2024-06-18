@@ -2,8 +2,8 @@ import fs from 'fs';
 import yaml from 'js-yaml';
 import type { NangoConfig, NangoModel, NangoIntegration, NangoIntegrationData } from '@nangohq/shared';
 import { isJsOrTsType, SyncConfigType, nangoConfigFile } from '@nangohq/shared';
-import { printDebug } from '../utils.js';
-import configService from './config.service.js';
+import { printDebug } from '../utils.js.js';
+import configService from './config.service.js.js';
 import path from 'path';
 
 class ModelService {

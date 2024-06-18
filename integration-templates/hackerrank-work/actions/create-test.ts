@@ -1,4 +1,4 @@
-import type { NangoAction, HackerRankWorkTest, HackerRankWorkCreateTestInput } from '../../types/lib/integration/asana';
+import type { NangoAction, HackerRankWorkTest, HackerRankWorkCreateTestInput } from '../../types/lib/integration/asana.js';
 
 const mapInputToPostData = (input: HackerRankWorkCreateTestInput): Record<string, any> => {
     return { ...input };

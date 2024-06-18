@@ -1,7 +1,7 @@
 import type { LogLevel, RecentlyCreatedConnection } from '@nangohq/shared';
 import { createActivityLog, LogActionEnum, postConnectionScriptService } from '@nangohq/shared';
 import type { LogContextGetter } from '@nangohq/logs';
-import { getOrchestrator } from '../../utils/utils.js';
+import { getOrchestrator } from '../../utils/utils.js.js';
 
 export async function externalPostConnection(
     createdConnection: RecentlyCreatedConnection,

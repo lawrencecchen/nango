@@ -1,6 +1,6 @@
 import { expect, describe, it } from 'vitest';
-import { removeDuplicateKey } from './uniqueKey.js';
-import type { FormattedRecord } from '../types.js';
+import { removeDuplicateKey } from './uniqueKey.js.js';
+import type { FormattedRecord } from '../types.js.js';
 
 describe('removeDuplicateKey', () => {
     it('Should remove duplicates', () => {

@@ -1,4 +1,4 @@
-import type { NangoAction, ZohoMailAddUserOutput, ZohoMailAddUserInput } from '../../types/lib/integration/asana';
+import type { NangoAction, ZohoMailAddUserOutput, ZohoMailAddUserInput } from '../../types/lib/integration/asana.js';
 
 export default async function runAction(nango: NangoAction, input: ZohoMailAddUserInput): Promise<ZohoMailAddUserOutput> {
     //zoid is shorter in this 847300000

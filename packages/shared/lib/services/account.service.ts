@@ -1,9 +1,9 @@
 import db from '@nangohq/database';
-import type { Account } from '../models/Admin.js';
-import type { Environment } from '../models/Environment.js';
-import { LogActionEnum } from '../models/Activity.js';
-import environmentService from './environment.service.js';
-import errorManager, { ErrorSourceEnum } from '../utils/error.manager.js';
+import type { Account } from '../models/Admin.js.js';
+import type { Environment } from '../models/Environment.js.js';
+import { LogActionEnum } from '../models/Activity.js.js';
+import environmentService from './environment.service.js.js';
+import errorManager, { ErrorSourceEnum } from '../utils/error.manager.js.js';
 
 class AccountService {
     async getAccountById(id: number): Promise<Account | null> {

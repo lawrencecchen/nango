@@ -1,5 +1,5 @@
-import type { Runner } from './runner.js';
-import { RunnerType } from './runner.js';
+import type { Runner } from './runner.js.js';
+import { RunnerType } from './runner.js.js';
 import type { ChildProcess } from 'child_process';
 import { execSync, spawn } from 'child_process';
 import { getRunnerClient } from '@nangohq/nango-runner';

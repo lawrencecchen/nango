@@ -1,15 +1,15 @@
 import './tracer.js';
-import { Temporal } from './temporal.js';
-import { Processor } from './processor/processor.js';
-import { server } from './server.js';
-import { cronAutoIdleDemo } from './crons/autoIdleDemo.js';
-import { deleteOldActivityLogs } from './crons/deleteOldActivities.js';
-import { deleteSyncsData } from './crons/deleteSyncsData.js';
-import { reconcileTemporalSchedules } from './crons/reconcileTemporalSchedules.js';
+import { Temporal } from './temporal.js.js';
+import { Processor } from './processor/processor.js.js';
+import { server } from './server.js.js';
+import { cronAutoIdleDemo } from './crons/autoIdleDemo.js.js';
+import { deleteOldActivityLogs } from './crons/deleteOldActivities.js.js';
+import { deleteSyncsData } from './crons/deleteSyncsData.js.js';
+import { reconcileTemporalSchedules } from './crons/reconcileTemporalSchedules.js.js';
 import { getLogger, stringifyError } from '@nangohq/utils';
-import { timeoutLogsOperations } from './crons/timeoutLogsOperations.js';
+import { timeoutLogsOperations } from './crons/timeoutLogsOperations.js.js';
 import db from '@nangohq/database';
-import { envs } from './env.js';
+import { envs } from './env.js.js';
 
 const logger = getLogger('Jobs');
 

@@ -1,13 +1,13 @@
 import { expect, describe, it, beforeAll } from 'vitest';
 import { multipleMigrations } from '@nangohq/database';
-import type { Connection } from '../models/Connection.js';
-import { NangoAction } from './sync.js';
-import connectionService from '../services/connection.service.js';
-import environmentService from '../services/environment.service.js';
-import { createConnectionSeeds } from '../seeders/connection.seeder.js';
-import { createConfigSeeds } from '../seeders/config.seeder.js';
-import { createEnvironmentSeed } from '../seeders/environment.seeder.js';
-import type { Environment } from '../models/Environment.js';
+import type { Connection } from '../models/Connection.js.js';
+import { NangoAction } from './sync.js.js';
+import connectionService from '../services/connection.service.js.js';
+import environmentService from '../services/environment.service.js.js';
+import { createConnectionSeeds } from '../seeders/connection.seeder.js.js';
+import { createConfigSeeds } from '../seeders/config.seeder.js.js';
+import { createEnvironmentSeed } from '../seeders/environment.seeder.js.js';
+import type { Environment } from '../models/Environment.js.js';
 
 describe('Connection service integration tests', () => {
     let env: Environment;

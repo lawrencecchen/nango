@@ -1,4 +1,4 @@
-import type { AuthModes } from './api.js';
+import type { AuthModes } from './api.js.js';
 
 export interface OAuthSession {
     providerConfigKey: string;

@@ -1,12 +1,12 @@
 import { expect, describe, it, beforeAll, afterEach } from 'vitest';
 import dayjs from 'dayjs';
 import * as uuid from 'uuid';
-import { migrate } from '../db/migrate.js';
-import { RECORDS_TABLE } from '../constants.js';
-import { db } from '../db/client.js';
-import * as Records from '../models/records.js';
-import { formatRecords } from '../helpers/format.js';
-import type { UnencryptedRecordData, UpsertSummary } from '../types.js';
+import { migrate } from '../db/migrate.js.js';
+import { RECORDS_TABLE } from '../constants.js.js';
+import { db } from '../db/client.js.js';
+import * as Records from '../models/records.js.js';
+import { formatRecords } from '../helpers/format.js.js';
+import type { UnencryptedRecordData, UpsertSummary } from '../types.js.js';
 
 describe('Records service', () => {
     beforeAll(async () => {

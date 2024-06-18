@@ -1,7 +1,7 @@
 import type { NangoProps, RunnerOutput } from '@nangohq/shared';
 import { AxiosError } from 'axios';
 import { ActionError, NangoSync, NangoAction, instrumentSDK, SpanTypes } from '@nangohq/shared';
-import { syncAbortControllers } from './state.js';
+import { syncAbortControllers } from './state.js.js';
 import { Buffer } from 'buffer';
 import * as vm from 'vm';
 import * as url from 'url';

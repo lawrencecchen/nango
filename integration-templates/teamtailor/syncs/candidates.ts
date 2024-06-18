@@ -1,4 +1,4 @@
-import type { NangoSync, TeamtailorCandidate } from '../../types/lib/integration/asana';
+import type { NangoSync, TeamtailorCandidate } from '../../types/lib/integration/asana.js';
 
 export default async function fetchData(nango: NangoSync): Promise<void> {
     let totalRecords = 0;

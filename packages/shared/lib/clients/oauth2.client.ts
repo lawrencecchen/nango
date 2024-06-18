@@ -1,14 +1,14 @@
-import type { Config as ProviderConfig, OAuth2Credentials, Connection } from '../models/index.js';
+import type { Config as ProviderConfig, OAuth2Credentials, Connection } from '../models/index.js.js';
 import type { TemplateOAuth2 as ProviderTemplateOAuth2, Template as ProviderTemplate } from '@nangohq/types';
 import type { AccessToken, ModuleOptions, WreckHttpOptions } from 'simple-oauth2';
 import { AuthorizationCode } from 'simple-oauth2';
-import connectionsManager from '../services/connection.service.js';
-import type { ServiceResponse } from '../models/Generic.js';
-import { LogActionEnum } from '../models/Activity.js';
-import { interpolateString } from '../utils/utils.js';
+import connectionsManager from '../services/connection.service.js.js';
+import type { ServiceResponse } from '../models/Generic.js.js';
+import { LogActionEnum } from '../models/Activity.js.js';
+import { interpolateString } from '../utils/utils.js.js';
 import Boom from '@hapi/boom';
-import { NangoError } from '../utils/error.js';
-import errorManager, { ErrorSourceEnum } from '../utils/error.manager.js';
+import { NangoError } from '../utils/error.js.js';
+import errorManager, { ErrorSourceEnum } from '../utils/error.manager.js.js';
 import { httpAgent, httpsAgent } from '@nangohq/utils';
 import type { Merge } from 'type-fest';
 

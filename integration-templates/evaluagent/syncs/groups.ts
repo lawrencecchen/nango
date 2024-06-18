@@ -1,4 +1,4 @@
-import type { NangoSync, EvaluAgentGroup } from '../../types/lib/integration/asana';
+import type { NangoSync, EvaluAgentGroup } from '../../types/lib/integration/asana.js';
 
 interface EvaluAgentGroupResponseCustom {
     is_custom_reporting_group: boolean;

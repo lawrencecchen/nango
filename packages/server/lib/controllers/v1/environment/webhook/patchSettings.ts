@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { asyncWrapper } from '../../../../utils/asyncWrapper.js';
+import { asyncWrapper } from '../../../../utils/asyncWrapper.js.js';
 import type { UpdateWebhookSettings } from '@nangohq/types';
 import { requireEmptyQuery, zodErrorToHTTP } from '@nangohq/utils';
 import { externalWebhookService } from '@nangohq/shared';

@@ -1,4 +1,4 @@
-import type { LeverOpportunityOffer, NangoSync } from '../../types/lib/integration/asana';
+import type { LeverOpportunityOffer, NangoSync } from '../../types/lib/integration/asana.js';
 
 const LIMIT = 100;
 

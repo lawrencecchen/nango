@@ -17,8 +17,8 @@ import {
     externalWebhookService,
     NANGO_VERSION
 } from '@nangohq/shared';
-import { NANGO_ADMIN_UUID } from './account.controller.js';
-import type { RequestLocals } from '../utils/express.js';
+import { NANGO_ADMIN_UUID } from './account.controller.js.js';
+import type { RequestLocals } from '../utils/express.js.js';
 
 export interface GetMeta {
     environments: Pick<Environment, 'name'>[];

@@ -1,11 +1,11 @@
 import { nanoid, stringifyError } from '@nangohq/utils';
 import type { SetRequired } from 'type-fest';
-import { createMessage, getOperation } from './messages.js';
-import { envs } from '../env.js';
-import type { FormatMessageData } from './helpers.js';
-import { getFormattedMessage } from './helpers.js';
-import { LogContext, LogContextStateless } from '../client.js';
-import { getKVStore, logger } from '../utils.js';
+import { createMessage, getOperation } from './messages.js.js';
+import { envs } from '../env.js.js';
+import type { FormatMessageData } from './helpers.js.js';
+import { getFormattedMessage } from './helpers.js.js';
+import { LogContext, LogContextStateless } from '../client.js.js';
+import { getKVStore, logger } from '../utils.js.js';
 import type { MessageRow, OperationRow, OperationRowInsert } from '@nangohq/types';
 
 interface Options {

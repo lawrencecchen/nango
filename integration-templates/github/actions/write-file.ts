@@ -1,4 +1,4 @@
-import type { NangoSync, GithubWriteFileInput, GithubWriteFileActionResult } from '../../types/lib/integration/asana';
+import type { NangoSync, GithubWriteFileInput, GithubWriteFileActionResult } from '../../types/lib/integration/asana.js';
 
 export default async function runAction(nango: NangoSync, input: GithubWriteFileInput): Promise<GithubWriteFileActionResult> {
     const endpoint = `/repos/${input.owner}/${input.repo}/contents/${input.path}`;

@@ -1,9 +1,9 @@
 import type { AxiosResponse } from 'axios';
 import parseLinksHeader from 'parse-link-header';
 import get from 'lodash-es/get.js';
-import type { Pagination, UserProvidedProxyConfiguration, CursorPagination, OffsetPagination, LinkPagination } from '../models/Proxy.js';
-import { PaginationType } from '../models/Proxy.js';
-import { isValidHttpUrl } from '../utils/utils.js';
+import type { Pagination, UserProvidedProxyConfiguration, CursorPagination, OffsetPagination, LinkPagination } from '../models/Proxy.js.js';
+import { PaginationType } from '../models/Proxy.js.js';
+import { isValidHttpUrl } from '../utils/utils.js.js';
 
 class PaginationService {
     public validateConfiguration(paginationConfig: Pagination): void {

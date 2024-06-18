@@ -1,5 +1,5 @@
 import db, { schema, dbNamespace } from '@nangohq/database';
-import errorManager, { ErrorSourceEnum } from '../../utils/error.manager.js';
+import errorManager, { ErrorSourceEnum } from '../../utils/error.manager.js.js';
 import { LogActionEnum } from '@nangohq/models/Activity.js';
 import type { NangoConnection } from '@nangohq/models/Connection.js';
 import type { Job as SyncJob, SyncResultByModel } from '@nangohq/models/Sync.js';

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { asyncWrapper } from '../../../utils/asyncWrapper.js';
+import { asyncWrapper } from '../../../utils/asyncWrapper.js.js';
 import { getLogger, requireEmptyQuery, zodErrorToHTTP } from '@nangohq/utils';
 import { analytics, userService, AnalyticsTypes, environmentService, createOnboardingProvider } from '@nangohq/shared';
 import type { WebUser, ValidateEmailAndLogin } from '@nangohq/types';

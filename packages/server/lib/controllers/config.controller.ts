@@ -24,8 +24,8 @@ import {
     getFlowConfigsByParams,
     getGlobalWebhookReceiveUrl
 } from '@nangohq/shared';
-import { getOrchestrator, parseConnectionConfigParamsFromTemplate } from '../utils/utils.js';
-import type { RequestLocals } from '../utils/express.js';
+import { getOrchestrator, parseConnectionConfigParamsFromTemplate } from '../utils/utils.js.js';
+import type { RequestLocals } from '../utils/express.js.js';
 
 export interface Integration {
     authMode: AuthModeType;

@@ -1,7 +1,7 @@
 import { expect, describe, it } from 'vitest';
-import proxyService from './proxy.service.js';
-import type { HTTP_VERB, UserProvidedProxyConfiguration, InternalProxyConfiguration, OAuth2Credentials } from '../models/index.js';
-import type { ApplicationConstructedProxyConfiguration } from '../models/Proxy.js';
+import proxyService from './proxy.service.js.js';
+import type { HTTP_VERB, UserProvidedProxyConfiguration, InternalProxyConfiguration, OAuth2Credentials } from '../models/index.js.js';
+import type { ApplicationConstructedProxyConfiguration } from '../models/Proxy.js.js';
 import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 describe('Proxy service Construct Header Tests', () => {

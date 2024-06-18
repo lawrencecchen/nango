@@ -1,7 +1,7 @@
 import db from '@nangohq/database';
 import type { ActivityLog, ActivityLogMessage, LogAction } from '@nangohq/models/Activity.js';
 import { LogActionEnum } from '@nangohq/models/Activity.js';
-import errorManager, { ErrorSourceEnum } from '../../utils/error.manager.js';
+import errorManager, { ErrorSourceEnum } from '../../utils/error.manager.js.js';
 
 import { getLogger } from '@nangohq/utils';
 

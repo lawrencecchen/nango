@@ -13,7 +13,7 @@ import chalk from 'chalk';
 import type { NangoModel, NangoIntegrationData, NangoIntegration } from '@nangohq/shared';
 import { SyncConfigType, cloudHost, stagingHost, NANGO_VERSION } from '@nangohq/shared';
 import * as dotenv from 'dotenv';
-import { state } from './state.js';
+import { state } from './state.js.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

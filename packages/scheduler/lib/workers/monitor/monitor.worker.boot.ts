@@ -1,7 +1,7 @@
 import { isMainThread, parentPort, workerData } from 'node:worker_threads';
-import { MonitorChild } from './monitor.worker.js';
-import { DatabaseClient } from '../../db/client.js';
-import { logger } from '../../utils/logger.js';
+import { MonitorChild } from './monitor.worker.js.js';
+import { DatabaseClient } from '../../db/client.js.js';
+import { logger } from '../../utils/logger.js.js';
 
 if (!isMainThread && parentPort) {
     const { url, schema } = workerData;

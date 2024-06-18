@@ -1,4 +1,4 @@
-import type { NangoSync, GithubRepo } from '../../types/lib/integration/asana';
+import type { NangoSync, GithubRepo } from '../../types/lib/integration/asana.js';
 
 const LIMIT = 100;
 

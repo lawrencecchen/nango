@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { NangoSync, NotionRichPage } from '../../types/lib/integration/asana';
+import type { NangoSync, NotionRichPage } from '../../types/lib/integration/asana.js';
 
 export default async function fetchData(nango: NangoSync) {
     const pages = (await paginate(nango, 'post', '/v1/search', 'Notion pages', 100, false)).filter((result: any) => result.object === 'page');

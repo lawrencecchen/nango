@@ -6,7 +6,9 @@
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",
     "private": true,
-    "scripts": {},
+    "scripts": {
+        "build": "tsc --outDir dist"
+    },
     "keywords": [],
     "repository": {
         "type": "git",

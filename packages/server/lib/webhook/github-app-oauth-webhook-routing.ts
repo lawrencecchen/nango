@@ -3,9 +3,9 @@ import type { Config as ProviderConfig, Connection, ConnectionConfig, Connection
 import { environmentService, connectionService, configService } from '@nangohq/shared';
 import { getLogger } from '@nangohq/utils';
 import crypto from 'crypto';
-import type { WebhookHandler } from './types.js';
+import type { WebhookHandler } from './types.js.js';
 import type { LogContextGetter } from '@nangohq/logs';
-import { connectionCreated as connectionCreatedHook } from '../hooks/hooks.js';
+import { connectionCreated as connectionCreatedHook } from '../hooks/hooks.js.js';
 
 const logger = getLogger('Webhook.GithubAppOauth');
 

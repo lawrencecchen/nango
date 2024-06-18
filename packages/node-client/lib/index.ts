@@ -21,14 +21,14 @@ import type {
     SyncStatusResponse,
     UpdateSyncFrequencyResponse
 } from './types.js';
-import { AuthModes } from './types.js';
-import { getUserAgent, validateProxyConfiguration, validateSyncRecordConfiguration } from './utils.js';
+import { AuthModes } from './types.js.js';
+import { getUserAgent, validateProxyConfiguration, validateSyncRecordConfiguration } from './utils.js.js';
 
 export const stagingHost = 'https://api-staging.nango.dev';
 export const prodHost = 'https://api.nango.dev';
 
-export * from './types.js';
-export { getUserAgent } from './utils.js';
+export * from './types.js.js';
+export { getUserAgent } from './utils.js.js';
 
 type CustomHeaders = Record<string, string | number | boolean>;
 

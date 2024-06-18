@@ -1,4 +1,4 @@
-import type { WebhookHandler } from './types.js';
+import type { WebhookHandler } from './types.js.js';
 import type { Config as ProviderConfig } from '@nangohq/shared';
 import { getLogger } from '@nangohq/utils';
 

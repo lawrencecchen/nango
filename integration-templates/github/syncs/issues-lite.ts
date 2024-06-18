@@ -1,4 +1,4 @@
-import type { NangoSync, Issue } from '../../types/lib/integration/asana';
+import type { NangoSync, Issue } from '../../types/lib/integration/asana.js';
 
 export default async function fetchData(nango: NangoSync) {
     const MAX_ISSUES = 15;

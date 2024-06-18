@@ -3,7 +3,7 @@ import type { MessagePort } from 'node:worker_threads';
 import { Worker, isMainThread } from 'node:worker_threads';
 import { getLogger, stringifyError } from '@nangohq/utils';
 import { OrchestratorClient, OrchestratorProcessor } from '@nangohq/nango-orchestrator';
-import { handler } from './handler.js';
+import { handler } from './handler.js.js';
 import tracer from 'dd-trace';
 
 const logger = getLogger('jobs.processor.worker');

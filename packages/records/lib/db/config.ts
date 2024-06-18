@@ -1,4 +1,4 @@
-import { envs } from '../env.js';
+import { envs } from '../env.js.js';
 import type { Knex } from 'knex';
 
 export const schema = envs.RECORDS_DATABASE_SCHEMA;

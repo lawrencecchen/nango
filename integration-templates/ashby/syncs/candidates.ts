@@ -1,4 +1,4 @@
-import type { AshbyCandidate, NangoSync } from '../../types/lib/integration/asana';
+import type { AshbyCandidate, NangoSync } from '../../types/lib/integration/asana.js';
 
 let nextCursor: string | null = null;
 

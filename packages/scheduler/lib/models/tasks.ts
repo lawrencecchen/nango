@@ -2,8 +2,8 @@ import type { JsonValue } from 'type-fest';
 import type knex from 'knex';
 import type { Result } from '@nangohq/utils';
 import { Ok, Err, stringifyError } from '@nangohq/utils';
-import { taskStates } from '../types.js';
-import type { TaskState, Task, TaskTerminalState, TaskNonTerminalState } from '../types.js';
+import { taskStates } from '../types.js.js';
+import type { TaskState, Task, TaskTerminalState, TaskNonTerminalState } from '../types.js.js';
 import { uuidv7 } from 'uuidv7';
 
 export const TASKS_TABLE = 'tasks';

@@ -1,8 +1,8 @@
 import { expect, describe, it, beforeAll } from 'vitest';
-import environmentService, { hashSecretKey } from './environment.service.js';
+import environmentService, { hashSecretKey } from './environment.service.js.js';
 import { v4 as uuid } from 'uuid';
 import { multipleMigrations } from '@nangohq/database';
-import { createAccount } from '../seeders/account.seeder.js';
+import { createAccount } from '../seeders/account.seeder.js.js';
 
 describe('Environment service', () => {
     beforeAll(async () => {

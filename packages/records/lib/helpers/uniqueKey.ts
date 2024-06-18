@@ -1,4 +1,4 @@
-import type { FormattedRecord } from '../types.js';
+import type { FormattedRecord } from '../types.js.js';
 
 export function getUniqueId(record: FormattedRecord): string {
     return record.external_id;

@@ -2,7 +2,7 @@ import get from 'lodash-es/get.js';
 import { environmentService, connectionService, telemetry, getSyncConfigsByConfigIdForWebhook, LogActionEnum, LogTypes } from '@nangohq/shared';
 import type { Config as ProviderConfig, SyncConfig, Connection } from '@nangohq/shared';
 import type { LogContextGetter } from '@nangohq/logs';
-import { getOrchestrator } from '../utils/utils.js';
+import { getOrchestrator } from '../utils/utils.js.js';
 
 export interface InternalNango {
     getWebhooks: (environment_id: number, nango_config_id: number) => Promise<SyncConfig[]>;

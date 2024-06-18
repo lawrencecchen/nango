@@ -1,4 +1,4 @@
-import type { BamboohrEmployee, NangoSync } from '../../types/lib/integration/asana';
+import type { BamboohrEmployee, NangoSync } from '../../types/lib/integration/asana.js';
 
 interface CustomReportData {
     title: string;

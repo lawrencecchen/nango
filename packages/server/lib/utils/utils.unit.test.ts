@@ -1,5 +1,5 @@
 import { expect, describe, it } from 'vitest';
-import { getConnectionMetadataFromTokenResponse, parseConnectionConfigParamsFromTemplate, getAdditionalAuthorizationParams } from './utils.js';
+import { getConnectionMetadataFromTokenResponse, parseConnectionConfigParamsFromTemplate, getAdditionalAuthorizationParams } from './utils.js.js';
 import type { Template as ProviderTemplate } from '@nangohq/types';
 
 describe('Utils unit tests', () => {

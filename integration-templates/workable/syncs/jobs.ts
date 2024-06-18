@@ -1,4 +1,4 @@
-import type { WorkableJob, NangoSync } from '../../types/lib/integration/asana';
+import type { WorkableJob, NangoSync } from '../../types/lib/integration/asana.js';
 
 export default async function fetchData(nango: NangoSync) {
     let totalRecords = 0;

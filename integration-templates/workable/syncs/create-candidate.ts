@@ -1,4 +1,4 @@
-import type { NangoAction, WorkableCreateCandidateResponse, WorkableCreateCandidateInput } from '../../types/lib/integration/asana';
+import type { NangoAction, WorkableCreateCandidateResponse, WorkableCreateCandidateInput } from '../../types/lib/integration/asana.js';
 
 export default async function runAction(nango: NangoAction, input: WorkableCreateCandidateInput): Promise<WorkableCreateCandidateResponse> {
     if (!input.shortcode) {

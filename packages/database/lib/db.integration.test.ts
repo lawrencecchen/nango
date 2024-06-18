@@ -1,5 +1,5 @@
 import { expect, describe, it } from 'vitest';
-import { multipleMigrations } from './index.js';
+import { multipleMigrations } from './index.js.js';
 
 describe('Migration test', async () => {
     it('Should run migrations successfully', async () => {

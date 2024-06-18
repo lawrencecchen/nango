@@ -1,6 +1,6 @@
 import type { AuthModeType, AuthOperationType } from '@nangohq/types';
-import type { ServiceResponse } from './Generic.js';
-import type { BaseConnection, StoredConnection } from './Connection.js';
+import type { ServiceResponse } from './Generic.js.js';
+import type { BaseConnection, StoredConnection } from './Connection.js.js';
 
 export enum OAuthAuthorizationMethod {
     BODY = 'body',

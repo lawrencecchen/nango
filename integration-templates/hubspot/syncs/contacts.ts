@@ -1,4 +1,4 @@
-import type { NangoSync, HubspotContact } from '../../types/lib/integration/asana';
+import type { NangoSync, HubspotContact } from '../../types/lib/integration/asana.js';
 
 export default async function fetchData(nango: NangoSync) {
     const properties = ['firstname', 'lastname', 'email'];

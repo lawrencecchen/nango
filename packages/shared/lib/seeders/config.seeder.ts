@@ -1,6 +1,6 @@
-import configService from '../services/config.service.js';
-import type { Config as ProviderConfig } from '../models/Provider.js';
-import type { Environment } from '../models/Environment.js';
+import configService from '../services/config.service.js.js';
+import type { Config as ProviderConfig } from '../models/Provider.js.js';
+import type { Environment } from '../models/Environment.js.js';
 
 export const createConfigSeeds = async (env: Environment): Promise<void> => {
     await configService.createProviderConfig({

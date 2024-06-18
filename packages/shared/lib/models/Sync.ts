@@ -1,8 +1,8 @@
 import type { Context } from '@temporalio/activity';
-import { LogActionEnum } from './Activity.js';
-import type { HTTP_VERB, Timestamps, TimestampsAndDeleted } from './Generic.js';
-import type { NangoProps } from '../sdk/sync.js';
-import type { NangoIntegrationData, NangoSyncEndpoint } from './NangoConfig.js';
+import { LogActionEnum } from './Activity.js.js';
+import type { HTTP_VERB, Timestamps, TimestampsAndDeleted } from './Generic.js.js';
+import type { NangoProps } from '../sdk/sync.js.js';
+import type { NangoIntegrationData, NangoSyncEndpoint } from './NangoConfig.js.js';
 
 export enum SyncStatus {
     RUNNING = 'RUNNING',

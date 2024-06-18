@@ -1,5 +1,5 @@
 import type { AsanaTask } from '@nangohq/types/lib/integration/asana';
-import { toTask } from '../mappers/to-task.js';
+import { toTask } from '../mappers/to-task.js.js';
 import { ActionError, NangoAction } from '@nangohq/shared/lib/sdk/sync';
 
 export default async function runAction(nango: NangoAction, input: any): Promise<AsanaTask> {

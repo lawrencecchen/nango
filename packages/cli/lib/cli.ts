@@ -11,11 +11,11 @@ import type { ChildProcess } from 'node:child_process';
 
 import type { NangoConfig } from '@nangohq/shared';
 import { localFileService, nangoConfigFile, SyncConfigType } from '@nangohq/shared';
-import { NANGO_INTEGRATIONS_NAME, getNangoRootPath, getPkgVersion, printDebug } from './utils.js';
-import configService from './services/config.service.js';
-import modelService from './services/model.service.js';
-import { NangoSyncTypesFileLocation, TYPES_FILE_NAME, exampleSyncName } from './constants.js';
-import { compileAllFiles, compileSingleFile, getFileToCompile } from './services/compile.service.js';
+import { NANGO_INTEGRATIONS_NAME, getNangoRootPath, getPkgVersion, printDebug } from './utils.js.js';
+import configService from './services/config.service.js.js';
+import modelService from './services/model.service.js.js';
+import { NangoSyncTypesFileLocation, TYPES_FILE_NAME, exampleSyncName } from './constants.js.js';
+import { compileAllFiles, compileSingleFile, getFileToCompile } from './services/compile.service.js.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

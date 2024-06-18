@@ -1,5 +1,5 @@
-import type { NangoAction, Task, AsanaUpdateTask, AsanaTask, NangoActionError } from '../../types/lib/integration/asana';
-import { toTask } from '../mappers/to-task.js';
+import type { NangoAction, Task, AsanaUpdateTask, AsanaTask, NangoActionError } from '../../types/lib/integration/asana.js';
+import { toTask } from '../mappers/to-task.js.js';
 
 export default async function runAction(nango: NangoAction, input: AsanaUpdateTask): Promise<Task> {
     if (!input.id) {

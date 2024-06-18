@@ -1,4 +1,4 @@
-import type { NangoSync, WildixPbxColleague } from '../../types/lib/integration/asana';
+import type { NangoSync, WildixPbxColleague } from '../../types/lib/integration/asana.js';
 
 interface Params {
     start?: number;

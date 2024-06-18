@@ -5,9 +5,9 @@ import type { Request, Response, NextFunction } from 'express';
 import timeout from 'connect-timeout';
 import { getJobsUrl, getPersistAPIUrl } from '@nangohq/shared';
 import type { NangoProps, RunnerOutput } from '@nangohq/shared';
-import { RunnerMonitor } from './monitor.js';
-import { exec } from './exec.js';
-import { cancel } from './cancel.js';
+import { RunnerMonitor } from './monitor.js.js';
+import { exec } from './exec.js.js';
+import { cancel } from './cancel.js.js';
 import superjson from 'superjson';
 
 export const t = initTRPC.create({

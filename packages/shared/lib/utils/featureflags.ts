@@ -1,6 +1,6 @@
 import { getLogger } from '@nangohq/utils';
-import { RedisKVStore } from './kvstore/RedisStore.js';
-import { getRedisUrl } from './utils.js';
+import { RedisKVStore } from './kvstore/RedisStore.js.js';
+import { getRedisUrl } from './utils.js.js';
 
 const logger = getLogger('FeatureFlags');
 

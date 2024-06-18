@@ -1,5 +1,5 @@
 import { Client } from '@elastic/elasticsearch';
-import { envs } from '../env.js';
+import { envs } from '../env.js.js';
 
 export const client = new Client({
     nodes: envs.NANGO_LOGS_ES_URL || 'http://localhost:0',

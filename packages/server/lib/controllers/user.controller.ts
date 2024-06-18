@@ -1,9 +1,9 @@
-import { getUserFromSession } from '../utils/utils.js';
+import { getUserFromSession } from '../utils/utils.js.js';
 import type { Request, Response, NextFunction } from 'express';
-import EmailClient from '../clients/email.client.js';
+import EmailClient from '../clients/email.client.js.js';
 import { isCloud, isEnterprise, basePublicUrl } from '@nangohq/utils';
 import { errorManager, userService } from '@nangohq/shared';
-import type { RequestLocals } from '../utils/express.js';
+import type { RequestLocals } from '../utils/express.js.js';
 
 export interface GetUser {
     user: {

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { asyncWrapper } from '../../../utils/asyncWrapper.js';
+import { asyncWrapper } from '../../../utils/asyncWrapper.js.js';
 import { userService } from '@nangohq/shared';
 import { requireEmptyQuery, zodErrorToHTTP } from '@nangohq/utils';
 import type { GetEmailByUuid } from '@nangohq/types';

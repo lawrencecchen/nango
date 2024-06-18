@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { errorManager } from '@nangohq/shared';
-import { connectionCreationStartCapCheck as connectionCreationStartCapCheckHook } from '../hooks/hooks.js';
+import { connectionCreationStartCapCheck as connectionCreationStartCapCheckHook } from '../hooks/hooks.js.js';
 
 export const authCheck = async (req: Request, res: Response, next: NextFunction) => {
     const environmentId = res.locals['environment']!.id;

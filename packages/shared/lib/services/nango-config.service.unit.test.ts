@@ -1,5 +1,5 @@
 import { expect, describe, it } from 'vitest';
-import * as NangoConfigService from './nango-config.service.js';
+import * as NangoConfigService from './nango-config.service.js.js';
 
 describe('Nango Config Interval tests', () => {
     it('throws error when interval is less than 5 minutes', async () => {

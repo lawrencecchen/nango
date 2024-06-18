@@ -1,4 +1,4 @@
-import type { TimestampsAndDeleted } from '../db.js';
+import type { TimestampsAndDeleted } from '../db.js.js';
 import type {
     AuthCredentials,
     ApiKeyCredentials,
@@ -10,8 +10,8 @@ import type {
     AuthModeType,
     AuthOperationType
 } from '../auth/api.js';
-import type { Environment } from '../environment/db.js';
-import type { Account } from '../account/db.js';
+import type { Environment } from '../environment/db.js.js';
+import type { Account } from '../account/db.js.js';
 
 export type Metadata = Record<string, unknown>;
 

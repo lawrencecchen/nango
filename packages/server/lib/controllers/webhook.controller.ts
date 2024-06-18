@@ -4,7 +4,7 @@ import type { Span } from 'dd-trace';
 import { featureFlags, environmentService } from '@nangohq/shared';
 import { metrics } from '@nangohq/utils';
 import { logContextGetter } from '@nangohq/logs';
-import routeWebhook from '../webhook/webhook.manager.js';
+import routeWebhook from '../webhook/webhook.manager.js.js';
 
 class WebhookController {
     async receive(req: Request, res: Response<any, never>, next: NextFunction) {

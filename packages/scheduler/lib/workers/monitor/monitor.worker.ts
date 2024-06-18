@@ -5,7 +5,7 @@ import { stringifyError } from '@nangohq/utils';
 import * as tasks from '@nangohq/models/tasks.js';
 import { setTimeout } from 'node:timers/promises';
 import type knex from 'knex';
-import { logger } from '../../utils/logger.js';
+import { logger } from '../../utils/logger.js.js';
 
 interface ExpiredTasksMessage {
     ids: string[];

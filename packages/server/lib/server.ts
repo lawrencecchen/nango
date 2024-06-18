@@ -8,14 +8,14 @@ import http from 'node:http';
 import db from '@nangohq/database';
 import { NANGO_VERSION, getGlobalOAuthCallbackUrl, getServerPort, getWebsocketsPath } from '@nangohq/shared';
 import { getLogger } from '@nangohq/utils';
-import oAuthSessionService from './services/oauth-session.service.js';
-import migrate from './utils/migrate.js';
+import oAuthSessionService from './services/oauth-session.service.js.js';
+import migrate from './utils/migrate.js.js';
 import { migrate as migrateRecords } from '@nangohq/records';
 import { start as migrateLogs } from '@nangohq/logs';
 
-import publisher from './clients/publisher.client.js';
-import { router } from './routes.js';
-import { refreshTokens } from './refreshTokens.js';
+import publisher from './clients/publisher.client.js.js';
+import { router } from './routes.js.js';
+import { refreshTokens } from './refreshTokens.js.js';
 
 const { NANGO_MIGRATE_AT_START = 'true' } = process.env;
 const logger = getLogger('Server');

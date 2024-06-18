@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/consistent-indexed-object-style */
-import type { HTTP_VERB } from './Generic.js';
-import type { SyncType, SyncConfigType, NangoConfigMetadata } from './Sync.js';
+import type { HTTP_VERB } from './Generic.js.js';
+import type { SyncType, SyncConfigType, NangoConfigMetadata } from './Sync.js.js';
 
 export interface NangoIntegrationDataV1 {
     type?: SyncConfigType;

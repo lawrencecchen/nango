@@ -1,4 +1,4 @@
-import type { GoogleWorkspaceUserToken, NangoSync } from '../../types/lib/integration/asana';
+import type { GoogleWorkspaceUserToken, NangoSync } from '../../types/lib/integration/asana.js';
 
 export default async function fetchData(nango: NangoSync) {
     // Get the users in the org

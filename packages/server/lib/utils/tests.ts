@@ -6,7 +6,7 @@ import { expect } from 'vitest';
 import type { APIEndpoints, APIEndpointsPicker, APIEndpointsPickerWithPath, ApiError } from '@nangohq/types';
 import getPort from 'get-port';
 
-import { router } from '../routes.js';
+import { router } from '../routes.js.js';
 
 function uriParamsReplacer(tpl: string, data: Record<string, any>) {
     let res = tpl;

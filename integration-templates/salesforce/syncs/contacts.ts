@@ -1,4 +1,4 @@
-import type { NangoSync, SalesforceContact } from '../../types/lib/integration/asana';
+import type { NangoSync, SalesforceContact } from '../../types/lib/integration/asana.js';
 
 export default async function fetchData(nango: NangoSync) {
     const query = buildQuery(nango.lastSyncDate);

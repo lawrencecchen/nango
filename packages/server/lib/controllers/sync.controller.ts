@@ -48,8 +48,8 @@ import { defaultOperationExpiration, logContextGetter } from '@nangohq/logs';
 import type { LastAction } from '@nangohq/records';
 import { isHosted } from '@nangohq/utils';
 import { records as recordsService } from '@nangohq/records';
-import type { RequestLocals } from '../utils/express.js';
-import { getOrchestrator } from '../utils/utils.js';
+import type { RequestLocals } from '../utils/express.js.js';
+import { getOrchestrator } from '../utils/utils.js.js';
 
 const orchestrator = getOrchestrator();
 

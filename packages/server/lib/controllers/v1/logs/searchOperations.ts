@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { asyncWrapper } from '../../../utils/asyncWrapper.js';
+import { asyncWrapper } from '../../../utils/asyncWrapper.js.js';
 import { requireEmptyQuery, zodErrorToHTTP } from '@nangohq/utils';
 import type { SearchOperations } from '@nangohq/types';
 import { model, envs } from '@nangohq/logs';

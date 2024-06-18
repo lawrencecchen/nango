@@ -1,6 +1,6 @@
 import { Ok, Err } from '@nangohq/utils';
 import type { Result } from '@nangohq/utils';
-import { syncAbortControllers } from './state.js';
+import { syncAbortControllers } from './state.js.js';
 
 export const cancel = (syncId: string): Result<string> => {
     const abortController = syncAbortControllers.get(syncId);

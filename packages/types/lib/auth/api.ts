@@ -1,4 +1,4 @@
-import type { BaseConnection } from '../connection/db.js';
+import type { BaseConnection } from '../connection/db.js.js';
 
 export interface AuthModes {
     OAuth1: 'OAUTH1';

@@ -1,4 +1,4 @@
-import type { NangoAction, ExpensifyListPolicyOutput, ExpensifyListPolicyInput } from '../../types/lib/integration/asana';
+import type { NangoAction, ExpensifyListPolicyOutput, ExpensifyListPolicyInput } from '../../types/lib/integration/asana.js';
 
 export default async function runAction(nango: NangoAction, input: ExpensifyListPolicyInput): Promise<ExpensifyListPolicyOutput> {
     //input validation

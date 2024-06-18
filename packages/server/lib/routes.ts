@@ -1,42 +1,42 @@
 import bodyParser from 'body-parser';
 import multer from 'multer';
-import oauthController from './controllers/oauth.controller.js';
-import configController from './controllers/config.controller.js';
-import providerController from './controllers/provider.controller.js';
-import connectionController from './controllers/connection.controller.js';
-import authController from './controllers/auth.controller.js';
-import unAuthController from './controllers/unauth.controller.js';
-import appStoreAuthController from './controllers/appStoreAuth.controller.js';
-import authMiddleware from './middleware/access.middleware.js';
-import userController from './controllers/user.controller.js';
-import proxyController from './controllers/proxy.controller.js';
-import activityController from './controllers/activity.controller.js';
-import syncController from './controllers/sync.controller.js';
-import flowController from './controllers/flow.controller.js';
-import apiAuthController from './controllers/apiAuth.controller.js';
-import appAuthController from './controllers/appAuth.controller.js';
-import onboardingController from './controllers/onboarding.controller.js';
-import webhookController from './controllers/webhook.controller.js';
-import { rateLimiterMiddleware } from './middleware/ratelimit.middleware.js';
-import { authCheck } from './middleware/resource-capping.middleware.js';
+import oauthController from './controllers/oauth.controller.js.js';
+import configController from './controllers/config.controller.js.js';
+import providerController from './controllers/provider.controller.js.js';
+import connectionController from './controllers/connection.controller.js.js';
+import authController from './controllers/auth.controller.js.js';
+import unAuthController from './controllers/unauth.controller.js.js';
+import appStoreAuthController from './controllers/appStoreAuth.controller.js.js';
+import authMiddleware from './middleware/access.middleware.js.js';
+import userController from './controllers/user.controller.js.js';
+import proxyController from './controllers/proxy.controller.js.js';
+import activityController from './controllers/activity.controller.js.js';
+import syncController from './controllers/sync.controller.js.js';
+import flowController from './controllers/flow.controller.js.js';
+import apiAuthController from './controllers/apiAuth.controller.js.js';
+import appAuthController from './controllers/appAuth.controller.js.js';
+import onboardingController from './controllers/onboarding.controller.js.js';
+import webhookController from './controllers/webhook.controller.js.js';
+import { rateLimiterMiddleware } from './middleware/ratelimit.middleware.js.js';
+import { authCheck } from './middleware/resource-capping.middleware.js.js';
 import path from 'path';
-import { dirname } from './utils/utils.js';
+import { dirname } from './utils/utils.js.js';
 import express from 'express';
 import cors from 'cors';
-import { setupAuth } from './clients/auth.client.js';
+import { setupAuth } from './clients/auth.client.js.js';
 import passport from 'passport';
-import environmentController from './controllers/environment.controller.js';
-import accountController from './controllers/account.controller.js';
+import environmentController from './controllers/environment.controller.js.js';
+import accountController from './controllers/account.controller.js.js';
 import type { Response, Request } from 'express';
 import { isCloud, isEnterprise, AUTH_ENABLED, MANAGED_AUTH_ENABLED, isBasicAuthEnabled, isTest } from '@nangohq/utils';
 import { errorManager } from '@nangohq/shared';
 import tracer from 'dd-trace';
-import { getConnection as getConnectionWeb } from './controllers/v1/connection/get.js';
-import { searchOperations } from './controllers/v1/logs/searchOperations.js';
-import { getOperation } from './controllers/v1/logs/getOperation.js';
-import { patchSettings } from './controllers/v1/environment/webhook/patchSettings.js';
-import { updatePrimaryUrl } from './controllers/v1/environment/webhook/updatePrimaryUrl.js';
-import { updateSecondaryUrl } from './controllers/v1/environment/webhook/updateSecondaryUrl.js';
+import { getConnection as getConnectionWeb } from './controllers/v1/connection/get.js.js';
+import { searchOperations } from './controllers/v1/logs/searchOperations.js.js';
+import { getOperation } from './controllers/v1/logs/getOperation.js.js';
+import { patchSettings } from './controllers/v1/environment/webhook/patchSettings.js.js';
+import { updatePrimaryUrl } from './controllers/v1/environment/webhook/updatePrimaryUrl.js.js';
+import { updateSecondaryUrl } from './controllers/v1/environment/webhook/updateSecondaryUrl.js.js';
 import {
     getEmailByUuid,
     resendVerificationEmailByUuid,
@@ -47,11 +47,11 @@ import {
     validateEmailAndLogin,
     getEmailByExpiredToken
 } from './controllers/v1/account/index.js';
-import { searchMessages } from './controllers/v1/logs/searchMessages.js';
-import { setMetadata } from './controllers/connection/setMetadata.js';
-import { updateMetadata } from './controllers/connection/updateMetadata.js';
+import { searchMessages } from './controllers/v1/logs/searchMessages.js.js';
+import { setMetadata } from './controllers/connection/setMetadata.js.js';
+import { updateMetadata } from './controllers/connection/updateMetadata.js.js';
 import type { ApiError } from '@nangohq/types';
-import { searchFilters } from './controllers/v1/logs/searchFilters.js';
+import { searchFilters } from './controllers/v1/logs/searchFilters.js.js';
 
 export const router = express.Router();
 

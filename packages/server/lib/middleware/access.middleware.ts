@@ -1,9 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
 import { isCloud, isBasicAuthEnabled, getLogger, metrics, stringifyError } from '@nangohq/utils';
 import { LogActionEnum, ErrorSourceEnum, environmentService, errorManager, userService } from '@nangohq/shared';
-import { NANGO_ADMIN_UUID } from '../controllers/account.controller.js';
+import { NANGO_ADMIN_UUID } from '../controllers/account.controller.js.js';
 import tracer from 'dd-trace';
-import type { RequestLocals } from '../utils/express.js';
+import type { RequestLocals } from '../utils/express.js.js';
 
 const logger = getLogger('AccessMiddleware');
 

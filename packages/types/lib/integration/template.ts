@@ -1,6 +1,6 @@
-import type { RetryHeaderConfig, CursorPagination, LinkPagination, OffsetPagination } from '../proxy/api.js';
-import type { AuthModeType, OAuthAuthorizationMethodType, OAuthBodyFormatType } from '../auth/api.js';
-import type { EndpointMethod } from '../api.js';
+import type { RetryHeaderConfig, CursorPagination, LinkPagination, OffsetPagination } from '../proxy/api.js.js';
+import type { AuthModeType, OAuthAuthorizationMethodType, OAuthBodyFormatType } from '../auth/api.js.js';
+import type { EndpointMethod } from '../api.js.js';
 
 export interface TokenUrlObject {
     OAUTH1?: string;

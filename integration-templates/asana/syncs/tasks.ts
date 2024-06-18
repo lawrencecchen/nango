@@ -1,6 +1,6 @@
-import type { NangoSync, BaseAsanaModel, AsanaTask, Task } from '../../types/lib/integration/asana';
-import { toUser } from '../mappers/to-user.js';
-import { toTask } from '../mappers/to-task.js';
+import type { NangoSync, BaseAsanaModel, AsanaTask, Task } from '../../types/lib/integration/asana.js';
+import { toUser } from '../mappers/to-user.js.js';
+import { toTask } from '../mappers/to-task.js.js';
 
 export default async function fetchData(nango: NangoSync): Promise<void> {
     const lastSyncDate = nango.lastSyncDate;

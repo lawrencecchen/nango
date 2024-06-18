@@ -1,34 +1,34 @@
 import type { ScheduleDescription } from '@temporalio/client';
 import { Client, Connection, ScheduleOverlapPolicy } from '@temporalio/client';
-import type { NangoConnection } from '../models/Connection.js';
+import type { NangoConnection } from '../models/Connection.js.js';
 import type { StringValue } from 'ms';
 import ms from 'ms';
 import fs from 'fs-extra';
-import type { Config as ProviderConfig } from '../models/Provider.js';
-import type { NangoIntegrationData } from '../models/NangoConfig.js';
-import type { Sync, SyncWithSchedule } from '../models/Sync.js';
-import { SyncStatus, SyncType, ScheduleStatus, SyncCommand } from '../models/Sync.js';
-import type { LogLevel } from '../models/Activity.js';
-import { LogActionEnum } from '../models/Activity.js';
-import { SYNC_TASK_QUEUE } from '../constants.js';
+import type { Config as ProviderConfig } from '../models/Provider.js.js';
+import type { NangoIntegrationData } from '../models/NangoConfig.js.js';
+import type { Sync, SyncWithSchedule } from '../models/Sync.js.js';
+import { SyncStatus, SyncType, ScheduleStatus, SyncCommand } from '../models/Sync.js.js';
+import type { LogLevel } from '../models/Activity.js.js';
+import { LogActionEnum } from '../models/Activity.js.js';
+import { SYNC_TASK_QUEUE } from '../constants.js.js';
 import {
     createActivityLog,
     createActivityLogMessage,
     createActivityLogMessageAndEnd,
     updateSuccess as updateSuccessActivityLog
 } from '../services/activity/activity.service.js';
-import { isSyncJobRunning, createSyncJob, updateRunId } from '../services/sync/job.service.js';
-import { getInterval } from '../services/nango-config.service.js';
-import { getSyncConfigRaw } from '../services/sync/config/config.service.js';
-import { updateOffset, createSchedule as createSyncSchedule, getScheduleById } from '../services/sync/schedule.service.js';
-import { clearLastSyncDate } from '../services/sync/sync.service.js';
-import errorManager, { ErrorSourceEnum } from '../utils/error.manager.js';
-import { NangoError } from '../utils/error.js';
+import { isSyncJobRunning, createSyncJob, updateRunId } from '../services/sync/job.service.js.js';
+import { getInterval } from '../services/nango-config.service.js.js';
+import { getSyncConfigRaw } from '../services/sync/config/config.service.js.js';
+import { updateOffset, createSchedule as createSyncSchedule, getScheduleById } from '../services/sync/schedule.service.js.js';
+import { clearLastSyncDate } from '../services/sync/sync.service.js.js';
+import errorManager, { ErrorSourceEnum } from '../utils/error.manager.js.js';
+import { NangoError } from '../utils/error.js.js';
 import type { LogContext, LogContextGetter } from '@nangohq/logs';
 import { isTest, isProd, Ok, Err, stringifyError } from '@nangohq/utils';
 import type { Result } from '@nangohq/utils';
-import type { InitialSyncArgs } from '../models/worker.js';
-import environmentService from '../services/environment.service.js';
+import type { InitialSyncArgs } from '../models/worker.js.js';
+import environmentService from '../services/environment.service.js.js';
 
 const generateWorkflowId = (sync: Pick<Sync, 'id'>, syncName: string, connectionId: string) => `${SYNC_TASK_QUEUE}.${syncName}.${connectionId}-${sync.id}`;
 const generateScheduleId = (sync: Pick<Sync, 'id'>, syncName: string, connectionId: string) =>

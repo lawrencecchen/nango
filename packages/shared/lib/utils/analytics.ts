@@ -1,14 +1,14 @@
 import { PostHog } from 'posthog-node';
 import { localhostUrl, isCloud, isStaging, baseUrl } from '@nangohq/utils';
-import { UserType } from '../utils/utils.js';
+import { UserType } from '../utils/utils.js.js';
 import ip from 'ip';
-import errorManager, { ErrorSourceEnum } from './error.manager.js';
-import accountService from '../services/account.service.js';
-import environmentService from '../services/environment.service.js';
-import userService from '../services/user.service.js';
-import type { Account, User } from '../models/Admin.js';
-import { LogActionEnum } from '../models/Activity.js';
-import { NANGO_VERSION } from '../version.js';
+import errorManager, { ErrorSourceEnum } from './error.manager.js.js';
+import accountService from '../services/account.service.js.js';
+import environmentService from '../services/environment.service.js.js';
+import userService from '../services/user.service.js.js';
+import type { Account, User } from '../models/Admin.js.js';
+import { LogActionEnum } from '../models/Activity.js.js';
+import { NANGO_VERSION } from '../version.js.js';
 
 export enum AnalyticsTypes {
     ACCOUNT_CREATED = 'server:account_created',

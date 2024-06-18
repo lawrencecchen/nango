@@ -1,5 +1,5 @@
-import type { ApiError, Endpoint } from '../api';
-import type { NangoRecord } from '../record/api';
+import type { ApiError, Endpoint } from '../api.ts.js';
+import type { NangoRecord } from '../record/api.ts.js';
 
 export type GetOnboardingStatus = Endpoint<{
     Method: 'GET';

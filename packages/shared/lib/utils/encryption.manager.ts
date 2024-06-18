@@ -1,13 +1,13 @@
 import utils from 'node:util';
 import crypto from 'crypto';
 import { getLogger, Encryption } from '@nangohq/utils';
-import type { Config as ProviderConfig } from '../models/Provider';
-import type { DBConfig } from '../models/Generic.js';
-import type { Environment } from '../models/Environment.js';
+import type { Config as ProviderConfig } from '../models/Provider.js';
+import type { DBConfig } from '../models/Generic.js.js';
+import type { Environment } from '../models/Environment.js.js';
 import type { EnvironmentVariable } from '@nangohq/types';
-import type { Connection, ApiConnection, StoredConnection } from '../models/Connection.js';
+import type { Connection, ApiConnection, StoredConnection } from '../models/Connection.js.js';
 import db from '@nangohq/database';
-import { hashSecretKey } from '../services/environment.service.js';
+import { hashSecretKey } from '../services/environment.service.js.js';
 
 const logger = getLogger('Encryption.Manager');
 

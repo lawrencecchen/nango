@@ -1,14 +1,14 @@
 import { isMainThread } from 'node:worker_threads';
 import type { JsonValue } from 'type-fest';
-import type { Task, TaskState, Schedule, ScheduleProps, ImmediateProps, ScheduleState } from './types';
-import * as tasks from './models/tasks.js';
-import * as schedules from './models/schedules.js';
+import type { Task, TaskState, Schedule, ScheduleProps, ImmediateProps, ScheduleState } from './types.js';
+import * as tasks from './models/tasks.js.js';
+import * as schedules from './models/schedules.js.js';
 import type { Result } from '@nangohq/utils';
 import { Err, Ok, stringifyError } from '@nangohq/utils';
-import { MonitorWorker } from './workers/monitor/monitor.worker.js';
-import { SchedulingWorker } from './workers/scheduling/scheduling.worker.js';
-import type { DatabaseClient } from './db/client.js';
-import { logger } from './utils/logger.js';
+import { MonitorWorker } from './workers/monitor/monitor.worker.js.js';
+import { SchedulingWorker } from './workers/scheduling/scheduling.worker.js.js';
+import type { DatabaseClient } from './db/client.js.js';
+import { logger } from './utils/logger.js.js';
 import { uuidv7 } from 'uuidv7';
 
 export class Scheduler {

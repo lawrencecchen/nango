@@ -3,8 +3,8 @@ import type { RedisClientType } from 'redis';
 import * as uuid from 'uuid';
 import { createClient } from 'redis';
 import { getLogger } from '@nangohq/utils';
-import type { WSErr } from '../utils/web-socket-error.js';
-import { errorHtml, successHtml } from '../utils/utils.js';
+import type { WSErr } from '../utils/web-socket-error.js.js';
+import { errorHtml, successHtml } from '../utils/utils.js.js';
 import { getRedisUrl } from '@nangohq/shared';
 
 const logger = getLogger('Server.Publisher');

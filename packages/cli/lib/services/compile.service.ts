@@ -7,11 +7,11 @@ import { build } from 'tsup';
 import { SyncConfigType, localFileService } from '@nangohq/shared';
 import type { StandardNangoConfig } from '@nangohq/shared';
 
-import configService from './config.service.js';
-import { getNangoRootPath, printDebug } from '../utils.js';
-import modelService from './model.service.js';
-import parserService from './parser.service.js';
-import { TYPES_FILE_NAME } from '../constants.js';
+import configService from './config.service.js.js';
+import { getNangoRootPath, printDebug } from '../utils.js.js';
+import modelService from './model.service.js.js';
+import parserService from './parser.service.js.js';
+import { TYPES_FILE_NAME } from '../constants.js.js';
 
 const ALLOWED_IMPORTS = ['url', 'crypto', 'zod', 'node:url', 'node:crypto'];
 

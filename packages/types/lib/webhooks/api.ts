@@ -1,6 +1,6 @@
-import type { AuthOperationType, AuthModeType } from '../auth/api.js';
-import type { SyncResult, SyncType } from '../scripts/syncs/api.js';
-import type { ErrorPayload } from '../api.js';
+import type { AuthOperationType, AuthModeType } from '../auth/api.js.js';
+import type { SyncResult, SyncType } from '../scripts/syncs/api.js.js';
+import type { ErrorPayload } from '../api.js.js';
 
 export type WebhookTypes = 'sync' | 'auth' | 'forward';
 

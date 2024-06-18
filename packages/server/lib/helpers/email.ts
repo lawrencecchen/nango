@@ -1,5 +1,5 @@
 import { basePublicUrl } from '@nangohq/utils';
-import EmailClient from '../clients/email.client.js';
+import EmailClient from '../clients/email.client.js.js';
 
 export function sendVerificationEmail(email: string, name: string, token: string) {
     const emailClient = EmailClient.getInstance();

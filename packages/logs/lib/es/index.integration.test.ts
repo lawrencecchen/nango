@@ -1,10 +1,10 @@
 import { beforeAll, describe, expect, it } from 'vitest';
-import { deleteIndex, migrateMapping } from './helpers.js';
-import { client } from './client.js';
-import { indexMessages } from './schema.js';
+import { deleteIndex, migrateMapping } from './helpers.js.js';
+import { client } from './client.js.js';
+import { indexMessages } from './schema.js.js';
 import { nanoid } from '@nangohq/utils';
-import { createMessage, getOperation, update } from '../models/messages.js';
-import { getFormattedMessage } from '../models/helpers.js';
+import { createMessage, getOperation, update } from '../models/messages.js.js';
+import { getFormattedMessage } from '../models/helpers.js.js';
 
 // This file is sequential
 describe('mapping', () => {

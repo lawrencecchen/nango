@@ -41,5 +41,6 @@
             "path": "../orchestrator"
         }
     ],
-    "include": ["lib/**/*", "../utils/lib/vitest.d.ts"]
+    "include": ["lib/**/*", "../utils/lib/vitest.d.ts"],
+    "exclude": ["node_modules"]
 }

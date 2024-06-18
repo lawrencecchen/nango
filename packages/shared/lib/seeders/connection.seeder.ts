@@ -1,8 +1,8 @@
 import db from '@nangohq/database';
-import connectionService from '../services/connection.service.js';
-import type { NangoConnection } from '../models/Connection.js';
-import type { AuthCredentials } from '../models/Auth.js';
-import type { Environment } from '../models/Environment.js';
+import connectionService from '../services/connection.service.js.js';
+import type { NangoConnection } from '../models/Connection.js.js';
+import type { AuthCredentials } from '../models/Auth.js.js';
+import type { Environment } from '../models/Environment.js.js';
 
 export const createConnectionSeeds = async (env: Environment): Promise<number[]> => {
     const connectionIds = [];
