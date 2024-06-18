@@ -186,25 +186,6 @@ class ModelService {
             console.log(`Contents of ${TYPES_FILE_NAME} after writing interface definitions: ${fs.readFileSync(path.join(fullPath, TYPES_FILE_NAME), 'utf8')}`);
         }
 
-        const typesFilePath = `${getNangoRootPath()}/${NangoSyncTypesFileLocation}`;
-
-        if (!fs.existsSync(typesFilePath)) {
-            console.log(`Failed to load ${NangoSyncTypesFileLocation}`);
-            throw new Error(`Failed to load ${NangoSyncTypesFileLocation}`);
-        }
-
-        // insert NangoSync types to the bottom of the file
-        const typesContent = fs.readFileSync(typesFilePath, 'utf8');
-        console.log(`Types content from ${typesFilePath}: ${typesContent}`);
-
-        if (!typesContent) {
-            console.log(`Empty ${NangoSyncTypesFileLocation}`);
-            throw new Error(`Empty ${NangoSyncTypesFileLocation}`);
-        }
-
-        fs.writeFileSync(path.join(fullPath, TYPES_FILE_NAME), typesContent, { flag: 'a' });
-        console.log(`Contents of ${TYPES_FILE_NAME} after appending types content: ${fs.readFileSync(path.join(fullPath, TYPES_FILE_NAME), 'utf8')}`);
-
         const { success, response: config } = await configService.load(fullPath);
 
         if (!success || !config) {
