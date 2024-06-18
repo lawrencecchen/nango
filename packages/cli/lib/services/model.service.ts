@@ -3,7 +3,6 @@ import yaml from 'js-yaml';
 import type { NangoConfig, NangoModel, NangoIntegration, NangoIntegrationData } from '@nangohq/shared';
 import { isJsOrTsType, SyncConfigType, nangoConfigFile } from '@nangohq/shared';
 import { printDebug } from '../utils.js';
-import { TYPES_FILE_NAME } from '../constants.js';
 import configService from './config.service.js';
 import path from 'path';
 
@@ -188,11 +187,14 @@ class ModelService {
             const { models, integrations } = configData;
             const interfaceDefinitions = modelService.build(models, integrations);
 
+            const typesFilePath: string = path.join(fullPath, 'dist', 'nango-sync.d.ts');
+
             if (interfaceDefinitions) {
                 printDebug(`Generated interfaceDefinitions: ${interfaceDefinitions.join('\n')}`);
-                await fs.promises.writeFile(path.join(fullPath, TYPES_FILE_NAME), interfaceDefinitions.join('\n'));
+                printDebug(`Writing interface definitions to ${typesFilePath}`);
+                await fs.promises.writeFile(typesFilePath, interfaceDefinitions.join('\n'));
                 printDebug(
-                    `Contents of ${TYPES_FILE_NAME} immediately after writing interface definitions: ${await fs.promises.readFile(path.join(fullPath, TYPES_FILE_NAME), 'utf8')}`
+                    `Contents of ${typesFilePath} immediately after writing interface definitions: ${await fs.promises.readFile(typesFilePath, 'utf8')}`
                 );
             } else {
                 printDebug('No interface definitions were generated.');
@@ -207,10 +209,9 @@ class ModelService {
             }
 
             const flowConfig = `export const NangoFlows = ${JSON.stringify(config, null, 2)} as const; \n`;
-            await fs.promises.appendFile(path.join(fullPath, TYPES_FILE_NAME), flowConfig);
-            printDebug(
-                `Contents of ${TYPES_FILE_NAME} immediately after appending flow config: ${await fs.promises.readFile(path.join(fullPath, TYPES_FILE_NAME), 'utf8')}`
-            );
+            printDebug(`Appending flow config to ${typesFilePath}`);
+            await fs.promises.appendFile(typesFilePath, flowConfig);
+            printDebug(`Contents of ${typesFilePath} immediately after appending flow config: ${await fs.promises.readFile(typesFilePath, 'utf8')}`);
 
             printDebug(`Completed createModelFile for fullPath: ${fullPath}`);
         } catch (error) {
