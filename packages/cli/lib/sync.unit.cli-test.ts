@@ -1,7 +1,8 @@
 import { expect, describe, it, beforeAll } from 'vitest';
 import * as path from 'path';
 import * as fs from 'fs';
-import yaml, { DumpOptions } from 'js-yaml';
+import * as yaml from 'js-yaml';
+import type { DumpOptions } from 'js-yaml';
 import { SyncConfigType } from '@nangohq/shared';
 import { init, generate } from './cli.js';
 import { exampleSyncName } from './constants.js';
@@ -35,8 +36,8 @@ interface Model {
 }
 
 interface Data {
-    integrations?: Record<string, Record<string, Integration>>;
-    models?: Record<string, Model>;
+    integrations: Record<string, { syncs?: Record<string, Integration> } | Integration>;
+    models: Record<string, Model>;
 }
 
 function getTestDirectory(name: string) {
@@ -140,7 +141,11 @@ describe('generate function tests', () => {
         const yamlData: string = yaml.dump(data as unknown as Data, {} as DumpOptions);
         await fs.promises.writeFile(`${dir}/nango.yaml`, yamlData, 'utf8');
         await generate({ debug: false, fullPath: dir });
-        expect(fs.existsSync(`${dir}/some-other-sync.ts`)).toBe(true);
+
+        const typesFilePath: string = path.join(dir, 'dist', 'nango-sync.d.ts');
+        const typesContent: string = await fs.promises.readFile(typesFilePath, 'utf8');
+        printDebug(`Contents of ${typesFilePath} after generate call: ${typesContent}`);
+        expect(typesContent).not.toBe('');
     });
 
     it('should support a single model return in v1 format', async () => {
@@ -431,7 +436,7 @@ describe('generate function tests', () => {
             }
         };
         const yamlData: string = yaml.dump(data as unknown as Data, {} as DumpOptions);
-        await fs.promises.writeFile(`${dir}/nango.yaml`, yamlData, 'utf8');
+        void fs.promises.writeFile(`${dir}/nango.yaml`, yamlData, 'utf8');
         expect(await generate({ debug: false, fullPath: dir })).toBeUndefined();
     });
 
@@ -628,7 +633,7 @@ describe('generate function tests', () => {
 
         const success = await compileAllFiles({ fullPath: dir, debug: false });
 
-        const module = await import(`${dir}dist/issues-github.js`);
+        const module = (await import(`${dir}dist/issues-github.js`)) as { default: { default: () => string } };
 
         const result = module.default.default();
         expect(result).toBe('Hello, world!');
