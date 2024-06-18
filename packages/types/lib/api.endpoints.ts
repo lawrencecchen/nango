@@ -1,7 +1,7 @@
-import type { EndpointMethod } from './api.ts.js';
-import type { GetOperation, SearchFilters, SearchMessages, SearchOperations } from './logs/api.ts.js';
-import type { GetOnboardingStatus } from './onboarding/api.ts.js';
-import type { SetMetadata, UpdateMetadata } from './connection/api/metadata.ts.js';
+import type { EndpointMethod } from './api.js';
+import type { GetOperation, SearchFilters, SearchMessages, SearchOperations } from './logs/api.js';
+import type { GetOnboardingStatus } from './onboarding/api.js';
+import type { SetMetadata, UpdateMetadata } from './connection/api/metadata.js';
 
 export type APIEndpoints = SearchOperations | GetOperation | SearchMessages | SearchFilters | GetOnboardingStatus | SetMetadata | UpdateMetadata;
 

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-redundant-type-constituents */
-import type { Endpoint } from '../api.ts.js';
-import type { MessageOperation, MessageRow, MessageState, OperationRow } from './messages.ts.js';
+import type { Endpoint } from '../api.js';
+import type { MessageOperation, MessageRow, MessageState, OperationRow } from './messages.js';
 
 type Concat<T extends MessageOperation> = T[keyof T] | (T extends { action: string } ? `${T['type']}:${T['action']}` : never);
 

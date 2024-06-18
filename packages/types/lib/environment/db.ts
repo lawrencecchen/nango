@@ -1,4 +1,4 @@
-import type { Timestamps } from '../db.ts.js';
+import type { Timestamps } from '../db.js';
 
 export interface EnvironmentVariable extends Timestamps {
     id?: number;

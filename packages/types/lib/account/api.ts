@@ -1,5 +1,5 @@
-import type { ApiError, Endpoint } from '../api.ts.js';
-import type { WebUser } from '../user/api.ts.js';
+import type { ApiError, Endpoint } from '../api.js';
+import type { WebUser } from '../user/api.js';
 
 export type Signup = Endpoint<{
     Method: 'POST';

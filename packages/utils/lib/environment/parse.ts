@@ -131,7 +131,8 @@ export const ENVS = z.object({
 export function parseEnvs<T extends z.ZodObject<any>>(schema: T, envs: Record<string, unknown> = process.env): z.SafeParseSuccess<z.infer<T>>['data'] {
     const res = schema.safeParse(envs);
     if (!res.success) {
-        throw new Error(`Missing or invalid env vars: ${zodErrorToString(res.error.issues)}`);
+        const errorIssues = (res as z.SafeParseError<typeof envs>).error.issues;
+        throw new Error(`Missing or invalid env vars: ${zodErrorToString(errorIssues)}`);
     }
 
     return res.data;

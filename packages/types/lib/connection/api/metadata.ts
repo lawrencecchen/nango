@@ -1,5 +1,5 @@
-import type { ApiError, Endpoint } from '../../api.ts.js';
-import type { Metadata } from '../db.ts.js';
+import type { ApiError, Endpoint } from '../../api.js';
+import type { Metadata } from '../db.js';
 
 export interface MetadataBody {
     connection_id: string | string[];
