@@ -9,7 +9,7 @@ import type {
     CustomCredentials,
     AuthModeType,
     AuthOperationType
-} from '../auth/api.js';
+} from '../sharedAuthTypes.js';
 import type { Environment } from '../environment/db.js';
 import type { Account } from '../account/db.js';
 
