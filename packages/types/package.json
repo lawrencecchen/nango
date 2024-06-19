@@ -4,7 +4,9 @@
     "description": "Types used in Nango applications",
     "type": "module",
     "typings": "dist/index.d.ts",
-    "scripts": {},
+    "scripts": {
+        "build": "tsc"
+    },
     "keywords": [],
     "repository": {
         "type": "git",
