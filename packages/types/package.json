@@ -19,5 +19,8 @@
     "license": "SEE LICENSE IN LICENSE FILE IN GIT REPOSITORY",
     "files": [
         "dist/**/*"
-    ]
+    ],
+    "dependencies": {
+        "typescript": "^4.7.4"
+    }
 }
