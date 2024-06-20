@@ -157,7 +157,14 @@ class ModelService {
         } else {
             try {
                 const nestedFields = Object.keys(rawField)
-                    .map((fieldName: string) => `  ${fieldName}: ${this.getFieldType(rawField[fieldName] as string | NangoModel, debug, modelName, models)};`)
+                    .map((fieldName: string) => {
+                        const field = rawField[fieldName] as string | NangoModel;
+                        if (field !== undefined) {
+                            return `  ${fieldName}: ${this.getFieldType(field, debug, modelName, models)};`;
+                        }
+                        return '';
+                    })
+                    .filter((field) => field !== '')
                     .join('\n');
                 return `{\n${nestedFields}\n}`;
             } catch (_) {

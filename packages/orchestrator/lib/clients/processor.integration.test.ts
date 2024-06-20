@@ -66,6 +66,7 @@ describe('OrchestratorProcessor', async () => {
     });
     it('should cancel terminated tasks', async () => {
         const groupKey = nanoid();
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const mockAbort = vi.fn((_taskId: string) => {});
         const mockProcess = vi.fn(async (task: OrchestratorTask): Promise<Result<JsonValue>> => {
             let aborted = false;

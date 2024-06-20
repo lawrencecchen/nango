@@ -1,22 +1,23 @@
 import type { Request, Response, NextFunction } from 'express';
-import type { OutgoingHttpHeaders } from 'http';
+import type { OutgoingHttpHeaders, IncomingMessage, RequestOptions } from 'http';
 import type { TransformCallback } from 'stream';
-import type stream from 'stream';
 import { Readable, Transform, PassThrough } from 'stream';
+import { parse as parseUrl } from 'url';
 import type { UrlWithParsedQuery } from 'url';
-import url from 'url';
-import querystring from 'querystring';
-import type { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { stringify as stringifyQuery } from 'querystring';
+import { Agent as HttpAgent } from 'http';
+import { Agent as HttpsAgent } from 'https';
+import type { RequestOptions as HttpsRequestOptions } from 'https';
 import { backOff } from 'exponential-backoff';
 import type {
+    ActivityLog,
     ActivityLogMessage,
     HTTP_VERB,
-    LogLevel,
-    LogAction,
     UserProvidedProxyConfiguration,
     InternalProxyConfiguration,
     ApplicationConstructedProxyConfiguration
 } from '@nangohq/shared';
+import type { HttpError } from '@nangohq/shared/lib/services/proxy.service';
 import {
     NangoError,
     updateProvider as updateProviderActivityLog,
@@ -32,7 +33,7 @@ import {
     connectionService,
     configService
 } from '@nangohq/shared';
-import { metrics, getLogger, axiosInstance as axios } from '@nangohq/utils';
+import { metrics, getLogger, httpRequest, httpsRequest } from '@nangohq/utils';
 import { logContextGetter, oldLevelToNewLevel } from '@nangohq/logs';
 import { connectionRefreshFailed as connectionRefreshFailedHook, connectionRefreshSuccess as connectionRefreshSuccessHook } from '../hooks/hooks.js';
 import type { LogContext } from '@nangohq/logs';
@@ -41,6 +42,9 @@ import type { RequestLocals } from '../utils/express.js';
 type ForwardedHeaders = Record<string, string>;
 
 const logger = getLogger('Proxy.Controller');
+
+const httpAgent = new HttpAgent();
+const httpsAgent = new HttpsAgent();
 
 class ProxyController {
     /**
@@ -51,55 +55,55 @@ class ProxyController {
      * @param {Response} res Express response object
      * @param {NextFuncion} next callback function to pass control to the next middleware function in the pipeline.
      */
-    public async routeCall(req: Request, res: Response<any, Required<RequestLocals>>, next: NextFunction) {
-        const { environment, account } = res.locals;
+    public async routeCall(req: Request, res: Response<unknown, Required<RequestLocals>>, next: NextFunction) {
+        const { environment, account } = res.locals as RequestLocals;
+
+        if (!environment || !account) {
+            next(new Error('Environment or account is missing in request locals'));
+            return;
+        }
 
         let logCtx: LogContext | undefined;
         try {
-            const connectionId = req.get('Connection-Id') as string;
-            const providerConfigKey = req.get('Provider-Config-Key') as string;
-            const retries = req.get('Retries') as string;
-            const baseUrlOverride = req.get('Base-Url-Override') as string;
-            const decompress = req.get('Decompress') as string;
-            const isSync = (req.get('Nango-Is-Sync') as string) === 'true';
-            const isDryRun = (req.get('Nango-Is-Dry-Run') as string) === 'true';
-            const retryOn = req.get('Retry-On') ? (req.get('Retry-On') as string).split(',').map(Number) : null;
-            const existingActivityLogId = req.get('Nango-Activity-Log-Id') as number | string;
-
-            const logAction: LogAction = isSync ? LogActionEnum.SYNC : LogActionEnum.PROXY;
+            const connectionId: string = req.get('Connection-Id') ?? '';
+            const providerConfigKey: string = req.get('Provider-Config-Key') ?? '';
+            const retries: string | null = req.get('Retries') ?? null;
+            const baseUrlOverride: string = req.get('Base-Url-Override') ?? '';
+            const isSync: boolean = req.get('Nango-Is-Sync') === 'true';
+            const isDryRun: boolean = req.get('Nango-Is-Dry-Run') === 'true';
+            const retryOn: number[] | null = req.get('Retry-On') ? req.get('Retry-On')?.split(',').map(Number) ?? null : null;
+            const existingActivityLogId: number | string | null = req.get('Nango-Activity-Log-Id') ?? null;
 
             if (!isSync) {
-                metrics.increment(metrics.Types.PROXY, 1, { accountId: account.id });
+                metrics.increment(metrics.Types.PROXY, 1, { accountId: String(account.id) });
             }
 
-            const log = {
-                level: 'debug' as LogLevel,
-                success: false,
-                action: logAction,
-                start: Date.now(),
-                end: Date.now(),
+            const { method } = req;
+            const path = req.params[0] as string;
+            const { query }: UrlWithParsedQuery = parseUrl(req.url, true) as unknown as UrlWithParsedQuery;
+            const queryString = stringifyQuery(query);
+            const endpoint = `${path}${queryString ? `?${queryString}` : ''}`;
+
+            const log: ActivityLog = {
+                level: 'debug',
                 timestamp: Date.now(),
-                method: req.method as HTTP_VERB,
-                connection_id: connectionId,
-                provider_config_key: providerConfigKey,
-                environment_id: environment.id
+                environment_id: environment.id,
+                action: LogActionEnum.PROXY,
+                success: null,
+                start: Date.now(),
+                connection_id: connectionId || null,
+                provider_config_key: providerConfigKey || null,
+                method: (method?.toUpperCase() as HTTP_VERB) || 'GET',
+                endpoint,
+                messages: []
             };
 
             let activityLogId: number | null = null;
 
-            if (!isDryRun) {
-                activityLogId = existingActivityLogId ? Number(existingActivityLogId) : await createActivityLog(log);
-            }
+            activityLogId = existingActivityLogId ? Number(existingActivityLogId) : await createActivityLog(log);
             logCtx = existingActivityLogId
                 ? await logContextGetter.get({ id: String(existingActivityLogId) })
                 : await logContextGetter.create({ operation: { type: 'proxy' }, message: 'Proxy call' }, { account, environment }, { dryRun: isDryRun });
-
-            const { method } = req;
-
-            const path = req.params[0] as string;
-            const { query }: UrlWithParsedQuery = url.parse(req.url, true) as unknown as UrlWithParsedQuery;
-            const queryString = querystring.stringify(query);
-            const endpoint = `${path}${queryString ? `?${queryString}` : ''}`;
 
             const headers = parseHeaders(req);
 
@@ -111,7 +115,7 @@ class ProxyController {
                 data: req.body,
                 headers,
                 baseUrlOverride,
-                decompress: decompress === 'true' ? true : false,
+                decompress: req.get('Decompress') === 'true',
                 method: method.toUpperCase() as HTTP_VERB,
                 retryOn
             };
@@ -156,11 +160,11 @@ class ProxyController {
             if (activityLogId) {
                 await updateProviderActivityLog(activityLogId, providerConfig.provider);
                 await logCtx.enrichOperation({
-                    integrationId: providerConfig.id!,
-                    integrationName: providerConfig.unique_key,
+                    integrationId: typeof providerConfig.id === 'number' ? providerConfig.id : null,
+                    integrationName: providerConfig.unique_key ?? '',
                     providerName: providerConfig.provider,
-                    connectionId: connection.id!,
-                    connectionName: connection.connection_id
+                    connectionId: typeof connection.id === 'number' ? connection.id : null,
+                    connectionName: connection.connection_id ?? ''
                 });
             }
 
@@ -246,11 +250,6 @@ class ProxyController {
         logCtx: LogContext;
     }) {
         const url = proxyService.constructUrl(configBody);
-        let decompress = false;
-
-        if (configBody.decompress === true || configBody.template.proxy?.decompress === true) {
-            decompress = true;
-        }
 
         return this.request({
             res,
@@ -259,7 +258,6 @@ class ProxyController {
             config: configBody,
             activityLogId,
             environment_id,
-            decompress,
             isSync,
             isDryRun,
             data: configBody.data,
@@ -279,7 +277,7 @@ class ProxyController {
         logCtx
     }: {
         res: Response;
-        responseStream: AxiosResponse;
+        responseStream: IncomingMessage;
         config: ApplicationConstructedProxyConfiguration;
         activityLogId: number | null;
         environment_id: number;
@@ -313,9 +311,9 @@ class ProxyController {
 
         if (isChunked || isEncoded) {
             const passThroughStream = new PassThrough();
-            responseStream.data.pipe(passThroughStream);
+            responseStream.pipe(passThroughStream);
             passThroughStream.pipe(res);
-            res.writeHead(responseStream.status, responseStream.headers as OutgoingHttpHeaders);
+            res.writeHead(responseStream.statusCode || 200, responseStream.headers as OutgoingHttpHeaders);
 
             await logCtx.success();
             return;
@@ -323,29 +321,27 @@ class ProxyController {
 
         let responseData = '';
 
-        responseStream.data.on('data', (chunk: Buffer) => {
+        responseStream.on('data', (chunk: Buffer) => {
             responseData += chunk.toString();
         });
 
-        responseStream.data.on('end', async () => {
+        responseStream.on('end', () => {
             if (!isJsonResponse) {
                 res.send(responseData);
-                await logCtx.success();
+                logCtx.success().catch((error: unknown) => logger.error(error));
                 return;
             }
 
             try {
-                const parsedResponse = JSON.parse(responseData);
-
+                const parsedResponse: unknown = JSON.parse(responseData);
                 res.json(parsedResponse);
-                await logCtx.success();
-            } catch (error) {
+                logCtx.success().catch((error: unknown) => logger.error(error));
+            } catch (error: unknown) {
                 logger.error(error);
                 res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(JSON.stringify({ error: 'Failed to parse JSON response' }));
-
-                await logCtx.error('Failed to parse JSON response', { error });
-                await logCtx.failed();
+                logCtx.error('Failed to parse JSON response', { error }).catch((error: unknown) => logger.error(error));
+                logCtx.failed().catch((error: unknown) => logger.error(error));
             }
         });
     }
@@ -359,67 +355,65 @@ class ProxyController {
         environment_id: number,
         logCtx: LogContext
     ) {
-        const error = e as AxiosError;
+        const isHttpError = (error: unknown): error is HttpError => {
+            return typeof error === 'object' && error !== null && 'message' in error;
+        };
 
-        if (!error.response?.data && error.toJSON) {
-            const {
-                message,
-                stack,
-                config: { method },
-                code,
-                status
-            } = error.toJSON() as any;
+        if (isHttpError(e)) {
+            const error = e;
 
-            const errorObject = { message, stack, code, status, url, method };
+            if (error.message) {
+                const errorObject = { message: error.message, stack: error.stack, url, method: config.method };
 
-            if (activityLogId) {
-                await createActivityLogMessageAndEnd({
-                    level: 'error',
-                    environment_id,
-                    activity_log_id: activityLogId,
-                    timestamp: Date.now(),
-                    content: `${method.toUpperCase()} request to ${url} failed`,
-                    params: errorObject
-                });
-                await logCtx.error(`${method.toUpperCase()} request to ${url} failed`, errorObject);
-                await logCtx.failed();
-            } else {
-                console.error(`Error: ${method.toUpperCase()} request to ${url} failed with the following params: ${JSON.stringify(errorObject)}`);
+                if (activityLogId) {
+                    await createActivityLogMessageAndEnd({
+                        level: 'error',
+                        environment_id,
+                        activity_log_id: activityLogId,
+                        timestamp: Date.now(),
+                        content: `${config.method.toUpperCase()} request to ${url} failed`,
+                        params: errorObject
+                    });
+                    await logCtx.error(`${config.method.toUpperCase()} request to ${url} failed`, errorObject);
+                    await logCtx.failed();
+                } else {
+                    logger.error(`Error: ${config.method.toUpperCase()} request to ${url} failed with the following params: ${JSON.stringify(errorObject)}`);
+                }
+
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+
+                const stream = new Readable();
+                stream.push(JSON.stringify(errorObject));
+                stream.push(null);
+
+                stream.pipe(res);
+
+                return;
             }
 
-            const responseStatus = error.response?.status || 500;
-            const responseHeaders = error.response?.headers || {};
-
-            res.writeHead(responseStatus, responseHeaders as OutgoingHttpHeaders);
-
+            const errorData = error.message;
+            const stringify = new Transform({
+                transform(chunk: Buffer, _encoding: BufferEncoding, callback: TransformCallback) {
+                    callback(null, chunk);
+                }
+            });
+            res.writeHead(500, { 'Content-Type': 'application/json' });
             const stream = new Readable();
-            stream.push(JSON.stringify(errorObject));
+            stream.push(JSON.stringify({ error: errorData }));
             stream.push(null);
 
-            stream.pipe(res);
-
-            return;
-        }
-
-        const errorData = error.response?.data as stream.Readable;
-        const stringify = new Transform({
-            transform(chunk: Buffer, _encoding: BufferEncoding, callback: TransformCallback) {
-                callback(null, chunk);
-            }
-        });
-        if (error.response?.status) {
-            res.writeHead(error.response.status, error.response.headers as OutgoingHttpHeaders);
-        }
-        if (errorData) {
-            errorData.pipe(stringify).pipe(res);
+            stream.pipe(stringify).pipe(res);
             stringify.on('data', (data) => {
-                void this.reportError(error, url, config, activityLogId, environment_id, data, logCtx);
+                if (typeof data === 'string') {
+                    void this.reportError(error, url, config, activityLogId, environment_id, data, logCtx);
+                } else {
+                    logger.error('Unexpected data type:', typeof data);
+                }
             });
         } else {
-            if (activityLogId) {
-                await logCtx.error('Unknown error');
-                await logCtx.failed();
-            }
+            logger.error('Unknown error type:', e);
+            res.writeHead(500, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Unknown error occurred' }));
         }
     }
 
@@ -430,7 +424,6 @@ class ProxyController {
         config,
         activityLogId,
         environment_id,
-        decompress,
         isSync,
         isDryRun,
         data,
@@ -442,7 +435,6 @@ class ProxyController {
         config: ApplicationConstructedProxyConfiguration;
         activityLogId: number | null;
         environment_id: number;
-        decompress: boolean;
         isSync?: boolean | undefined;
         isDryRun?: boolean | undefined;
         data?: unknown;
@@ -451,19 +443,19 @@ class ProxyController {
         try {
             const activityLogs: ActivityLogMessage[] = [];
             const headers = proxyService.constructHeaders(config);
-            const requestConfig: AxiosRequestConfig = {
+            const requestOptions: RequestOptions | HttpsRequestOptions = {
                 method,
-                url,
-                responseType: 'stream',
                 headers,
-                decompress
+                agent: url.startsWith('https') ? httpsAgent : httpAgent
             };
             if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
-                requestConfig.data = data || {};
+                requestOptions.headers = { ...requestOptions.headers, 'Content-Type': 'application/json' };
             }
-            const responseStream: AxiosResponse = await backOff(
+            const requestFunction = url.startsWith('https') ? httpsRequest : httpRequest;
+            const parsedUrl = new URL(url);
+            const responseStream: IncomingMessage = await backOff(
                 () => {
-                    return axios(requestConfig);
+                    return requestFunction({ ...requestOptions, path: parsedUrl.pathname + parsedUrl.search }, data ? JSON.stringify(data) : undefined);
                 },
                 { numOfAttempts: Number(config.retries), retry: proxyService.retry.bind(this, activityLogId, environment_id, config, activityLogs) }
             );
@@ -479,14 +471,14 @@ class ProxyController {
                 })
             );
 
-            await this.handleResponse({ res, responseStream, config, activityLogId, environment_id, url, isSync, isDryRun, logCtx });
+            await this.handleResponse({ res, responseStream, config, activityLogId, environment_id, url: parsedUrl.href, isSync, isDryRun, logCtx });
         } catch (error) {
             await this.handleErrorResponse(res, error, url, config, activityLogId, environment_id, logCtx);
         }
     }
 
     private async reportError(
-        error: AxiosError,
+        error: HttpError,
         url: string,
         config: ApplicationConstructedProxyConfiguration,
         activityLogId: number | null,
@@ -502,27 +494,27 @@ class ProxyController {
                 activity_log_id: activityLogId,
                 timestamp: Date.now(),
                 content: JSON.stringify({
-                    nangoComment: `The provider responded back with a ${error.response?.status} to the url: ${url}`,
+                    nangoComment: `The provider responded back with a ${error.response?.status ?? 'unknown status'} to the url: ${url}`,
                     providerResponse: errorMessage.toString()
                 }),
                 params: {
                     requestHeaders: JSON.stringify(safeHeaders, null, 2),
-                    responseHeaders: JSON.stringify(error.response?.headers, null, 2)
+                    responseHeaders: JSON.stringify(error.response?.headers ?? {}, null, 2)
                 }
             });
             await logCtx?.error('The provider responded back with an error code', {
-                code: error.response?.status,
+                code: error.response?.status ?? 'unknown status',
                 url,
                 error: errorMessage,
                 requestHeaders: safeHeaders,
-                responseHeaders: error.response?.headers
+                responseHeaders: error.response?.headers ?? {}
             });
             await logCtx?.failed();
         } else {
-            const content = `The provider responded back with a ${error.response?.status} and the message ${errorMessage} to the url: ${url}.${
+            const content = `The provider responded back with a ${error.response?.status ?? 'unknown status'} and the message ${errorMessage} to the url: ${url}.${
                 config.template.docs ? ` Refer to the documentation at ${config.template.docs} for help` : ''
             }`;
-            console.error(content);
+            logger.error(content);
         }
     }
 }

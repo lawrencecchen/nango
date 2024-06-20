@@ -1,11 +1,17 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { vi, expect, describe, it, beforeEach } from 'vitest';
 import { sendAuth } from './auth.js';
-import { axiosInstance } from '@nangohq/utils';
+import * as utils from '@nangohq/utils';
 import type { Connection, Environment, ExternalWebhook } from '@nangohq/types';
 import * as logPackage from '@nangohq/logs';
 
-const spy = vi.spyOn(axiosInstance, 'post');
+vi.mock('@nangohq/utils', () => ({
+    httpRequest: vi.fn(),
+    httpsRequest: vi.fn()
+}));
+
+const spyHttp = utils.httpRequest;
+const spyHttps = utils.httpsRequest;
 
 const connection: Pick<Connection, 'connection_id' | 'provider_config_key'> = {
     connection_id: '1',
@@ -53,7 +59,8 @@ describe('Webhooks: forward notification tests', () => {
             activityLogId: 1,
             logCtx
         });
-        expect(spy).not.toHaveBeenCalled();
+        expect(spyHttp).not.toHaveBeenCalled();
+        expect(spyHttps).not.toHaveBeenCalled();
     });
 
     it('Should send a forward webhook if the webhook url is not present but the secondary is', async () => {
@@ -78,7 +85,8 @@ describe('Webhooks: forward notification tests', () => {
             activityLogId: 1,
             logCtx
         });
-        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spyHttp).toHaveBeenCalledTimes(1);
+        expect(spyHttps).not.toHaveBeenCalled();
     });
 
     it('Should send a forwarded webhook if the webhook url is present', async () => {
@@ -104,7 +112,8 @@ describe('Webhooks: forward notification tests', () => {
             activityLogId: 1,
             logCtx
         });
-        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spyHttp).toHaveBeenCalledTimes(1);
+        expect(spyHttps).not.toHaveBeenCalled();
     });
 
     it('Should send a forwarded webhook twice if the webhook url and secondary are present', async () => {
@@ -126,6 +135,7 @@ describe('Webhooks: forward notification tests', () => {
             activityLogId: 1,
             logCtx
         });
-        expect(spy).toHaveBeenCalledTimes(2);
+        expect(spyHttp).toHaveBeenCalledTimes(2);
+        expect(spyHttps).not.toHaveBeenCalled();
     });
 });

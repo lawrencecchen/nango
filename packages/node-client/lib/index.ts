@@ -9,8 +9,6 @@ import type {
     BasicApiCredentials,
     Connection,
     ConnectionList,
-    CreateConnectionOAuth1,
-    CreateConnectionOAuth2,
     CredentialsCommon,
     GetRecordsRequestConfig,
     Integration,
@@ -212,14 +210,14 @@ export class Nango {
     /**
      * @deprecated This method has been deprecated, please use the REST API to import a connection.
      */
-    public importConnection(_connectionArgs: CreateConnectionOAuth1 | (CreateConnectionOAuth2 & { metadata: string; connection_config: string })) {
+    public importConnection() {
         throw new Error('This method has been deprecated, please use the REST API to import a connection.');
     }
 
     /**
-     * @deprecated This method has been deprecated, please use the REST API to import a connection.
+     * @deprecated This method has been deprecated, please use the REST API to create a connection.
      */
-    public createConnection(_connectionArgs: CreateConnectionOAuth1 | (CreateConnectionOAuth2 & { metadata: string; connection_config: string })) {
+    public createConnection() {
         throw new Error('This method has been deprecated, please use the REST API to create a connection.');
     }
 
@@ -257,9 +255,9 @@ export class Nango {
      * @param forceRefresh - Optional. When set to true, this obtains a new access token from the provider before the current token has expired
      * @returns A promise that resolves with the raw token response
      */
-    public async getRawTokenResponse<T = Record<string, any>>(providerConfigKey: string, connectionId: string, forceRefresh?: boolean): Promise<T> {
+    public async getRawTokenResponse<T extends Record<string, unknown>>(providerConfigKey: string, connectionId: string, forceRefresh?: boolean): Promise<T> {
         const response = await this.getConnectionDetails(providerConfigKey, connectionId, forceRefresh);
-        const credentials = response.data.credentials as CredentialsCommon;
+        const credentials = response.data.credentials as CredentialsCommon<T>;
         return credentials.raw as T;
     }
 
@@ -394,7 +392,7 @@ export class Nango {
     /**
      * @deprecated. Use listRecords() instead.
      */
-    public async getRecords<T = any>(config: GetRecordsRequestConfig): Promise<(T & { _nango_metadata: RecordMetadata })[]> {
+    public async getRecords<T = unknown>(config: GetRecordsRequestConfig): Promise<(T & { _nango_metadata: RecordMetadata })[]> {
         const { connectionId, providerConfigKey, model, delta, offset, limit, includeNangoMetadata, filter } = config;
         validateSyncRecordConfiguration(config);
 
@@ -441,7 +439,7 @@ export class Nango {
      * @param config - Configuration object for listing records
      * @returns A promise that resolves with an object containing an array of records and a cursor for pagination
      */
-    public async listRecords<T extends Record<string, any> = Record<string, any>>(
+    public async listRecords<T extends Record<string, unknown> = Record<string, unknown>>(
         config: ListRecordsRequestConfig
     ): Promise<{ records: (T & { _nango_metadata: RecordMetadata })[]; next_cursor: string | null }> {
         const { connectionId, providerConfigKey, model, delta, modifiedAfter, limit, filter, cursor } = config;
@@ -698,7 +696,7 @@ export class Nango {
      * @param config - The configuration object for the proxy request
      * @returns A promise that resolves with the response from the proxied request
      */
-    public async proxy<T = any>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
+    public async proxy<T extends Record<string, unknown> = Record<string, unknown>>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
         if (!config.connectionId && this.connectionId) {
             config.connectionId = this.connectionId;
         }
@@ -777,7 +775,7 @@ export class Nango {
      * @param config - The configuration object for the GET request
      * @returns A promise that resolves with the response from the GET request
      */
-    public async get<T = any>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
+    public async get<T extends Record<string, unknown> = Record<string, unknown>>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
         return this.proxy({
             ...config,
             method: 'GET'
@@ -789,7 +787,7 @@ export class Nango {
      * @param config - The configuration object for the POST request
      * @returns A promise that resolves with the response from the POST request
      */
-    public async post<T = any>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
+    public async post<T extends Record<string, unknown> = Record<string, unknown>>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
         return this.proxy({
             ...config,
             method: 'POST'
@@ -801,7 +799,7 @@ export class Nango {
      * @param config - The configuration object for the PATCH request
      * @returns A promise that resolves with the response from the PATCH request
      */
-    public async patch<T = any>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
+    public async patch<T extends Record<string, unknown> = Record<string, unknown>>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
         return this.proxy({
             ...config,
             method: 'PATCH'
@@ -813,7 +811,7 @@ export class Nango {
      * @param config - The configuration object for the DELETE request
      * @returns A promise that resolves with the response from the DELETE request
      */
-    public async delete<T = any>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
+    public async delete<T extends Record<string, unknown> = Record<string, unknown>>(config: ProxyConfiguration): Promise<AxiosResponse<T>> {
         return this.proxy({
             ...config,
             method: 'DELETE'
@@ -852,7 +850,7 @@ export class Nango {
         connectionId: string,
         forceRefresh: boolean = false,
         refreshToken: boolean = false,
-        additionalHeader: Record<string, any> = {}
+        additionalHeader: Record<string, unknown> = {}
     ): Promise<AxiosResponse<Connection>> {
         const url = `${this.serverUrl}/connection/${connectionId}`;
 

@@ -1,13 +1,23 @@
-import braintree from 'braintree';
+import * as braintree from 'braintree';
 import type { Config as ProviderConfig, Connection, AuthorizationTokenResponse, RefreshTokenResponse } from '../models/index.js';
 import type { TemplateOAuth2 as ProviderTemplateOAuth2 } from '@nangohq/types';
-import qs from 'qs';
+import * as qs from 'qs';
 import { parseTokenExpirationDate, isTokenExpired } from '../utils/utils.js';
 import { NangoError } from '../utils/error.js';
-import { getLogger, axiosInstance as axios } from '@nangohq/utils';
+import { getLogger, httpsRequest } from '@nangohq/utils';
+import type { IncomingMessage } from 'http';
+import type { RequestOptions } from 'https';
 
 const stripeAppExpiresIn = 3600;
 const logger = getLogger('Provider.Client');
+
+async function streamToString(stream: IncomingMessage): Promise<string> {
+    const chunks: Uint8Array[] = [];
+    for await (const chunk of stream) {
+        chunks.push(chunk as Uint8Array);
+    }
+    return Buffer.concat(chunks).toString('utf-8');
+}
 
 class ProviderClient {
     public shouldUseProviderClient(provider: string): boolean {
@@ -37,7 +47,13 @@ class ProviderClient {
         }
     }
 
-    public async getToken(config: ProviderConfig, tokenUrl: string, code: string, callBackUrl: string, codeVerifier: string): Promise<object> {
+    public async getToken(
+        config: ProviderConfig,
+        tokenUrl: string,
+        code: string,
+        callBackUrl: string,
+        codeVerifier: string
+    ): Promise<AuthorizationTokenResponse | RefreshTokenResponse> {
         switch (config.provider) {
             case 'braintree':
             case 'braintree-sandbox':
@@ -64,33 +80,44 @@ class ProviderClient {
             throw new NangoError('wrong_credentials_type');
         }
 
-        const credentials = connection.credentials;
-
-        if (config.provider !== 'facebook' && !credentials.refresh_token) {
+        if (config.provider !== 'facebook' && !connection.credentials.refresh_token) {
             throw new NangoError('missing_refresh_token');
-        } else if (config.provider === 'facebook' && !credentials.access_token) {
+        } else if (config.provider === 'facebook' && !connection.credentials.access_token) {
             throw new NangoError('missing_facebook_access_token');
         }
 
         switch (config.provider) {
             case 'braintree':
             case 'braintree-sandbox':
-                return this.refreshBraintreeToken(credentials.refresh_token!, config.oauth_client_id, config.oauth_client_secret);
+                if (typeof connection.credentials.refresh_token !== 'string') {
+                    throw new NangoError('invalid_refresh_token');
+                }
+                return this.refreshBraintreeToken(connection.credentials.refresh_token, config.oauth_client_id, config.oauth_client_secret);
             case 'figma':
             case 'figjam':
-                return this.refreshFigmaToken(template.refresh_url as string, credentials.refresh_token!, config.oauth_client_id, config.oauth_client_secret);
+                return this.refreshFigmaToken(
+                    template.refresh_url as string,
+                    connection.credentials.refresh_token as string,
+                    config.oauth_client_id,
+                    config.oauth_client_secret
+                );
             case 'facebook':
-                return this.refreshFacebookToken(template.token_url as string, credentials.access_token, config.oauth_client_id, config.oauth_client_secret);
+                return this.refreshFacebookToken(
+                    template.token_url as string,
+                    connection.credentials.access_token,
+                    config.oauth_client_id,
+                    config.oauth_client_secret
+                );
             case 'tiktok-accounts':
                 return this.refreshTiktokAccountsToken(
                     template.refresh_url as string,
-                    credentials.refresh_token as string,
+                    connection.credentials.refresh_token as string,
                     config.oauth_client_id,
                     config.oauth_client_secret
                 );
             case 'stripe-app':
             case 'stripe-app-sandbox':
-                return this.refreshStripeAppToken(template.token_url as string, credentials.refresh_token!, config.oauth_client_secret);
+                return this.refreshStripeAppToken(template.token_url as string, connection.credentials.refresh_token as string, config.oauth_client_secret);
             default:
                 throw new NangoError('unknown_provider_client');
         }
@@ -101,18 +128,48 @@ class ProviderClient {
             throw new NangoError('wrong_credentials_type');
         }
 
-        const credentials = connection.credentials;
-        const oauthConnection = connection;
+        const url = `${connection.connection_config['instance_url']}/services/oauth2/introspect`;
+        const body = JSON.stringify({
+            token: connection.credentials.access_token,
+            client_id: config.oauth_client_id,
+            client_secret: config.oauth_client_secret,
+            token_type_hint: 'access_token'
+        });
+        const options: RequestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept-Encoding': 'application/json',
+                'Content-Length': Buffer.byteLength(body)
+            }
+        };
 
         switch (config.provider) {
             case 'salesforce':
             case 'salesforce-sandbox':
-                return this.introspectedSalesforceTokenExpired(
-                    credentials.access_token,
-                    config.oauth_client_id,
-                    config.oauth_client_secret,
-                    oauthConnection.connection_config as Record<string, string>
-                );
+                try {
+                    const response = await httpsRequest({ ...options, path: url }, body);
+                    const parsedResponse = JSON.parse(await streamToString(response));
+                    if (parsedResponse && typeof parsedResponse.active === 'boolean' && typeof parsedResponse.exp === 'number') {
+                        const responseData: { active: boolean; exp: number } = {
+                            active: parsedResponse.active,
+                            exp: parsedResponse.exp
+                        };
+
+                        if (!responseData.active || !responseData.exp) {
+                            return true;
+                        }
+
+                        const expireDate = parseTokenExpirationDate(responseData.exp);
+
+                        return isTokenExpired(expireDate, 15 * 60);
+                    }
+                    return true;
+                } catch (err) {
+                    logger.error(err);
+                    // TODO add observability
+                    return false;
+                }
             default:
                 throw new NangoError('unknown_provider_client');
         }
@@ -127,19 +184,36 @@ class ProviderClient {
     ): Promise<AuthorizationTokenResponse> {
         const params = new URLSearchParams();
         params.set('redirect_uri', callBackUrl);
-        const body = {
+        const body = JSON.stringify({
             client_id: clientId,
             client_secret: clientSecret,
             code: code,
             grant_type: 'authorization_code'
+        });
+        const options: RequestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(body)
+            }
         };
-        const url = `${tokenUrl}?${params.toString()}`;
-        const response = await axios.post(url, body);
-        if (response.status === 200 && response.data !== null) {
+        const response = await httpsRequest({ ...options, path: `${tokenUrl}?${params.toString()}` }, body);
+        const parsedResponse = JSON.parse(await streamToString(response));
+        if (
+            parsedResponse &&
+            typeof parsedResponse.access_token === 'string' &&
+            typeof parsedResponse.refresh_token === 'string' &&
+            typeof parsedResponse.expires_in === 'number'
+        ) {
+            const responseData: { access_token: string; refresh_token: string; expires_in: number } = {
+                access_token: parsedResponse.access_token,
+                refresh_token: parsedResponse.refresh_token,
+                expires_in: parsedResponse.expires_in
+            };
             return {
-                access_token: response.data['access_token'],
-                refresh_token: response.data['refresh_token'],
-                expires_in: response.data['expires_in']
+                access_token: responseData.access_token,
+                refresh_token: responseData.refresh_token,
+                expires_in: responseData.expires_in
             };
         }
         throw new NangoError('figma_token_request_error');
@@ -155,184 +229,300 @@ class ProviderClient {
     ): Promise<AuthorizationTokenResponse> {
         const params = new URLSearchParams();
         params.set('redirect_uri', callBackUrl);
-        const body = {
+        const body = JSON.stringify({
             client_id: clientId,
             client_secret: clientSecret,
             code: code,
             redirect_uri: callBackUrl,
             code_verifier: codeVerifier
+        });
+        const options: RequestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(body)
+            }
         };
-        const url = `${tokenUrl}?${params.toString()}`;
-        const response = await axios.post(url, body);
-        if (response.status === 200 && response.data !== null) {
+        const response = await httpsRequest({ ...options, path: `${tokenUrl}?${params.toString()}` }, body);
+        const parsedResponse = JSON.parse(await streamToString(response));
+        if (parsedResponse && typeof parsedResponse.access_token === 'string' && typeof parsedResponse.expires_in === 'number') {
+            const responseData: { access_token: string; expires_in: number } = {
+                access_token: parsedResponse.access_token,
+                expires_in: parsedResponse.expires_in
+            };
             return {
-                access_token: response.data['access_token'],
-                expires_in: response.data['expires_in']
+                access_token: responseData.access_token,
+                expires_in: responseData.expires_in
             };
         }
         throw new NangoError('facebook_token_request_error');
     }
 
-    private async createTiktokAdsToken(tokenUrl: string, code: string, clientId: string, clientSecret: string): Promise<object> {
+    private async createTiktokAdsToken(tokenUrl: string, code: string, clientId: string, clientSecret: string): Promise<AuthorizationTokenResponse> {
         try {
-            const body = {
+            const body = JSON.stringify({
                 secret: clientSecret,
                 app_id: clientId,
                 auth_code: code
+            });
+
+            const options: RequestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(body)
+                }
             };
 
-            const response = await axios.post(tokenUrl, body);
-
-            if (response.status === 200 && response.data !== null) {
+            const response = await httpsRequest({ ...options, path: tokenUrl }, body);
+            const parsedResponse = JSON.parse(await streamToString(response));
+            if (
+                parsedResponse &&
+                parsedResponse.data &&
+                typeof parsedResponse.data.access_token === 'string'
+            ) {
                 return {
-                    access_token: response.data.data['access_token'],
-                    advertiser_ids: response.data.data['advertiser_ids'],
-                    scope: response.data.data['scope'],
-                    request_id: response.data['request_id']
+                    access_token: parsedResponse.data.access_token,
+                    refresh_token: '', // Tiktok Ads API does not provide a refresh token
+                    expires_in: 3600 // Assuming a default expiration time
                 };
             }
             throw new NangoError('tiktok_token_request_error');
-        } catch (e: any) {
-            throw new NangoError('tiktok_token_request_error', e.message);
+        } catch (e: unknown) {
+            throw new NangoError('tiktok_token_request_error', (e as Error).message);
         }
     }
 
-    private async createStripeAppToken(tokenUrl: string, code: string, clientSecret: string, callback: string): Promise<object> {
+    private async createStripeAppToken(tokenUrl: string, code: string, clientSecret: string, callback: string): Promise<AuthorizationTokenResponse> {
         try {
-            const headers = {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                Authorization: 'Basic ' + Buffer.from(clientSecret + ':').toString('base64')
-            };
-            const body = {
+            const body = JSON.stringify({
                 grant_type: 'authorization_code',
                 code: code,
                 redirect_uri: callback
+            });
+
+            const options: RequestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    Authorization: 'Basic ' + Buffer.from(clientSecret + ':').toString('base64'),
+                    'Content-Length': Buffer.byteLength(body)
+                }
             };
 
-            const response = await axios.post(tokenUrl, body, { headers: headers });
-            if (response.status === 200 && response.data) {
+            const response = await httpsRequest({ ...options, path: tokenUrl }, body);
+            const parsedResponse = JSON.parse(await streamToString(response));
+            if (
+                parsedResponse &&
+                typeof parsedResponse.access_token === 'string' &&
+                typeof parsedResponse.livemode === 'boolean' &&
+                typeof parsedResponse.refresh_token === 'string' &&
+                typeof parsedResponse.scope === 'string' &&
+                typeof parsedResponse.stripe_publishable_key === 'string' &&
+                typeof parsedResponse.stripe_user_id === 'string' &&
+                typeof parsedResponse.token_type === 'string'
+            ) {
                 return {
-                    access_token: response.data['access_token'],
-                    livemode: response.data['livemode'],
-                    refresh_token: response.data['refresh_token'],
-                    scope: response.data['scope'],
-                    stripe_publishable_key: response.data['stripe_publishable_key'],
-                    stripe_user_id: response.data['stripe_user_id'],
-                    token_type: response.data['token_type'],
+                    access_token: parsedResponse.access_token,
+                    refresh_token: parsedResponse.refresh_token,
                     expires_in: stripeAppExpiresIn
                 };
             }
 
             throw new NangoError('stripe_app_token_request_error');
-        } catch (e: any) {
-            throw new NangoError('stripe_app_token_request_error', e.message);
+        } catch (e: unknown) {
+            throw new NangoError('stripe_app_token_request_error', (e as Error).message);
         }
     }
 
     private async refreshStripeAppToken(refreshTokenUrl: string, refreshToken: string, clientSecret: string): Promise<object> {
         try {
-            const headers = {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                Authorization: 'Basic ' + Buffer.from(clientSecret + ':').toString('base64')
-            };
-
-            const body = {
+            const body = JSON.stringify({
                 grant_type: 'refresh_token',
                 refresh_token: refreshToken
+            });
+
+            const options: RequestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    Authorization: 'Basic ' + Buffer.from(clientSecret + ':').toString('base64'),
+                    'Content-Length': Buffer.byteLength(body)
+                }
             };
 
-            const response = await axios.post(refreshTokenUrl, body, { headers: headers });
+            const response = await httpsRequest({ ...options, path: refreshTokenUrl }, body);
+            const responseData: {
+                access_token: string;
+                livemode: boolean;
+                refresh_token: string;
+                scope: string;
+                stripe_publishable_key: string;
+                stripe_user_id: string;
+                token_type: string;
+            } = JSON.parse(await streamToString(response));
 
-            if (response.status === 200 && response.data) {
+            if (responseData) {
                 return {
-                    access_token: response.data['access_token'],
-                    livemode: response.data['livemode'],
-                    refresh_token: response.data['refresh_token'],
-                    scope: response.data['scope'],
-                    stripe_publishable_key: response.data['stripe_publishable_key'],
-                    stripe_user_id: response.data['stripe_user_id'],
-                    token_type: response.data['token_type'],
+                    access_token: responseData.access_token,
+                    livemode: responseData.livemode,
+                    refresh_token: responseData.refresh_token,
+                    scope: responseData.scope,
+                    stripe_publishable_key: responseData.stripe_publishable_key,
+                    stripe_user_id: responseData.stripe_user_id,
+                    token_type: responseData.token_type,
                     expires_in: stripeAppExpiresIn
                 };
             }
             throw new NangoError('stripe_app_token_refresh_request_error');
-        } catch (e: any) {
-            throw new NangoError('stripe_app_token_refresh_request_error', e.message);
+        } catch (e: unknown) {
+            throw new NangoError('stripe_app_token_refresh_request_error', (e as Error).message);
         }
     }
 
-    private async createTiktokAccountsToken(tokenUrl: string, code: string, client_id: string, client_secret: string, redirect_uri: string): Promise<object> {
+    private async createTiktokAccountsToken(tokenUrl: string, code: string, client_id: string, client_secret: string, redirect_uri: string): Promise<AuthorizationTokenResponse> {
         try {
-            const body = {
+            const body = JSON.stringify({
                 client_id,
                 client_secret,
                 grant_type: 'authorization_code',
                 auth_code: code,
                 redirect_uri
+            });
+
+            const options: RequestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(body)
+                }
             };
 
-            const response = await axios.post(tokenUrl, body);
-
-            if (response.status === 200 && response.data && response.data.data) {
+            const response = await httpsRequest({ ...options, path: tokenUrl }, body);
+            const parsedResponse = JSON.parse(await streamToString(response));
+            if (
+                parsedResponse &&
+                parsedResponse.data &&
+                typeof parsedResponse.data.access_token === 'string' &&
+                typeof parsedResponse.data.token_type === 'string' &&
+                typeof parsedResponse.data.scope === 'string' &&
+                typeof parsedResponse.data.expires_in === 'number' &&
+                typeof parsedResponse.data.refresh_token === 'string' &&
+                typeof parsedResponse.data.refresh_token_expires_in === 'number' &&
+                typeof parsedResponse.data.open_id === 'string' &&
+                typeof parsedResponse.request_id === 'string'
+            ) {
                 return {
-                    access_token: response.data.data['access_token'],
-                    token_type: response.data.data['token_type'],
-                    scope: response.data.data['scope'],
-                    expires_in: response.data.data['expires_in'],
-                    refresh_token: response.data.data['refresh_token'],
-                    refresh_token_expires_in: response.data.data['refresh_token_expires_in'],
-                    open_id: response.data.data['open_id'],
-                    request_id: response.data['request_id']
+                    access_token: parsedResponse.data.access_token,
+                    refresh_token: parsedResponse.data.refresh_token,
+                    expires_in: parsedResponse.data.expires_in
                 };
             }
 
-            throw new NangoError('tiktok_token_request_error', response.data);
-        } catch (e: any) {
-            throw new NangoError('tiktok_token_request_error', e.message);
+            throw new NangoError('tiktok_token_request_error', parsedResponse);
+        } catch (e: unknown) {
+            throw new NangoError('tiktok_token_request_error', (e as Error).message);
         }
     }
 
     private async refreshTiktokAccountsToken(refreshTokenUrl: string, refreshToken: string, clientId: string, clientSecret: string): Promise<object> {
         try {
-            const body = {
+            const body = JSON.stringify({
                 client_id: clientId,
                 client_secret: clientSecret,
                 grant_type: 'refresh_token',
                 refresh_token: refreshToken
+            });
+
+            const options: RequestOptions = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Content-Length': Buffer.byteLength(body)
+                }
             };
 
-            const response = await axios.post(refreshTokenUrl, body);
-
-            if (response.status === 200 && response.data !== null) {
+            const response = await httpsRequest({ ...options, path: refreshTokenUrl }, body);
+            const parsedResponse = JSON.parse(await streamToString(response));
+            if (
+                parsedResponse &&
+                parsedResponse.data &&
+                typeof parsedResponse.data.access_token === 'string' &&
+                typeof parsedResponse.data.token_type === 'string' &&
+                typeof parsedResponse.data.scope === 'string' &&
+                typeof parsedResponse.data.expires_in === 'number' &&
+                typeof parsedResponse.data.refresh_token === 'string' &&
+                typeof parsedResponse.data.refresh_token_expires_in === 'number' &&
+                typeof parsedResponse.data.open_id === 'string' &&
+                typeof parsedResponse.request_id === 'string'
+            ) {
+                const responseData: {
+                    data: {
+                        access_token: string;
+                        token_type: string;
+                        scope: string;
+                        expires_in: number;
+                        refresh_token: string;
+                        refresh_token_expires_in: number;
+                        open_id: string;
+                    };
+                    request_id: string;
+                } = {
+                    data: {
+                        access_token: parsedResponse.data.access_token,
+                        token_type: parsedResponse.data.token_type,
+                        scope: parsedResponse.data.scope,
+                        expires_in: parsedResponse.data.expires_in,
+                        refresh_token: parsedResponse.data.refresh_token,
+                        refresh_token_expires_in: parsedResponse.data.refresh_token_expires_in,
+                        open_id: parsedResponse.data.open_id
+                    },
+                    request_id: parsedResponse.request_id
+                };
                 return {
-                    access_token: response.data.data['access_token'],
-                    token_type: response.data.data['token_type'],
-                    scope: response.data.data['scope'],
-                    expires_in: response.data.data['expires_in'],
-                    refresh_token: response.data.data['refresh_token'],
-                    refresh_token_expires_in: response.data.data['refresh_token_expires_in'],
-                    open_id: response.data.data['open_id'],
-                    request_id: response.data['request_id']
+                    access_token: responseData.data.access_token,
+                    token_type: responseData.data.token_type,
+                    scope: responseData.data.scope,
+                    expires_in: responseData.data.expires_in,
+                    refresh_token: responseData.data.refresh_token,
+                    refresh_token_expires_in: responseData.data.refresh_token_expires_in,
+                    open_id: responseData.data.open_id,
+                    request_id: responseData.request_id
                 };
             }
-            throw new NangoError('tiktok_token_refresh_request_error');
-        } catch (e: any) {
-            throw new NangoError('tiktok_token_refresh_request_error', e.message);
+
+            throw new NangoError('tiktok_token_refresh_request_error', parsedResponse);
+        } catch (e: unknown) {
+            throw new NangoError('tiktok_token_refresh_request_error', (e as Error).message);
         }
     }
 
     private async refreshFigmaToken(refreshTokenUrl: string, refreshToken: string, clientId: string, clientSecret: string): Promise<RefreshTokenResponse> {
-        const body = {
+        const body = JSON.stringify({
             client_id: clientId,
             client_secret: clientSecret,
             refresh_token: refreshToken
+        });
+
+        const options: RequestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(body)
+            }
         };
-        const response = await axios.post(refreshTokenUrl, body);
-        if (response.status === 200 && response.data !== null) {
+
+        const response = await httpsRequest({ ...options, path: refreshTokenUrl }, body);
+        const parsedResponse = JSON.parse(await streamToString(response));
+        if (parsedResponse && typeof parsedResponse.access_token === 'string' && typeof parsedResponse.expires_in === 'number') {
+            const responseData: { access_token: string; expires_in: number } = {
+                access_token: parsedResponse.access_token,
+                expires_in: parsedResponse.expires_in
+            };
             return {
                 refresh_token: refreshToken,
-                access_token: response.data['access_token'],
-                expires_in: response.data['expires_in']
+                access_token: responseData.access_token,
+                expires_in: responseData.expires_in
             };
         }
         throw new NangoError('figma_refresh_token_request_error');
@@ -346,17 +536,30 @@ class ProviderClient {
             fb_exchange_token: accessToken
         };
         const urlWithParams = `${refreshTokenUrl}?${qs.stringify(queryParams)}`;
-        const response = await axios.post(urlWithParams);
-        if (response.status === 200 && response.data !== null) {
+
+        const options: RequestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        };
+
+        const response = await httpsRequest({ ...options, path: urlWithParams });
+        const parsedResponse = JSON.parse(await streamToString(response));
+        if (parsedResponse && typeof parsedResponse.access_token === 'string' && typeof parsedResponse.expires_in === 'number') {
+            const responseData: { access_token: string; expires_in: number } = {
+                access_token: parsedResponse.access_token,
+                expires_in: parsedResponse.expires_in
+            };
             return {
-                access_token: response.data['access_token'],
-                expires_in: response.data['expires_in']
+                access_token: responseData.access_token,
+                expires_in: responseData.expires_in
             };
         }
         throw new NangoError('facebook_refresh_token_request_error');
     }
 
-    private async createBraintreeToken(code: string, clientId: string, clientSecret: string): Promise<object> {
+    private async createBraintreeToken(code: string, clientId: string, clientSecret: string): Promise<AuthorizationTokenResponse> {
         const gateway = new braintree.BraintreeGateway({ clientId: clientId, clientSecret: clientSecret });
         const res = await gateway.oauth.createTokenFromCode({ code: code });
 
@@ -369,7 +572,7 @@ class ProviderClient {
         return {
             access_token: creds['accessToken'],
             refresh_token: creds['refreshToken'],
-            expires_at: creds['expiresAt']
+            expires_in: Math.floor((new Date(creds['expiresAt']).getTime() - Date.now()) / 1000)
         };
     }
 
@@ -390,46 +593,6 @@ class ProviderClient {
         };
     }
 
-    private async introspectedSalesforceTokenExpired(
-        accessToken: string,
-        clientId: string,
-        clientSecret: string,
-        connectionConfig: Record<string, string>
-    ): Promise<boolean> {
-        if (!connectionConfig['instance_url']) {
-            throw new NangoError('salesforce_instance_url_missing');
-        }
-
-        const url = `${connectionConfig['instance_url']}/services/oauth2/introspect`;
-
-        const headers = {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Accept-Encoding': 'application/json'
-        };
-
-        const body = {
-            token: accessToken,
-            client_id: clientId,
-            client_secret: clientSecret,
-            token_type_hint: 'access_token'
-        };
-
-        try {
-            const res = await axios.post(url, body, { headers: headers });
-
-            if (res.status != 200 || res.data == null || !res.data['active'] || res.data['exp'] == null) {
-                return true;
-            }
-
-            const expireDate = parseTokenExpirationDate(res.data['exp']);
-
-            return isTokenExpired(expireDate, 15 * 60);
-        } catch (err) {
-            logger.error(err);
-            // TODO add observability
-            return false;
-        }
-    }
 }
 
 export default new ProviderClient();

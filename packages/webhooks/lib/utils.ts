@@ -1,7 +1,7 @@
-import crypto from 'crypto';
-import { backOff } from 'exponential-backoff';
-import type { AxiosError } from 'axios';
-import { axiosInstance as axios } from '@nangohq/utils';
+import * as crypto from 'crypto';
+import { httpAgent, httpsAgent } from '@nangohq/utils';
+import * as http from 'node:http';
+import * as https from 'node:https';
 import type { LogContext } from '@nangohq/logs';
 import type { WebhookTypes, SyncType, AuthOperationType, Environment, ExternalWebhook } from '@nangohq/types';
 
@@ -28,7 +28,7 @@ export const NON_FORWARDABLE_HEADERS = [
 export const retry = async (
     activityLogId: number | null,
     logCtx?: LogContext | null | undefined,
-    error?: AxiosError,
+    error?: { response?: { status: number }; code?: string },
     attemptNumber?: number
 ): Promise<boolean> => {
     if (error?.response && (error?.response?.status < 200 || error?.response?.status >= 300)) {
@@ -141,22 +141,27 @@ export const deliver = async ({
                 ...filterHeaders(incomingHeaders || {})
             };
 
-            const response = await backOff(
-                () => {
-                    return axios.post(url, body, { headers });
-                },
-                { numOfAttempts: RETRY_ATTEMPTS, retry: retry.bind(this, activityLogId, logCtx) }
-            );
+            const options = {
+                method: 'POST',
+                headers,
+                agent: url.startsWith('https') ? httpsAgent : httpAgent
+            };
+
+            const response = url.startsWith('https')
+                ? await httpsRequest({ ...options, hostname: new URL(url).hostname, path: new URL(url).pathname }, JSON.stringify(body))
+                : await httpRequest({ ...options, hostname: new URL(url).hostname, path: new URL(url).pathname }, JSON.stringify(body));
+
+            const status = response.statusCode;
 
             if (logCtx) {
-                if (response.status >= 200 && response.status < 300) {
+                if (status >= 200 && status < 300) {
                     await logCtx.info(
-                        `${webhookType} webhook sent successfully to the ${type} ${url} and received with a ${response.status} response code${endingMessage ? ` ${endingMessage}` : ''}.`,
+                        `${webhookType} webhook sent successfully to the ${type} ${url} and received with a ${status} response code${endingMessage ? ` ${endingMessage}` : ''}.`,
                         body as Record<string, unknown>
                     );
                 } else {
                     await logCtx.error(
-                        `${webhookType} sent webhook successfully to the ${type} ${url} but received a ${response.status} response code${endingMessage ? ` ${endingMessage}` : ''}. Please send a 2xx on successful receipt.`,
+                        `${webhookType} sent webhook successfully to the ${type} ${url} but received a ${status} response code${endingMessage ? ` ${endingMessage}` : ''}. Please send a 2xx on successful receipt.`,
                         body as Record<string, unknown>
                     );
                     success = false;
@@ -175,3 +180,49 @@ export const deliver = async ({
 
     return success;
 };
+
+export async function httpRequest(options: http.RequestOptions, postData?: string): Promise<{ statusCode: number; data: string }> {
+    return new Promise((resolve, reject) => {
+        const req = http.request(options, (res) => {
+            let data = '';
+            res.on('data', (chunk: Buffer) => {
+                data += chunk.toString();
+            });
+            res.on('end', () => {
+                resolve({ statusCode: res.statusCode || 0, data });
+            });
+        });
+
+        req.on('error', (e) => {
+            reject(e);
+        });
+
+        if (postData) {
+            req.write(postData);
+        }
+        req.end();
+    });
+}
+
+export async function httpsRequest(options: https.RequestOptions, postData?: string): Promise<{ statusCode: number; data: string }> {
+    return new Promise((resolve, reject) => {
+        const req = https.request(options, (res) => {
+            let data = '';
+            res.on('data', (chunk: Buffer) => {
+                data += chunk.toString();
+            });
+            res.on('end', () => {
+                resolve({ statusCode: res.statusCode || 0, data });
+            });
+        });
+
+        req.on('error', (e) => {
+            reject(e);
+        });
+
+        if (postData) {
+            req.write(postData);
+        }
+        req.end();
+    });
+}

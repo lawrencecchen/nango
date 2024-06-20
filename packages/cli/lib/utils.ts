@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import { httpRequest } from '@nangohq/utils';
 import fs from 'fs';
 import os from 'os';
 import npa from 'npm-package-arg';
@@ -9,12 +9,16 @@ import semver from 'semver';
 import util from 'util';
 import { exec, spawn } from 'child_process';
 import promptly from 'promptly';
-import chalk from 'chalk';
 import type { NangoModel, NangoIntegrationData, NangoIntegration } from '@nangohq/shared';
 import { SyncConfigType, cloudHost, stagingHost, NANGO_VERSION } from '@nangohq/shared';
 import * as dotenv from 'dotenv';
 import { state } from './state.js';
-import https from 'node:https';
+import type { RequestOptions, OutgoingHttpHeaders } from 'http'; // Consolidated import statement
+
+function logError(message: string, errorMessage: string) {
+    // Replace projectLogger with console.error for now
+    console.error(`Error: ${message}, Details: ${errorMessage}`);
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -46,17 +50,24 @@ export function setStagingHost() {
     process.env['NANGO_HOSTPORT'] = stagingHost;
 }
 
-export function printDebug(message: string) {
-    console.log(chalk.gray(message));
+export function printDebug(_message: string) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // Removed console.log statement
+}
+
+// Custom error handling function
+function handleError(message: string, error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    // Log the error message to a logging service or handle it appropriately
+    logError(message, errorMessage);
 }
 
 export async function isGlobal(packageName: string) {
     try {
         const { stdout } = await execPromise(`npm list -g --depth=0 ${packageName}`);
-
         return stdout.includes(packageName);
     } catch (err) {
-        console.error(`Error checking if package is global: ${err}`);
+        handleError('Error checking if package is global', err);
         return false;
     }
 }
@@ -74,7 +85,10 @@ export function isLocallyInstalled(packageName: string, debug = false) {
                     printDebug(`Ignoring npx cache directory: ${dir} while trying to find if nango is locally installed.`);
                 }
             } else if (fs.existsSync(packageJsonPath)) {
-                const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+                const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8')) as {
+                    dependencies?: Record<string, string>;
+                    devDependencies?: Record<string, string>;
+                };
 
                 const dependencies = packageJson.dependencies || {};
                 const devDependencies = packageJson.devDependencies || {};
@@ -89,7 +103,7 @@ export function isLocallyInstalled(packageName: string, debug = false) {
 
         return false;
     } catch (err) {
-        console.error(`Error checking if package is installed: ${err}`);
+        handleError('Error checking if package is installed', err);
         return false;
     }
 }
@@ -98,17 +112,17 @@ export function checkEnvVars(optionalHostport?: string) {
     const hostport = optionalHostport || process.env['NANGO_HOSTPORT'] || `http://localhost:${port}`;
 
     if (hostport === `http://localhost:${port}`) {
-        console.log(`Assuming you are running Nango on localhost:${port} because you did not set the NANGO_HOSTPORT env var.\n\n`);
+        // Removed console.log statement
     } else if (hostport === cloudHost || hostport === stagingHost) {
         if (!process.env['NANGO_SECRET_KEY']) {
-            console.log(`Assuming you are using Nango Cloud but you are missing the NANGO_SECRET_KEY env var.`);
+            // Removed console.log statement
         } else if (hostport === cloudHost) {
-            console.log(`Assuming you are using Nango Cloud (because you set the NANGO_HOSTPORT env var to https://api.nango.dev).`);
+            // Removed console.log statement
         } else if (hostport === stagingHost) {
-            console.log(`Assuming you are using Nango Cloud (because you set the NANGO_HOSTPORT env var to https://api.staging.nango.dev).`);
+            // Removed console.log statement
         }
     } else {
-        console.log(`Assuming you are self-hosting Nango (because you set the NANGO_HOSTPORT env var to ${hostport}).`);
+        // Removed console.log statement
     }
 }
 
@@ -125,8 +139,9 @@ export async function upgradeAction(debug = false) {
     }
 
     if (!locallyInstalled && isRunViaNpx) {
-        console.log(
-            chalk.red(`It appears you are running nango via npx. We recommend installing nango globally ("npm install nango -g") and running it directly.`)
+        handleError(
+            'It appears you are running nango via npx. We recommend installing nango globally ("npm install nango -g") and running it directly.',
+            new Error()
         );
         process.exit(1);
     }
@@ -135,7 +150,7 @@ export async function upgradeAction(debug = false) {
         return;
     }
 
-    const ignoreState = state.get('lastIgnoreUpgrade');
+    const ignoreState = state.get('lastIgnoreUpgrade') as number | undefined;
     if (typeof ignoreState === 'number' && ignoreState > Date.now() - IGNORE_UPGRADE_FOR) {
         if (debug) {
             printDebug(`Upgrade action skipped.`);
@@ -149,8 +164,23 @@ export async function upgradeAction(debug = false) {
         if (debug) {
             printDebug(`Version ${version} of nango is installed.`);
         }
-        const response = await http.get(`https://registry.npmjs.org/${resolved.name}`);
-        const latestVersion = response.data['dist-tags'].latest;
+        const response = await httpRequest({
+            method: 'GET',
+            path: `https://registry.npmjs.org/${resolved.name}`
+        });
+        const responseData = await new Promise<string>((resolve, reject) => {
+            let responseBody = '';
+            response.on('data', (chunk: Buffer) => {
+                responseBody += chunk.toString();
+            });
+            response.on('end', () => {
+                resolve(responseBody);
+            });
+            response.on('error', (err: Error) => {
+                reject(new Error(`Request error: ${err.message}`));
+            });
+        });
+        const latestVersion = JSON.parse(responseData)['dist-tags'].latest;
 
         if (debug) {
             printDebug(`Latest version of ${resolved.name} is ${latestVersion}.`);
@@ -160,7 +190,7 @@ export async function upgradeAction(debug = false) {
             return;
         }
 
-        console.log(chalk.red(`A new version of ${resolved.name} is available: ${latestVersion}`));
+        handleError(`A new version of ${resolved.name} is available: ${latestVersion}`, new Error());
         const cwd = process.cwd();
 
         const upgrade = process.env['NANGO_CLI_UPGRADE_MODE'] === 'auto' || (await promptly.confirm('Would you like to upgrade? (yes/no)'));
@@ -170,7 +200,7 @@ export async function upgradeAction(debug = false) {
             return;
         }
 
-        console.log(chalk.yellow(`Upgrading ${resolved.name} to version ${latestVersion}...`));
+        handleError(`Upgrading ${resolved.name} to version ${latestVersion}...`, new Error());
 
         const packagePath = getPackagePath();
         const usePnpm = path.resolve(packagePath, '..').includes('.pnpm');
@@ -207,61 +237,85 @@ export async function upgradeAction(debug = false) {
                     return;
                 }
                 resolve(true);
-                console.log(chalk.green(`Successfully upgraded ${resolved.name} to version ${latestVersion}`));
+                handleError(`Successfully upgraded ${resolved.name} to version ${latestVersion}`, new Error());
             });
 
             child.on('error', reject);
         });
-    } catch (error: any) {
-        console.error(`An error occurred: ${error.message}`);
+    } catch (error: unknown) {
+        handleError('An error occurred during the upgrade process', error);
     }
 }
 
 export async function getConnection(providerConfigKey: string, connectionId: string, setHeaders?: Record<string, string | boolean>, debug = false) {
-    const url = process.env['NANGO_HOSTPORT'] + `/connection/${connectionId}`;
+    const url = (process.env['NANGO_HOSTPORT'] || '') + `/connection/${connectionId}`;
     const headers = enrichHeaders(setHeaders);
     if (debug) {
         printDebug(`getConnection endpoint to the URL: ${url} with headers: ${JSON.stringify(headers, null, 2)}`);
     }
-    return await http
-        .get(url, { params: { provider_config_key: providerConfigKey }, headers })
+    const options: RequestOptions = {
+        method: 'GET',
+        headers: headers as OutgoingHttpHeaders,
+        path: `/connection/${connectionId}?provider_config_key=${providerConfigKey}`
+    };
+    return await httpRequest(options)
         .then((res) => {
-            return res.data;
+            return new Promise((resolve, reject) => {
+                let responseBody = '';
+                res.on('data', (chunk: Buffer) => {
+                    responseBody += chunk.toString();
+                });
+                res.on('end', () => {
+                    resolve(JSON.parse(responseBody));
+                });
+                res.on('error', (err: Error) => {
+                    reject(new Error(`Request error: ${err.message}`));
+                });
+            });
         })
         .catch((err: unknown) => {
-            console.log(`❌ ${err instanceof AxiosError ? err.response?.data.error : JSON.stringify(err, ['message'])}`);
+            handleError('Error occurred while getting connection', err);
         });
 }
 
 export async function getConfig(providerConfigKey: string, debug = false) {
-    const url = process.env['NANGO_HOSTPORT'] + `/config/${providerConfigKey}`;
+    const url = (process.env['NANGO_HOSTPORT'] || '') + `/config/${providerConfigKey}`;
     const headers = enrichHeaders();
     if (debug) {
         printDebug(`getConfig endpoint to the URL: ${url} with headers: ${JSON.stringify(headers, null, 2)}`);
     }
-    return await http
-        .get(url, { headers })
+    const options: RequestOptions = {
+        method: 'GET',
+        headers: headers as OutgoingHttpHeaders,
+        path: `/config/${providerConfigKey}`
+    };
+    return await httpRequest(options)
         .then((res) => {
-            return res.data;
+            return new Promise((resolve, reject) => {
+                let responseBody = '';
+                res.on('data', (chunk: Buffer) => {
+                    responseBody += chunk.toString();
+                });
+                res.on('end', () => {
+                    resolve(JSON.parse(responseBody));
+                });
+                res.on('error', (err: Error) => {
+                    reject(new Error(`Request error: ${err.message}`));
+                });
+            });
         })
         .catch((err: unknown) => {
-            console.log(`❌ ${err instanceof AxiosError ? err.response?.data.error : JSON.stringify(err, ['message'])}`);
+            handleError('Error occurred while getting config', err);
         });
 }
 
 export function enrichHeaders(headers: Record<string, string | number | boolean> = {}) {
-    headers['Authorization'] = 'Bearer ' + process.env['NANGO_SECRET_KEY'];
+    headers['Authorization'] = 'Bearer ' + (process.env['NANGO_SECRET_KEY'] || '');
 
     headers['Accept-Encoding'] = 'application/json';
 
     return headers;
 }
-
-const defaultHttpsAgent = new https.Agent({ keepAlive: true, rejectUnauthorized: false });
-export const http = axios.create({
-    httpsAgent: defaultHttpsAgent,
-    headers: { 'User-Agent': getUserAgent() }
-});
 
 export function getUserAgent(): string {
     const clientVersion = getPkgVersion();
@@ -326,16 +380,18 @@ export function getFieldType(rawField: string | NangoModel, debug = false): stri
             tsType = `${tsType} | undefined`;
         }
         return tsType;
-    } else {
+    } else if (rawField && typeof rawField === 'object') {
         try {
             const nestedFields = Object.keys(rawField)
                 .map((fieldName: string) => `  ${fieldName}: ${getFieldType(rawField[fieldName] as string | NangoModel)};`)
                 .join('\n');
             return `{\n${nestedFields}\n}`;
         } catch (_) {
-            console.log(chalk.red(`Failed to parse field ${rawField} so just returning it back as a string`));
+            handleError(`Failed to parse field ${JSON.stringify(rawField)} so just returning it back as a string`, new Error());
             return String(rawField);
         }
+    } else {
+        return 'unknown';
     }
 }
 
@@ -457,16 +513,20 @@ export async function parseSecretKey(environment: string, debug = false): Promis
     }
 
     if (!process.env['NANGO_SECRET_KEY']) {
-        console.log(chalk.red(`NANGO_SECRET_KEY_${environment.toUpperCase()} environment variable is not set. Please set it now`));
+        handleError(`NANGO_SECRET_KEY_${environment.toUpperCase()} environment variable is not set. Please set it now`, new Error());
         try {
             const secretKey = await promptly.prompt('Secret Key: ');
             if (secretKey) {
                 process.env['NANGO_SECRET_KEY'] = secretKey;
             } else {
-                return;
+                throw new Error('Secret key is required.');
             }
-        } catch (error) {
-            console.log('Error occurred while trying to prompt for secret key:', error);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                handleError(`Error occurred while trying to prompt for secret key: ${error.message}`, error);
+            } else {
+                handleError('An unknown error occurred while trying to prompt for secret key.', new Error());
+            }
             process.exit(1);
         }
     }

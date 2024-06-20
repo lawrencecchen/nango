@@ -18,7 +18,8 @@ export type PutRecurring = Endpoint<{
 }>;
 
 const validate = validateRequest<PutRecurring>({
-    parseBody: (data: any) => {
+    parseBody: (data: unknown) => {
+        const typedData = data as PutRecurring['Body'];
         return z
             .object({
                 schedule: z.union([
@@ -33,7 +34,7 @@ const validate = validateRequest<PutRecurring>({
                 ])
             })
             .strict()
-            .parse(data);
+            .parse(typedData);
     }
 });
 

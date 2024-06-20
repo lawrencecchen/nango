@@ -6,5 +6,18 @@
     "sourceMap": true,
     "composite": true,
     "checkJs": false
-  }
+  },
+  "include": [
+    "packages/utils/lib/**/*",
+    "packages/shared/lib/**/*",
+    "packages/webhooks/lib/**/*",
+    "packages/database/lib/**/*",
+    "packages/logs/lib/**/*",
+    "packages/node-client/lib/**/*",
+    "packages/types/lib/**/*",
+    "packages/records/lib/**/*",
+    "packages/orchestrator/lib/**/*",
+    "packages/cli/lib/**/*",
+    "packages/server/lib/**/*"
+  ]
 }

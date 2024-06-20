@@ -32,8 +32,9 @@ export type PostImmediate = Endpoint<{
 }>;
 
 const validate = validateRequest<PostImmediate>({
-    parseBody: (data: any) => {
-        function argsSchema(data: any) {
+    parseBody: (data: unknown) => {
+        const typedData = data as PostImmediate['Body'];
+        function argsSchema(data: PostImmediate['Body']) {
             if ('args' in data && 'type' in data.args) {
                 switch (data.args.type) {
                     case 'sync':
@@ -63,10 +64,10 @@ const validate = validateRequest<PostImmediate>({
                     startedToCompleted: z.number().int().positive(),
                     heartbeat: z.number().int().positive()
                 }),
-                args: argsSchema(data)
+                args: argsSchema(typedData)
             })
             .strict()
-            .parse(data);
+            .parse(typedData);
     }
 });
 

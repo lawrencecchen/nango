@@ -34,7 +34,8 @@ export type PostRecurring = Endpoint<{
 }>;
 
 const validate = validateRequest<PostRecurring>({
-    parseBody: (data: any) => {
+    parseBody: (data: unknown) => {
+        const typedData = data as PostRecurring['Body'];
         return z
             .object({
                 name: z.string().min(1),
@@ -53,7 +54,7 @@ const validate = validateRequest<PostRecurring>({
                 args: syncArgsSchema
             })
             .strict()
-            .parse(data);
+            .parse(typedData);
     }
 });
 

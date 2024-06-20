@@ -18,7 +18,7 @@ export type PostScheduleRun = Endpoint<{
 }>;
 
 const validate = validateRequest<PostScheduleRun>({
-    parseBody: (data: any) => {
+    parseBody: (data: unknown) => {
         return z
             .object({ scheduleName: z.string().min(1) })
             .strict()

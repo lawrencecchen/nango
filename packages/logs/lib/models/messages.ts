@@ -137,7 +137,7 @@ export async function listOperations(opts: {
         });
     }
 
-    const cursor = opts.cursor ? parseCursor(opts.cursor) : undefined;
+    const cursor = opts.cursor ? (parseCursor(opts.cursor) as (string | number)[]) : undefined;
     const res = await client.search<OperationRow>({
         index: indexMessages.index,
         size: opts.limit,
@@ -177,7 +177,25 @@ export async function getOperation(opts: { id: MessageRow['id']; indexName?: str
         }
     });
     if (res.hits.hits.length <= 0) {
-        throw new ResponseError({ statusCode: 404, warnings: [], meta: {} as any });
+        throw new ResponseError({
+            statusCode: 404,
+            warnings: [],
+            meta: {
+                context: {},
+                name: 'ResponseError',
+                request: {
+                    params: {
+                        method: 'GET',
+                        path: '/'
+                    },
+                    options: {},
+                    id: ''
+                },
+                connection: null,
+                attempts: 0,
+                aborted: false
+            }
+        });
     }
     return res.hits.hits[0]!._source!;
 }
@@ -269,15 +287,15 @@ export async function listMessages(opts: {
     }
 
     // Sort and cursor
-    let cursor: any[] | undefined;
+    let cursor: Array<string | number> | undefined;
     let sort: estypes.Sort = [{ createdAt: 'desc' }, { id: 'desc' }];
     if (opts.cursorBefore) {
         // search_before does not exists so we reverse the sort
         // https://github.com/elastic/elasticsearch/issues/29449
-        cursor = parseCursor(opts.cursorBefore);
+        cursor = parseCursor(opts.cursorBefore) as (string | number)[];
         sort = [{ createdAt: 'asc' }, { id: 'asc' }];
     } else if (opts.cursorAfter) {
-        cursor = opts.cursorAfter ? parseCursor(opts.cursorAfter) : undefined;
+        cursor = opts.cursorAfter ? (parseCursor(opts.cursorAfter) as (string | number)[]) : undefined;
     }
 
     const res = await client.search<MessageRow>({
@@ -361,7 +379,7 @@ export async function listFilters(opts: {
     const agg = res.aggregations!['byName'];
 
     return {
-        items: agg.buckets as any
+        items: agg.buckets as Array<{ key: string; doc_count: number }>
     };
 }
 

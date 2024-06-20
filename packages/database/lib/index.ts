@@ -20,7 +20,7 @@ export class KnexDatabase {
             return;
         }
 
-        const pool = this.knex.client.pool as Pool<any>;
+        const pool = this.knex.client.pool as Pool<unknown>;
         const acquisitionMap = new Map<number, number>();
 
         setInterval(() => {
@@ -47,7 +47,7 @@ export class KnexDatabase {
         });
     }
 
-    async migrate(directory: string): Promise<any> {
+    async migrate(directory: string): Promise<{ batch: number } | undefined> {
         return retry(
             async () =>
                 await this.knex.migrate.latest({
@@ -84,7 +84,7 @@ export const multipleMigrations = async (): Promise<void> => {
     try {
         await db.knex.raw(`CREATE SCHEMA IF NOT EXISTS ${db.schema()}`);
 
-        const [_, pendingMigrations] = await db.knex.migrate.list({
+        const [, pendingMigrations] = await db.knex.migrate.list({
             directory: String(process.env['NANGO_DB_MIGRATION_FOLDER'])
         });
 
@@ -97,7 +97,11 @@ export const multipleMigrations = async (): Promise<void> => {
             });
             console.log('Migrations completed.');
         }
-    } catch (error: any) {
-        console.error(error.message || error);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.error(error.message);
+        } else {
+            console.error(error);
+        }
     }
 };

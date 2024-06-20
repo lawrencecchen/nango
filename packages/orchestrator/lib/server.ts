@@ -26,11 +26,11 @@ export const getServer = (scheduler: Scheduler, eventEmmiter: EventEmitter): Exp
     // Logging middleware
     server.use((req: Request, res: Response, next: NextFunction) => {
         const originalSend = res.send;
-        res.send = function (body: any) {
+        res.send = function (body: unknown) {
             if (res.statusCode >= 400) {
                 logger.error(`${req.method} ${req.path} ${res.statusCode} -> ${JSON.stringify(body)}`);
             }
-            originalSend.call(this, body) as any;
+            originalSend.call(this, body);
             return this;
         };
         next();
@@ -58,7 +58,7 @@ export const getServer = (scheduler: Scheduler, eventEmmiter: EventEmitter): Exp
         next();
     });
 
-    server.use((err: any, _req: Request, res: Response<ApiError<'invalid_json' | 'internal_error'>>, _next: any) => {
+    server.use((err: SyntaxError & { body?: unknown; type?: string }, _req: Request, res: Response<ApiError<'invalid_json' | 'internal_error'>>, _next: NextFunction) => {
         if (err instanceof SyntaxError && 'body' in err && 'type' in err && err.type === 'entity.parse.failed') {
             res.status(400).send({ error: { code: 'invalid_json', message: err.message } });
             return;

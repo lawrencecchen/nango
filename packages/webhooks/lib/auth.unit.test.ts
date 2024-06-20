@@ -1,11 +1,17 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { vi, expect, describe, it, beforeEach } from 'vitest';
 import { sendAuth } from './auth.js';
-import { axiosInstance } from '@nangohq/utils';
+import * as utils from '@nangohq/utils';
 import type { NangoAuthWebhookBodySuccess, Connection, Environment, ExternalWebhook } from '@nangohq/types';
 import * as logPackage from '@nangohq/logs';
 
-const spy = vi.spyOn(axiosInstance, 'post');
+vi.mock('@nangohq/utils', () => ({
+    httpRequest: vi.fn(),
+    httpsRequest: vi.fn()
+}));
+
+const spyHttp = utils.httpRequest;
+const spyHttps = utils.httpsRequest;
 
 const connection: Pick<Connection, 'connection_id' | 'provider_config_key'> = {
     connection_id: '1',
@@ -54,7 +60,8 @@ describe('Webhooks: auth notification tests', () => {
             activityLogId: 1,
             logCtx
         });
-        expect(spy).not.toHaveBeenCalled();
+        expect(spyHttp).not.toHaveBeenCalled();
+        expect(spyHttps).not.toHaveBeenCalled();
     });
 
     it('Should send an auth webhook if the primary webhook url is present but the secondary is not', async () => {
@@ -80,7 +87,8 @@ describe('Webhooks: auth notification tests', () => {
             activityLogId: 1,
             logCtx
         });
-        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spyHttp).toHaveBeenCalledTimes(1);
+        expect(spyHttps).not.toHaveBeenCalled();
     });
 
     it('Should send an auth webhook if the webhook url is not present but the secondary is', async () => {
@@ -107,7 +115,8 @@ describe('Webhooks: auth notification tests', () => {
             activityLogId: 1,
             logCtx
         });
-        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spyHttp).toHaveBeenCalledTimes(1);
+        expect(spyHttps).not.toHaveBeenCalled();
     });
 
     it('Should send an auth webhook twice if the webhook url is present and the secondary is as well', async () => {
@@ -132,7 +141,8 @@ describe('Webhooks: auth notification tests', () => {
             activityLogId: 1,
             logCtx
         });
-        expect(spy).toHaveBeenCalledTimes(2);
+        expect(spyHttp).toHaveBeenCalledTimes(2);
+        expect(spyHttps).not.toHaveBeenCalled();
     });
 
     it('Should send an auth webhook if the webhook url is present and if the auth webhook is checked and the operation failed', async () => {
@@ -162,7 +172,8 @@ describe('Webhooks: auth notification tests', () => {
             activityLogId: 1,
             logCtx
         });
-        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spyHttp).toHaveBeenCalledTimes(1);
+        expect(spyHttps).not.toHaveBeenCalled();
     });
 
     it('Should not send an auth webhook if the webhook url is present and if the auth webhook is not checked', async () => {
@@ -186,7 +197,8 @@ describe('Webhooks: auth notification tests', () => {
             operation: 'creation',
             logCtx
         });
-        expect(spy).not.toHaveBeenCalled();
+        expect(spyHttp).not.toHaveBeenCalled();
+        expect(spyHttps).not.toHaveBeenCalled();
     });
 
     it('Should not send an auth webhook if on refresh error is checked but there is no webhook url', async () => {
@@ -213,7 +225,8 @@ describe('Webhooks: auth notification tests', () => {
             operation: 'refresh',
             logCtx
         });
-        expect(spy).not.toHaveBeenCalled();
+        expect(spyHttp).not.toHaveBeenCalled();
+        expect(spyHttps).not.toHaveBeenCalled();
     });
 
     it('Should send an auth webhook if on refresh error is checked', async () => {
@@ -239,7 +252,8 @@ describe('Webhooks: auth notification tests', () => {
             operation: 'refresh',
             logCtx
         });
-        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spyHttp).toHaveBeenCalledTimes(1);
+        expect(spyHttps).not.toHaveBeenCalled();
     });
 
     it('Should not send an auth webhook if on refresh error is not checked', async () => {
@@ -265,7 +279,8 @@ describe('Webhooks: auth notification tests', () => {
             logCtx
         });
 
-        expect(spy).not.toHaveBeenCalled();
+        expect(spyHttp).not.toHaveBeenCalled();
+        expect(spyHttps).not.toHaveBeenCalled();
     });
 
     it('Should send an auth webhook twice if on refresh error is checked and there are two webhook urls with the correct body', async () => {
@@ -291,7 +306,8 @@ describe('Webhooks: auth notification tests', () => {
             logCtx
         });
 
-        expect(spy).toHaveBeenCalledTimes(2);
+        expect(spyHttp).toHaveBeenCalledTimes(2);
+        expect(spyHttps).not.toHaveBeenCalled();
 
         const body: NangoAuthWebhookBodySuccess = {
             from: 'nango',
@@ -305,7 +321,7 @@ describe('Webhooks: auth notification tests', () => {
             operation: 'refresh'
         };
 
-        expect(spy).toHaveBeenNthCalledWith(
+        expect(spyHttp).toHaveBeenNthCalledWith(
             1,
             'http://example.com/webhook',
             expect.objectContaining(body),
@@ -316,7 +332,7 @@ describe('Webhooks: auth notification tests', () => {
             })
         );
 
-        expect(spy).toHaveBeenNthCalledWith(
+        expect(spyHttp).toHaveBeenNthCalledWith(
             2,
             'http://example.com/webhook-secondary',
             expect.objectContaining(body),

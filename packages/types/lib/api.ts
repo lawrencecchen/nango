@@ -28,13 +28,13 @@ export type EndpointMethod = 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
 export interface EndpointDefinition {
     Method: EndpointMethod;
     Path: string;
-    Params?: Record<string, any>;
-    Body?: Record<string, any>;
-    Querystring?: Record<string, any>;
+    Params?: Record<string, unknown>;
+    Body?: Record<string, unknown>;
+    Querystring?: Record<string, unknown>;
     // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-    Error?: ApiError<any> | never;
+    Error?: ApiError<string> | never;
     // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-    Success: Record<string, any> | never;
+    Success: Record<string, unknown> | never;
 }
 export interface Endpoint<T extends EndpointDefinition> {
     // ------------
@@ -44,22 +44,22 @@ export interface Endpoint<T extends EndpointDefinition> {
     /**
      * URL params
      */
-    Params: T['Params'] extends Record<string, any> ? T['Params'] : never;
+    Params: T['Params'] extends Record<string, unknown> ? T['Params'] : never;
 
     /**
      * URL query string
      */
-    Querystring: T['Querystring'] extends Record<string, any> ? T['Querystring'] : never;
+    Querystring: T['Querystring'] extends Record<string, unknown> ? T['Querystring'] : never;
 
     /**
      * Helpers: Querystring + Params
      */
-    QP: (T['Params'] extends Record<string, any> ? T['Params'] : never) & (T['Querystring'] extends Record<string, any> ? T['Querystring'] : never);
+    QP: (T['Params'] extends Record<string, unknown> ? T['Params'] : never) & (T['Querystring'] extends Record<string, unknown> ? T['Querystring'] : never);
 
     /**
      * Received body
      */
-    Body: T['Body'] extends Record<string, any> ? T['Body'] : never;
+    Body: T['Body'] extends Record<string, unknown> ? T['Body'] : never;
 
     // ------------
     // ------------ Response
@@ -71,12 +71,12 @@ export interface Endpoint<T extends EndpointDefinition> {
     /**
      * Response body for any error
      */
-    Errors: T['Error'] extends ApiError<any> ? ResDefaultErrors | T['Error'] : ResDefaultErrors;
+    Errors: T['Error'] extends ApiError<string> ? ResDefaultErrors | T['Error'] : ResDefaultErrors;
 
     /**
      * Response body (success + error)
      */
-    Reply: ResDefaultErrors | (T['Error'] extends ApiError<any> ? T['Error'] | T['Success'] : T['Success']);
+    Reply: ResDefaultErrors | (T['Error'] extends ApiError<string> ? T['Error'] | T['Success'] : T['Success']);
 }
 
 export interface ErrorPayload {

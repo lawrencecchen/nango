@@ -1,7 +1,9 @@
-import type { AxiosError, AxiosResponse, AxiosRequestConfig, ParamsSerializerOptions } from 'axios';
-import { axiosInstance as axios, getLogger } from '@nangohq/utils';
+import { getLogger, httpRequest, httpsRequest } from '@nangohq/utils';
 import { backOff } from 'exponential-backoff';
 import FormData from 'form-data';
+import type { IncomingMessage, OutgoingHttpHeaders, ClientRequestArgs } from 'http';
+import { URL } from 'url';
+
 import type { ApiKeyCredentials, BasicApiCredentials } from '../models/Auth.js';
 import type { HTTP_VERB, ServiceResponse } from '../models/Generic.js';
 import type { ResponseType, ApplicationConstructedProxyConfiguration, UserProvidedProxyConfiguration, InternalProxyConfiguration } from '../models/Proxy.js';
@@ -14,13 +16,38 @@ import type { Template as ProviderTemplate } from '@nangohq/types';
 
 const logger = getLogger('Proxy');
 
+interface HttpError extends Error {
+    response?: {
+        status?: number;
+        headers?: Record<string, string>;
+    };
+    code?: string;
+}
+
+export type { HttpError };
+
 interface Activities {
     activityLogs: ActivityLogMessage[];
 }
 
 interface RouteResponse {
-    response: AxiosResponse | AxiosError;
+    response:
+        | {
+              data: Record<string, unknown>;
+              status: number;
+              statusText: string;
+              headers: OutgoingHttpHeaders;
+              config: {
+                  url: string | undefined;
+                  method: string | undefined;
+                  headers: OutgoingHttpHeaders;
+                  body: string | undefined;
+              };
+              request: Record<string, unknown>;
+          }
+        | HttpError;
 }
+
 interface RetryHandlerResponse {
     shouldRetry: boolean;
 }
@@ -32,7 +59,7 @@ class ProxyService {
     ): Promise<RouteResponse & Activities> {
         const { success, error, response: proxyConfig, activityLogs: configureActivityLogs } = this.configure(externalConfig, internalConfig);
         if (!success || error || !proxyConfig) {
-            throw new Error(`Proxy configuration is missing: ${error}`);
+            throw new Error(`Proxy configuration is missing: ${(error as NangoError).message}`);
         }
         return await this.sendToHttpMethod(proxyConfig, internalConfig).then((resp) => {
             return { response: resp.response, activityLogs: [...configureActivityLogs, ...resp.activityLogs] };
@@ -174,14 +201,14 @@ class ProxyService {
             environment_id: connection.environment_id,
             activity_log_id: activityLogId as number,
             timestamp: Date.now(),
-            content: `Endpoint set to ${endpoint} with retries set to ${retries} ${retryOn ? `and retryOn set to ${retryOn}` : ''}`
+            content: `Endpoint set to ${endpoint} with retries set to ${retries} ${retryOn ? `and retryOn set to ${retryOn.join(', ')}` : ''}`
         });
 
         if (headers && headers['Content-Type'] === 'multipart/form-data') {
             const formData = new FormData();
 
-            Object.keys(data as any).forEach((key) => {
-                formData.append(key, (data as any)[key]);
+            Object.keys(data as Record<string, unknown>).forEach((key) => {
+                formData.append(key, (data as Record<string, unknown>)[key] as string | Blob);
             });
 
             data = formData;
@@ -205,7 +232,7 @@ class ProxyService {
             decompress: (externalConfig as UserProvidedProxyConfiguration).decompress === 'true' || externalConfig.decompress === true,
             connection,
             params: externalConfig.params as Record<string, string>,
-            paramsSerializer: externalConfig.paramsSerializer as ParamsSerializerOptions,
+            paramsSerializer: externalConfig.paramsSerializer as Record<string, unknown>,
             responseType: externalConfig.responseType as ResponseType,
             retryOn: retryOn && Array.isArray(retryOn) ? retryOn.map(Number) : null
         };
@@ -216,58 +243,75 @@ class ProxyService {
     public retryHandler = async (
         activityLogId: number | null,
         environment_id: number,
-        error: AxiosError,
-        type: 'at' | 'after',
+        error: HttpError,
+        _type: 'at' | 'after',
         retryHeader: string
     ): Promise<RetryHandlerResponse & Activities> => {
         const activityLogs: ActivityLogMessage[] = [];
 
-        if (type === 'at') {
-            const resetTimeEpoch = error.response?.headers[retryHeader] || error.response?.headers[retryHeader.toLowerCase()];
+        const resetTimeEpoch: string | undefined =
+            error.response && error.response.headers && typeof error.response.headers[retryHeader] === 'string'
+                ? (error.response.headers[retryHeader] as string)
+                : error.response && error.response.headers && typeof error.response.headers[retryHeader.toLowerCase()] === 'string'
+                  ? (error.response.headers[retryHeader.toLowerCase()] as string)
+                  : undefined;
 
-            if (resetTimeEpoch) {
-                const currentEpochTime = Math.floor(Date.now() / 1000);
-                const retryAtEpoch = Number(resetTimeEpoch);
+        if (resetTimeEpoch) {
+            const currentEpochTime = Math.floor(Date.now() / 1000);
+            const retryAtEpoch = Number(resetTimeEpoch);
 
-                if (retryAtEpoch > currentEpochTime) {
-                    const waitDuration = retryAtEpoch - currentEpochTime;
+            if (retryAtEpoch > currentEpochTime) {
+                const waitDuration = retryAtEpoch - currentEpochTime;
 
-                    const content = `Rate limit reset time was parsed successfully, retrying after ${waitDuration} seconds`;
-
-                    activityLogs.push({
-                        level: 'error',
-                        environment_id,
-                        activity_log_id: activityLogId as number, // In DryRun this value can be empty
-                        timestamp: Date.now(),
-                        content
-                    });
-
-                    await new Promise((resolve) => setTimeout(resolve, waitDuration * 1000));
-
-                    return { shouldRetry: true, activityLogs };
-                }
-            }
-        }
-
-        if (type === 'after') {
-            const retryHeaderVal = error.response?.headers[retryHeader] || error.response?.headers[retryHeader.toLowerCase()];
-
-            if (retryHeaderVal) {
-                const retryAfter = Number(retryHeaderVal);
-                const content = `Retry header was parsed successfully, retrying after ${retryAfter} seconds`;
+                const content = `Rate limit reset time was parsed successfully, retrying after ${waitDuration} seconds`;
 
                 activityLogs.push({
                     level: 'error',
                     environment_id,
-                    activity_log_id: activityLogId as number, // In DryRun this value can be empty
+                    activity_log_id: activityLogId ?? 0, // In DryRun this value can be empty
                     timestamp: Date.now(),
                     content
                 });
 
-                await new Promise((resolve) => setTimeout(resolve, retryAfter * 1000));
+                console.log(`Wait duration: ${waitDuration} seconds`);
+                const beforeWait = Date.now();
+                await new Promise((resolve) => setTimeout(resolve, waitDuration * 1000));
+                const afterWait = Date.now();
+                console.log(`Actual wait time: ${afterWait - beforeWait} milliseconds`);
 
                 return { shouldRetry: true, activityLogs };
             }
+        }
+
+        const retryHeaderVal: string | undefined =
+            error.response && error.response.headers && typeof error.response.headers[retryHeader] === 'string'
+                ? (error.response.headers[retryHeader] as string)
+                : error.response && error.response.headers && typeof error.response.headers[retryHeader.toLowerCase()] === 'string'
+                  ? (error.response.headers[retryHeader.toLowerCase()] as string)
+                  : undefined;
+
+        if (retryHeaderVal) {
+            let retryAfter = Number(retryHeaderVal);
+            if (retryAfter < 1) {
+                retryAfter = 1; // Ensure a minimum delay of 1 second
+            }
+            const content = `Retry header was parsed successfully, retrying after ${retryAfter} seconds`;
+
+            activityLogs.push({
+                level: 'error',
+                environment_id,
+                activity_log_id: activityLogId ?? 0, // In DryRun this value can be empty
+                timestamp: Date.now(),
+                content
+            });
+
+            console.log(`Retry after: ${retryAfter} seconds`);
+            const beforeRetry = Date.now();
+            await new Promise((resolve) => setTimeout(resolve, retryAfter * 1000));
+            const afterRetry = Date.now();
+            console.log(`Actual retry time: ${afterRetry - beforeRetry} milliseconds`);
+
+            return { shouldRetry: true, activityLogs };
         }
 
         return { shouldRetry: true, activityLogs };
@@ -277,7 +321,7 @@ class ProxyService {
      * Retry
      * @desc if retries are set the retry function to determine if retries are
      * actually kicked off or not
-     * @param {AxiosError} error
+     * @param {Error} error
      * @param {attemptNumber} number
      */
     public retry = async (
@@ -285,13 +329,13 @@ class ProxyService {
         environment_id: number,
         config: ApplicationConstructedProxyConfiguration,
         activityLogs: ActivityLogMessage[],
-        error: AxiosError,
+        error: HttpError,
         attemptNumber: number
     ): Promise<boolean> => {
         if (
-            error.response?.status.toString().startsWith('5') ||
+            error.response?.status?.toString().startsWith('5') ||
             // Note that Github issues a 403 for both rate limits and improper scopes
-            (error.response?.status === 403 && error.response.headers['x-ratelimit-remaining'] && error.response.headers['x-ratelimit-remaining'] === '0') ||
+            (error.response?.status === 403 && error.response.headers?.['x-ratelimit-remaining'] && error.response.headers['x-ratelimit-remaining'] === '0') ||
             error.response?.status === 429 ||
             ['ECONNRESET', 'ETIMEDOUT', 'ECONNABORTED'].includes(error.code as string) ||
             config.retryOn?.includes(Number(error.response?.status))
@@ -359,30 +403,28 @@ class ProxyService {
         configBody: ApplicationConstructedProxyConfiguration,
         internalConfig: InternalProxyConfiguration
     ): Promise<RouteResponse & Activities> {
-        const options: AxiosRequestConfig = {
-            headers: configBody.headers as Record<string, string | number | boolean>
+        const options: ClientRequestArgs = {
+            headers: configBody.headers as OutgoingHttpHeaders
         };
 
         if (configBody.params) {
-            options.params = configBody.params as Record<string, string>;
+            options.path = (options.path ?? '') + '?' + new URLSearchParams(configBody.params as Record<string, string>).toString();
         }
 
         if (configBody.paramsSerializer) {
-            options.paramsSerializer = configBody.paramsSerializer;
-        }
-
-        if (configBody.responseType) {
-            options.responseType = configBody.responseType;
+            const serializedParams = (configBody.paramsSerializer as (params: Record<string, string>) => string)(configBody.params as Record<string, string>);
+            options.path = (options.path ?? '') + (serializedParams ? '&' + serializedParams : '');
         }
 
         if (configBody.data) {
-            options.data = configBody.data;
+            if (options.headers) {
+                options.headers['Content-Length'] = Buffer.byteLength(String(configBody.data));
+            }
         }
-
         const { existingActivityLogId: activityLogId, connection } = internalConfig;
         const { method } = configBody;
 
-        options.url = this.constructUrl(configBody);
+        options.path = this.constructUrl(configBody);
         options.method = method;
 
         const headers = this.constructHeaders(configBody);
@@ -419,21 +461,61 @@ class ProxyService {
         config: ApplicationConstructedProxyConfiguration,
         activityLogId: number,
         environment_id: number,
-        options: AxiosRequestConfig
+        options: ClientRequestArgs
     ): Promise<RouteResponse & Activities> {
         const activityLogs: ActivityLogMessage[] = [];
         try {
-            const response: AxiosResponse = await backOff(
+            const url = new URL(options.path ?? '');
+            const requestFunction = url.protocol === 'https:' ? httpsRequest : httpRequest;
+            const response: IncomingMessage = await backOff(
                 () => {
-                    return axios.request(options);
+                    return requestFunction(
+                        {
+                            hostname: url.hostname,
+                            path: url.pathname + url.search,
+                            method: options.method,
+                            headers: options.headers as OutgoingHttpHeaders
+                        },
+                        config.data as string | undefined
+                    );
                 },
-                { numOfAttempts: Number(config.retries), retry: this.retry.bind(this, activityLogId, environment_id, config, activityLogs) }
+                { numOfAttempts: Number(config.retries), retry: this.retry.bind(this, activityLogId ?? 0, environment_id, config, activityLogs) }
             );
 
-            const handling = this.handleResponse(config, activityLogId, environment_id, options.url!);
-            return { response, activityLogs: [...activityLogs, ...handling.activityLogs] };
+            let responseBody = '';
+            for await (const chunk of response) {
+                responseBody += (chunk as Buffer).toString();
+            }
+
+            const parsedResponse: {
+                data: Record<string, unknown>;
+                status: number;
+                statusText: string;
+                headers: OutgoingHttpHeaders;
+                config: {
+                    url: string | undefined;
+                    method: string | undefined;
+                    headers: OutgoingHttpHeaders;
+                    body: string | undefined;
+                };
+                request: Record<string, unknown>;
+            } = {
+                data: JSON.parse(responseBody) as Record<string, unknown>,
+                status: response.statusCode ?? 200,
+                statusText: response.statusMessage ?? 'OK',
+                headers: response.headers as OutgoingHttpHeaders,
+                config: {
+                    url: options.path ?? undefined,
+                    method: options.method,
+                    headers: options.headers as OutgoingHttpHeaders,
+                    body: config.data as string | undefined
+                },
+                request: {}
+            };
+            const handling: Activities = this.handleResponse(config, activityLogId ?? 0, environment_id, options.path ?? '');
+            return { response: parsedResponse, activityLogs: [...activityLogs, ...handling.activityLogs] };
         } catch (e: unknown) {
-            const handling = this.handleErrorResponse(e as AxiosError, options.url!, config, activityLogId, environment_id);
+            const handling = this.handleErrorResponse(e as HttpError, options.path ?? '', config, activityLogId, environment_id);
             return { response: handling.response, activityLogs: [...activityLogs, ...handling.activityLogs] };
         }
     }
@@ -488,7 +570,7 @@ class ProxyService {
                 break;
             default:
                 headers = {
-                    Authorization: `Bearer ${config.token}`
+                    Authorization: `Bearer ${String(config.token)}`
                 };
                 break;
         }
@@ -553,91 +635,31 @@ class ProxyService {
         };
     }
 
-    private reportError(
-        error: AxiosError,
-        url: string,
-        config: ApplicationConstructedProxyConfiguration,
-        activityLogId: number,
-        environment_id: number,
-        errorMessage: string
-    ): ActivityLogMessage[] {
-        const activities: ActivityLogMessage[] = [];
-        if (activityLogId) {
-            const safeHeaders = this.stripSensitiveHeaders(config.headers, config);
-            activities.push({
-                level: 'error',
-                environment_id,
-                activity_log_id: activityLogId,
-                timestamp: Date.now(),
-                content: errorMessage.toString(),
-                params: {
-                    requestHeaders: JSON.stringify(safeHeaders, null, 2),
-                    responseHeaders: JSON.stringify(error.response?.headers, null, 2)
-                }
-            });
-        } else {
-            const content = `The provider responded back with a ${error.response?.status} and the message ${errorMessage} to the url: ${url}.${
-                config.template.docs ? ` Refer to the documentation at ${config.template.docs} for help` : ''
-            }`;
-            console.error(content);
-        }
-        return activities;
-    }
-
     private handleErrorResponse(
-        error: AxiosError,
+        error: HttpError,
         url: string,
         config: ApplicationConstructedProxyConfiguration,
         activityLogId: number,
         environment_id: number
     ): RouteResponse & Activities {
         const activityLogs: ActivityLogMessage[] = [];
-        if (!error.response?.data) {
-            const {
-                message,
-                stack,
-                config: { method },
-                code,
-                status
-            } = error.toJSON() as any;
+        const errorMessage = error.message || 'Unknown error';
 
-            const errorObject = { message, stack, code, status, url, method };
-
-            if (activityLogId) {
-                activityLogs.push({
-                    level: 'error',
-                    environment_id,
-                    activity_log_id: activityLogId,
-                    timestamp: Date.now(),
-                    content: `${method.toUpperCase()} request to ${url} failed`,
-                    params: errorObject
-                });
-            } else {
-                console.error(`Error: ${method.toUpperCase()} request to ${url} failed with the following params: ${JSON.stringify(errorObject)}`);
-            }
-
-            activityLogs.push(...this.reportError(error, url, config, activityLogId, environment_id, message));
+        if (activityLogId) {
+            const safeHeaders = this.stripSensitiveHeaders(config.headers, config);
+            activityLogs.push({
+                level: 'error',
+                environment_id,
+                activity_log_id: activityLogId,
+                timestamp: Date.now(),
+                content: `${config.method.toUpperCase()} request to ${url} failed`,
+                params: {
+                    requestHeaders: JSON.stringify(safeHeaders, null, 2),
+                    errorMessage
+                }
+            });
         } else {
-            const {
-                message,
-                config: { method }
-            } = error.toJSON() as any;
-            const errorData = error.response.data;
-
-            if (activityLogId) {
-                activityLogs.push({
-                    level: 'error',
-                    environment_id,
-                    activity_log_id: activityLogId,
-                    timestamp: Date.now(),
-                    content: `${method.toUpperCase()} request to ${url} failed`,
-                    params: JSON.stringify((errorData as any).error || errorData, null, 2) as any
-                });
-            } else {
-                console.error(`Error: ${method.toUpperCase()} request to ${url} failed with the following params: ${JSON.stringify(errorData)}`);
-            }
-
-            activityLogs.push(...this.reportError(error, url, config, activityLogId, environment_id, message));
+            logger.error(`Error: ${config.method.toUpperCase()} request to ${url} failed with the following message: ${errorMessage}`);
         }
 
         return {

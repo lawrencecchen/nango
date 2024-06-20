@@ -37,7 +37,7 @@ export class OrchestratorClient {
         this.baseUrl = baseUrl;
     }
 
-    private routeFetch<E extends Endpoint<any>>(route: Route<E>) {
+    private routeFetch<E extends Endpoint<Record<string, unknown>>>(route: Route<E>) {
         return routeFetch(this.baseUrl, route);
     }
 

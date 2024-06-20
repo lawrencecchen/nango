@@ -51,7 +51,7 @@ export enum AuthModes {
     None = 'NONE'
 }
 
-export interface CredentialsCommon<T = Record<string, any>> {
+export interface CredentialsCommon<T = Record<string, unknown>> {
     type: AuthModes;
     raw: T;
 }
@@ -74,7 +74,7 @@ export interface AppCredentials extends CredentialsCommon {
     type: AuthModes.App;
     access_token: string;
     expires_at?: Date | undefined;
-    raw: Record<string, any>;
+    raw: Record<string, unknown>;
 }
 
 export interface ProxyConfiguration {

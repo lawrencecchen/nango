@@ -25,12 +25,11 @@ export class LogContextStateless {
     }
 
     async log(data: MessageRowInsert): Promise<boolean> {
-        if (this.logToConsole) {
-            const obj: Record<string, any> = {};
-            if (data.error) obj['error'] = data.error;
-            if (data.meta) obj['meta'] = data.meta;
-            logger[data.level!](`${this.dryRun ? '[dry] ' : ''}log: ${data.message}`, Object.keys(obj).length > 0 ? obj : undefined);
-        }
+        const obj: Record<string, unknown> = {};
+        if (data.error) obj['error'] = data.error;
+        if (data.meta) obj['meta'] = data.meta;
+        logger[data.level ?? 'info'](`${this.dryRun ? '[dry] ' : ''}log: ${data.message}`, Object.keys(obj).length > 0 ? obj : undefined);
+
         if (this.dryRun) {
             return true;
         }

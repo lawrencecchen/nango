@@ -1,11 +1,17 @@
 /* eslint-disable @typescript-eslint/unbound-method */
 import { vi, expect, describe, it, beforeEach } from 'vitest';
 import { sendSync } from './sync.js';
-import { axiosInstance } from '@nangohq/utils';
 import type { NangoSyncWebhookBodySuccess, Connection, Environment, ExternalWebhook } from '@nangohq/types';
 import * as logPackage from '@nangohq/logs';
+import * as utils from '@nangohq/utils';
 
-const spy = vi.spyOn(axiosInstance, 'post');
+vi.mock('@nangohq/utils', () => ({
+    httpRequest: vi.fn(),
+    httpsRequest: vi.fn()
+}));
+
+const spyHttp = utils.httpRequest;
+const spyHttps = utils.httpsRequest;
 
 const connection: Pick<Connection, 'connection_id' | 'provider_config_key'> = {
     connection_id: '1',
@@ -52,7 +58,8 @@ describe('Webhooks: sync notification tests', () => {
             activityLogId: 1,
             logCtx
         });
-        expect(spy).not.toHaveBeenCalled();
+        expect(spyHttp).not.toHaveBeenCalled();
+        expect(spyHttps).not.toHaveBeenCalled();
     });
 
     it('Should not send a sync webhook if the webhook url is not present even if always send is checked', async () => {
@@ -77,7 +84,8 @@ describe('Webhooks: sync notification tests', () => {
             },
             environment: { name: 'dev', id: 1, secret_key: 'secret' } as Environment
         });
-        expect(axiosInstance.post).not.toHaveBeenCalled();
+        expect(spyHttp).not.toHaveBeenCalled();
+        expect(spyHttps).not.toHaveBeenCalled();
     });
 
     it('Should not send a sync webhook if the webhook url is present but if always send is not checked and there were no sync changes', async () => {
@@ -101,7 +109,8 @@ describe('Webhooks: sync notification tests', () => {
             },
             environment: { name: 'dev', id: 1, secret_key: 'secret' } as Environment
         });
-        expect(spy).not.toHaveBeenCalled();
+        expect(spyHttp).not.toHaveBeenCalled();
+        expect(spyHttps).not.toHaveBeenCalled();
     });
 
     it('Should send a sync webhook if the webhook url is present and if always send is not checked and there were sync changes', async () => {
@@ -125,7 +134,8 @@ describe('Webhooks: sync notification tests', () => {
             },
             environment: { name: 'dev', id: 1, secret_key: 'secret' } as Environment
         });
-        expect(spy).toHaveBeenCalled();
+        expect(spyHttp).toHaveBeenCalled();
+        expect(spyHttps).toHaveBeenCalled();
     });
 
     it('Should send a sync webhook if the webhook url is present and if always send is checked and there were sync changes', async () => {
@@ -149,7 +159,8 @@ describe('Webhooks: sync notification tests', () => {
             },
             environment: { name: 'dev', id: 1, secret_key: 'secret' } as Environment
         });
-        expect(spy).toHaveBeenCalled();
+        expect(spyHttp).toHaveBeenCalled();
+        expect(spyHttps).toHaveBeenCalled();
     });
 
     it('Should send an sync webhook if the webhook url is present and if always send is checked and there were no sync changes', async () => {
@@ -173,7 +184,8 @@ describe('Webhooks: sync notification tests', () => {
             },
             environment: { name: 'dev', id: 1, secret_key: 'secret' } as Environment
         });
-        expect(spy).toHaveBeenCalled();
+        expect(spyHttp).toHaveBeenCalled();
+        expect(spyHttps).toHaveBeenCalled();
     });
 
     it('Should send an sync webhook twice if the webhook url and secondary are present and if always send is checked and there were no sync changes', async () => {
@@ -200,7 +212,8 @@ describe('Webhooks: sync notification tests', () => {
                 secret_key: 'secret'
             } as Environment
         });
-        expect(spy).toHaveBeenCalledTimes(2);
+        expect(spyHttp).toHaveBeenCalledTimes(2);
+        expect(spyHttps).toHaveBeenCalledTimes(2);
     });
 
     it('Should send a webhook with the correct body on sync success', async () => {
@@ -240,9 +253,10 @@ describe('Webhooks: sync notification tests', () => {
             success: true,
             syncType: 'INCREMENTAL'
         };
-        expect(spy).toHaveBeenCalledTimes(2);
+        expect(spyHttp).toHaveBeenCalledTimes(2);
+        expect(spyHttps).toHaveBeenCalledTimes(2);
 
-        expect(spy).toHaveBeenNthCalledWith(
+        expect(spyHttp).toHaveBeenNthCalledWith(
             1,
             'http://example.com/webhook',
             expect.objectContaining(body),
@@ -253,14 +267,12 @@ describe('Webhooks: sync notification tests', () => {
             })
         );
 
-        expect(spy).toHaveBeenNthCalledWith(
+        expect(spyHttps).toHaveBeenNthCalledWith(
             2,
             'http://example.com/webhook-secondary',
             expect.objectContaining(body),
             expect.objectContaining({
-                headers: {
-                    'X-Nango-Signature': expect.toBeSha256()
-                }
+                headers: { 'X-Nango-Signature': expect.toBeSha256() }
             })
         );
     });
@@ -290,7 +302,8 @@ describe('Webhooks: sync notification tests', () => {
             environment: { name: 'dev', id: 1, secret_key: 'secret' } as Environment
         });
 
-        expect(spy).not.toHaveBeenCalled();
+        expect(spyHttp).not.toHaveBeenCalled();
+        expect(spyHttps).not.toHaveBeenCalled();
     });
 
     it('Should send an error webhook if the option is checked with the correct body', async () => {
@@ -318,6 +331,7 @@ describe('Webhooks: sync notification tests', () => {
             environment: { name: 'dev', id: 1, secret_key: 'secret' } as Environment
         });
 
-        expect(spy).toHaveBeenCalled();
+        expect(spyHttp).toHaveBeenCalled();
+        expect(spyHttps).toHaveBeenCalled();
     });
 });

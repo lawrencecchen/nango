@@ -1,9 +1,9 @@
-import type { AxiosResponse } from 'axios';
 import parseLinksHeader from 'parse-link-header';
 import get from 'lodash-es/get.js';
 import type { Pagination, UserProvidedProxyConfiguration, CursorPagination, OffsetPagination, LinkPagination } from '../models/Proxy.js';
 import { PaginationType } from '../models/Proxy.js';
 import { isValidHttpUrl } from '../utils/utils.js';
+import type { HttpResponse } from '../sdk/sync';
 
 class PaginationService {
     public validateConfiguration(paginationConfig: Pagination): void {
@@ -43,9 +43,9 @@ class PaginationService {
     public async *cursor<T>(
         config: UserProvidedProxyConfiguration,
         paginationConfig: CursorPagination,
-        updatedBodyOrParams: Record<string, any>,
+        updatedBodyOrParams: Record<string, string | number>,
         passPaginationParamsInBody: boolean,
-        proxy: (config: UserProvidedProxyConfiguration) => Promise<AxiosResponse>
+        proxy: (config: UserProvidedProxyConfiguration) => Promise<HttpResponse>
     ): AsyncGenerator<T[], undefined, void> {
         const cursorPagination: CursorPagination = paginationConfig;
 
@@ -58,7 +58,7 @@ class PaginationService {
 
             this.updateConfigBodyOrParams(passPaginationParamsInBody, config, updatedBodyOrParams);
 
-            const response: AxiosResponse = await proxy(config);
+            const response: HttpResponse = await proxy(config);
 
             const responseData: T[] = cursorPagination.response_path ? get(response.data, cursorPagination.response_path) : response.data;
 
@@ -79,16 +79,16 @@ class PaginationService {
     public async *link<T>(
         config: UserProvidedProxyConfiguration,
         paginationConfig: LinkPagination,
-        updatedBodyOrParams: Record<string, any>,
+        updatedBodyOrParams: Record<string, string | number>,
         passPaginationParamsInBody: boolean,
-        proxy: (config: UserProvidedProxyConfiguration) => Promise<AxiosResponse>
+        proxy: (config: UserProvidedProxyConfiguration) => Promise<HttpResponse>
     ): AsyncGenerator<T[], undefined, void> {
         const linkPagination: LinkPagination = paginationConfig;
 
         this.updateConfigBodyOrParams(passPaginationParamsInBody, config, updatedBodyOrParams);
 
         while (true) {
-            const response: AxiosResponse = await proxy(config);
+            const response: HttpResponse = await proxy(config);
 
             const responseData: T[] = paginationConfig.response_path ? get(response.data, paginationConfig.response_path) : response.data;
             if (!responseData.length) {
@@ -118,9 +118,9 @@ class PaginationService {
     public async *offset<T>(
         config: UserProvidedProxyConfiguration,
         paginationConfig: OffsetPagination,
-        updatedBodyOrParams: Record<string, any>,
+        updatedBodyOrParams: Record<string, string | number>,
         passPaginationParamsInBody: boolean,
-        proxy: (config: UserProvidedProxyConfiguration) => Promise<AxiosResponse>
+        proxy: (config: UserProvidedProxyConfiguration) => Promise<HttpResponse>
     ): AsyncGenerator<T[], undefined, void> {
         const offsetPagination: OffsetPagination = paginationConfig;
         const offsetParameterName: string = offsetPagination.offset_name_in_request;
@@ -131,7 +131,7 @@ class PaginationService {
 
             this.updateConfigBodyOrParams(passPaginationParamsInBody, config, updatedBodyOrParams);
 
-            const response: AxiosResponse = await proxy(config);
+            const response: HttpResponse = await proxy(config);
 
             const responseData: T[] = paginationConfig.response_path ? get(response.data, paginationConfig.response_path) : response.data;
             if (!responseData || !responseData.length) {
@@ -153,13 +153,13 @@ class PaginationService {
         }
     }
 
-    private updateConfigBodyOrParams(passPaginationParamsInBody: boolean, config: UserProvidedProxyConfiguration, updatedBodyOrParams: Record<string, string>) {
+    private updateConfigBodyOrParams(passPaginationParamsInBody: boolean, config: UserProvidedProxyConfiguration, updatedBodyOrParams: Record<string, string | number>) {
         passPaginationParamsInBody ? (config.data = updatedBodyOrParams) : (config.params = updatedBodyOrParams);
     }
 
-    private getNextPageLinkFromBodyOrHeaders(linkPagination: LinkPagination, response: AxiosResponse, paginationConfig: Pagination) {
+    private getNextPageLinkFromBodyOrHeaders(linkPagination: LinkPagination, response: HttpResponse, paginationConfig: Pagination) {
         if (linkPagination.link_rel_in_response_header) {
-            const linkHeader = parseLinksHeader(response.headers['link']);
+            const linkHeader = parseLinksHeader(Array.isArray(response.headers['link']) ? response.headers['link'][0] : response.headers['link'] ?? null);
             return linkHeader?.[linkPagination.link_rel_in_response_header]?.url;
         } else if (linkPagination.link_path_in_response_body) {
             return get(response.data, linkPagination.link_path_in_response_body);

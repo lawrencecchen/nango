@@ -85,6 +85,6 @@ export function createCursor({ sort }: estypes.SearchHit): string {
     return Buffer.from(JSON.stringify(sort)).toString('base64');
 }
 
-export function parseCursor(str: string): any[] {
+export function parseCursor(str: string): unknown[] {
     return JSON.parse(Buffer.from(str, 'base64').toString('utf8'));
 }

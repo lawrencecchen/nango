@@ -58,6 +58,7 @@ const handler = (scheduler: Scheduler, eventEmitter: EventEmitter) => {
                 respond(res);
             }
         };
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const onTaskStarted = async (_t: Task) => {
             cleanupAndRespond(async (res) => {
                 const getTasks = await scheduler.dequeue({ groupKey, limit });

@@ -19,7 +19,7 @@ import { NangoError } from '../utils/error.js';
 
 import type { ConnectionConfig, Connection, StoredConnection, BaseConnection, NangoConnection } from '../models/Connection.js';
 import type { Metadata, ActiveLogIds, Template as ProviderTemplate, TemplateOAuth2 as ProviderTemplateOAuth2, AuthModeType } from '@nangohq/types';
-import { getLogger, stringifyError, Ok, Err, axiosInstance as axios } from '@nangohq/utils';
+import { getLogger, stringifyError, Ok, Err, httpsRequest } from '@nangohq/utils';
 import type { Result } from '@nangohq/utils';
 import type { ServiceResponse } from '../models/Generic.js';
 import encryptionManager from '../utils/encryption.manager.js';
@@ -1049,15 +1049,36 @@ class ConnectionService {
                 }
             }
             const fullUrl = `${url}?${params}`;
-            const response = await axios.post(fullUrl);
+            const response = await httpsRequest(
+                {
+                    hostname: new URL(fullUrl).hostname,
+                    path: new URL(fullUrl).pathname,
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                },
+                params.toString()
+            );
 
-            const { data } = response;
-
-            if (!data || !data.success) {
+            const data = await new Promise<string>((resolve, reject) => {
+                let responseBody = '';
+                response.on('data', (chunk) => {
+                    responseBody += chunk;
+                });
+                response.on('end', () => {
+                    resolve(responseBody);
+                });
+                response.on('error', (err) => {
+                    reject(err);
+                });
+            });
+            const parsedData = JSON.parse(data);
+            if (!parsedData || !parsedData.success) {
                 return { success: false, error: new NangoError('invalid_client_credentials'), response: null };
             }
 
-            const parsedCreds = this.parseRawCredentials(data.data, 'OAUTH2_CC') as OAuth2ClientCredentials;
+            const parsedCreds = this.parseRawCredentials(parsedData.data, 'OAUTH2_CC') as OAuth2ClientCredentials;
 
             parsedCreds.client_id = client_id;
             parsedCreds.client_secret = client_secret;
@@ -1127,15 +1148,31 @@ class ConnectionService {
                 Object.assign(headers, additionalApiHeaders);
             }
 
-            const tokenResponse = await axios.post(
-                url,
-                {},
+            const tokenResponse = await httpsRequest(
                 {
+                    hostname: new URL(url).hostname,
+                    path: new URL(url).pathname,
+                    method: 'POST',
                     headers
-                }
+                },
+                ''
             );
 
-            return { success: true, error: null, response: tokenResponse.data };
+            const tokenResponseData = await new Promise<string>((resolve, reject) => {
+                let responseBody = '';
+                tokenResponse.on('data', (chunk) => {
+                    responseBody += chunk;
+                });
+                tokenResponse.on('end', () => {
+                    resolve(responseBody);
+                });
+                tokenResponse.on('error', (err) => {
+                    reject(err);
+                });
+            });
+            const parsedResponse = JSON.parse(tokenResponseData);
+
+            return { success: true, error: null, response: parsedResponse };
         } catch (e: any) {
             const errorPayload = {
                 message: e.message || 'Unknown error',

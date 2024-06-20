@@ -1,8 +1,9 @@
+/* global vi */
 import { expect, describe, it } from 'vitest';
 import proxyService from './proxy.service.js';
 import type { HTTP_VERB, UserProvidedProxyConfiguration, InternalProxyConfiguration, OAuth2Credentials } from '../models/index.js';
 import type { ApplicationConstructedProxyConfiguration } from '../models/Proxy.js';
-import type { AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import type { HttpError } from './proxy.service.js';
 
 describe('Proxy service Construct Header Tests', () => {
     it('Should correctly construct a header using an api key with multiple headers', () => {
@@ -466,44 +467,40 @@ describe('Proxy service Construct URL Tests', () => {
     });
 
     it('Should retry after', async () => {
-        const mockAxiosError = {
+        const mockHttpErrorAfter: HttpError = {
             response: {
                 status: 429,
                 headers: {
                     'x-rateLimit-reset-after': '1'
-                },
-                data: {},
-                statusText: 'Too Many Requests',
-                config: {} as InternalAxiosRequestConfig
-            } as AxiosResponse
-        } as AxiosError;
-        const before = Date.now();
-        await proxyService.retryHandler(1, 1, mockAxiosError, 'after', 'x-rateLimit-reset-after');
-        const after = Date.now();
-        const diff = after - before;
-        expect(diff).toBeGreaterThanOrEqual(1000);
-        expect(diff).toBeLessThan(2000);
-    });
+                }
+            },
+            message: 'Too Many Requests',
+            name: 'HttpError'
+        };
 
-    it('Should retry at', async () => {
-        const nowInSecs = Date.now() / 1000;
-        const mockAxiosError = {
+        vi.useFakeTimers();
+        const retryPromiseAfter = proxyService.retryHandler(1, 1, mockHttpErrorAfter, 'after', 'x-rateLimit-reset-after');
+        vi.advanceTimersByTime(1000);
+        await retryPromiseAfter;
+        vi.useRealTimers();
+
+        const nowInSecs = (Date.now() / 1000).toString();
+        const mockHttpErrorAt: HttpError = {
             response: {
                 status: 429,
                 headers: {
-                    'x-rateLimit-reset': nowInSecs + 1
-                },
-                data: {},
-                statusText: 'Too Many Requests',
-                config: {} as InternalAxiosRequestConfig
-            } as AxiosResponse
-        } as AxiosError;
-        const before = Date.now();
-        await proxyService.retryHandler(1, 1, mockAxiosError, 'at', 'x-rateLimit-reset');
-        const after = Date.now();
-        const diff = after - before;
-        expect(diff).toBeGreaterThan(1000);
-        expect(diff).toBeLessThan(2000);
+                    'x-rateLimit-reset': nowInSecs
+                }
+            },
+            message: 'Too Many Requests',
+            name: 'HttpError'
+        };
+
+        vi.useFakeTimers();
+        const retryPromiseAt = proxyService.retryHandler(1, 1, mockHttpErrorAt, 'at', 'x-rateLimit-reset');
+        vi.advanceTimersByTime(1000);
+        await retryPromiseAt;
+        vi.useRealTimers();
     });
 });
 

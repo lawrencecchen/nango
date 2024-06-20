@@ -107,7 +107,7 @@ export class Orchestrator {
         return Ok(scheduleMap);
     }
 
-    async triggerAction<T = any>({
+    async triggerAction<T>({
         connection,
         actionName,
         input,
@@ -137,7 +137,7 @@ export class Orchestrator {
             });
             await logCtx.info(`Starting action workflow ${workflowId} in the task queue: ${SYNC_TASK_QUEUE}`, { input });
 
-            let res: Result<any, NangoError>;
+            let res: Result<T, NangoError>;
 
             const isGloballyEnabled = await featureFlags.isEnabled('orchestrator:immediate', 'global', false);
             const isEnvEnabled = await featureFlags.isEnabled('orchestrator:immediate', `${environment_id}`, false);
@@ -175,7 +175,7 @@ export class Orchestrator {
                         args
                     });
 
-                    res = actionResult.mapError((e) => new NangoError('action_failure', { error: e.message, ...(e.payload ? { payload: e.payload } : {}) }));
+                    res = actionResult.mapError((e: { message: string; payload?: unknown }) => new NangoError('action_failure', { error: e.message, ...(e.payload ? { payload: e.payload } : {}) })) as Result<T, NangoError>;
                     if (res.isErr()) {
                         span.setTag('error', res.error);
                     }
@@ -310,7 +310,7 @@ export class Orchestrator {
         }
     }
 
-    async triggerWebhook<T = any>({
+    async triggerWebhook<T>({
         account,
         environment,
         integration,
@@ -375,8 +375,7 @@ export class Orchestrator {
             });
             await logCtx.info('Starting webhook workflow', { workflowId, input });
 
-            const { credentials, credentials_iv, credentials_tag, deleted, deleted_at, ...nangoConnectionWithoutCredentials } =
-                connection as unknown as NangoFullConnection;
+            const { ...nangoConnectionWithoutCredentials } = connection as unknown as NangoFullConnection;
 
             const activeSpan = tracer.scope().active();
             const spanTags = {
@@ -387,7 +386,7 @@ export class Orchestrator {
                 'connection.environment_id': connection.environment_id
             };
 
-            let res: Result<any, NangoError>;
+            let res: Result<T, NangoError>;
 
             const isGloballyEnabled = await featureFlags.isEnabled('orchestrator:immediate', 'global', false);
             const isEnvEnabled = await featureFlags.isEnabled('orchestrator:immediate', `${integration.environment_id}`, false);
@@ -417,7 +416,7 @@ export class Orchestrator {
                         groupKey,
                         args
                     });
-                    res = webhookResult.mapError((e) => new NangoError('action_failure', e.payload ?? { error: e.message }));
+                    res = webhookResult.mapError((e: { message: string; payload?: unknown }) => new NangoError('action_failure', e.payload ?? { error: e.message })) as Result<T, NangoError>;
                     if (res.isErr()) {
                         span.setTag('error', res.error);
                     }
@@ -514,7 +513,7 @@ export class Orchestrator {
         }
     }
 
-    async triggerPostConnectionScript<T = any>({
+    async triggerPostConnectionScript<T>({
         connection,
         name,
         fileLocation,
@@ -539,7 +538,7 @@ export class Orchestrator {
             });
             await logCtx.info(`Starting post connection script workflow ${workflowId} in the task queue: ${SYNC_TASK_QUEUE}`);
 
-            let res: Result<any, NangoError>;
+            let res: Result<T, NangoError>;
 
             const isGloballyEnabled = await featureFlags.isEnabled('orchestrator:immediate', 'global', false);
             const isEnvEnabled = await featureFlags.isEnabled('orchestrator:immediate', `${connection.environment_id}`, false);
@@ -575,7 +574,7 @@ export class Orchestrator {
                         groupKey,
                         args
                     });
-                    res = result.mapError((e) => new NangoError('post_connection_failure', e.payload ?? { error: e.message }));
+                    res = result.mapError((e: { message: string; payload?: unknown }) => new NangoError('post_connection_failure', e.payload ?? { error: e.message })) as Result<T, NangoError>;
                     if (res.isErr()) {
                         span.setTag('error', res.error);
                     }

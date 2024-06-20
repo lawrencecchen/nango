@@ -1,4 +1,3 @@
-import type { ParamsSerializerOptions } from 'axios';
 import type { HTTP_VERB, BasicApiCredentials, ApiKeyCredentials, AppCredentials } from '@nangohq/shared';
 import type { Template as ProviderTemplate } from '@nangohq/types';
 
@@ -20,7 +19,7 @@ export interface ProxyBodyConfiguration {
     data?: unknown;
     headers?: Record<string, string>;
     params?: string | Record<string, string>;
-    paramsSerializer?: ParamsSerializerOptions;
+    paramsSerializer?: unknown;
     baseUrlOverride?: string;
     decompress?: boolean;
 }

@@ -7,10 +7,9 @@ import type { Template } from '@nangohq/types';
 import configService from '../services/config.service.js';
 import type { CursorPagination, LinkPagination, OffsetPagination } from '../models/Proxy.js';
 import type { NangoProps } from './sync.js';
-import { NangoAction } from './sync.js';
+import { NangoAction, defaultPersistApi } from './sync.js';
 import { isValidHttpUrl } from '../utils/utils.js';
 import proxyService from '../services/proxy.service.js';
-import type { AxiosResponse } from 'axios';
 
 const nangoProps: NangoProps = {
     secretKey: '***',
@@ -35,7 +34,19 @@ describe('cache', () => {
         nodeClient.prototype.getConnection = vi.fn().mockReturnValue({ credentials: {} });
         nodeClient.prototype.setMetadata = vi.fn().mockReturnValue({});
         nodeClient.prototype.getIntegration = vi.fn().mockReturnValue({ config: { provider: 'github' } });
-        vi.spyOn(proxyService, 'route').mockImplementation(() => Promise.resolve({ response: {} as AxiosResponse, activityLogs: [] }));
+        vi.spyOn(proxyService, 'route').mockImplementation(() =>
+            Promise.resolve({
+                response: {
+                    data: {},
+                    status: 200,
+                    statusText: 'OK',
+                    headers: {},
+                    config: { url: '', method: '', headers: {}, body: '' },
+                    request: {}
+                },
+                activityLogs: []
+            })
+        );
     });
     afterEach(() => {
         vi.clearAllMocks();
@@ -112,9 +123,8 @@ describe('Pagination', () => {
     let nango: Nango;
 
     beforeEach(() => {
-        const config: any = {
+        const config: NangoProps = {
             secretKey: 'encrypted',
-            serverUrl: 'https://example.com',
             providerConfigKey,
             connectionId,
             dryRun: true
@@ -209,8 +219,8 @@ describe('Pagination', () => {
     it('Paginates using offset', async () => {
         stubProviderTemplate(offsetPagination);
 
-        const firstBatch: any[] = [{ id: 1 }, { id: 2 }, { id: 3 }];
-        const secondBatch: any[] = [{ id: 4 }, { id: 5 }, { id: 6 }];
+        const firstBatch: Record<string, unknown>[] = [{ id: 1 }, { id: 2 }, { id: 3 }];
+        const secondBatch: Record<string, unknown>[] = [{ id: 4 }, { id: 5 }, { id: 6 }];
         (await import('@nangohq/node')).Nango.prototype.proxy = vi
             .fn()
             .mockReturnValueOnce({ data: { issues: firstBatch } })
@@ -221,7 +231,7 @@ describe('Pagination', () => {
 
         const generator = nangoAction.paginate({ endpoint });
 
-        const actualRecords: any[] = [];
+        const actualRecords: unknown[] = [];
         for await (const batch of generator) {
             actualRecords.push(...batch);
         }
@@ -234,9 +244,9 @@ describe('Pagination', () => {
     it('Paginates using cursor', async () => {
         stubProviderTemplate(cursorPagination);
 
-        const firstBatch: any[] = [{ id: 1 }, { id: 2 }, { id: 3 }];
-        const secondBatch: any[] = [{ id: 4 }, { id: 5 }, { id: 6 }];
-        const thirdBatch: any[] = [{ id: 7 }, { id: 8 }, { id: 9 }];
+        const firstBatch: Record<string, unknown>[] = [{ id: 1 }, { id: 2 }, { id: 3 }];
+        const secondBatch: Record<string, unknown>[] = [{ id: 4 }, { id: 5 }, { id: 6 }];
+        const thirdBatch: Record<string, unknown>[] = [{ id: 7 }, { id: 8 }, { id: 9 }];
         (await import('@nangohq/node')).Nango.prototype.proxy = vi
             .fn()
             .mockReturnValueOnce({
@@ -261,7 +271,7 @@ describe('Pagination', () => {
 
         const generator = nangoAction.paginate({ endpoint });
 
-        const actualRecords: any[] = [];
+        const actualRecords: unknown[] = [];
         for await (const batch of generator) {
             actualRecords.push(...batch);
         }
@@ -274,7 +284,7 @@ describe('Pagination', () => {
     it('Stops pagination if cursor is empty', async () => {
         stubProviderTemplate(cursorPagination);
 
-        const onlyBatch: any[] = [{ id: 1 }, { id: 2 }, { id: 3 }];
+        const onlyBatch: Record<string, unknown>[] = [{ id: 1 }, { id: 2 }, { id: 3 }];
         (await import('@nangohq/node')).Nango.prototype.proxy = vi.fn().mockReturnValueOnce({
             data: {
                 issues: onlyBatch,
@@ -288,7 +298,7 @@ describe('Pagination', () => {
 
         const generator = nangoAction.paginate({ endpoint });
 
-        const actualRecords: any[] = [];
+        const actualRecords: unknown[] = [];
         for await (const batch of generator) {
             actualRecords.push(...batch);
         }
@@ -301,8 +311,8 @@ describe('Pagination', () => {
         async (paginationConfig: CursorPagination | OffsetPagination | LinkPagination) => {
             stubProviderTemplate(paginationConfig);
 
-            const firstBatch: any[] = [{ id: 1 }, { id: 2 }, { id: 3 }];
-            const emptyBatch: any[] = [];
+            const firstBatch: Record<string, unknown>[] = [{ id: 1 }, { id: 2 }, { id: 3 }];
+            const emptyBatch: Record<string, unknown>[] = [];
             (await import('@nangohq/node')).Nango.prototype.proxy = vi
                 .fn()
                 .mockReturnValueOnce({
@@ -327,7 +337,7 @@ describe('Pagination', () => {
 
             const generator = nangoAction.paginate({ endpoint });
 
-            const actualRecords: any[] = [];
+            const actualRecords: unknown[] = [];
             for await (const batch of generator) {
                 actualRecords.push(...batch);
             }
@@ -343,9 +353,9 @@ describe('Pagination', () => {
     ])('Paginates using next URL/path %s from body', async (nextUrlOrPathValue, anotherNextUrlOrPathValue) => {
         stubProviderTemplate(linkPagination);
 
-        const firstBatch: any[] = [{ id: 1 }, { id: 2 }, { id: 3 }];
-        const secondBatch: any[] = [{ id: 4 }, { id: 5 }, { id: 6 }];
-        const thirdBatch: any[] = [{ id: 7 }, { id: 8 }, { id: 9 }];
+        const firstBatch: Record<string, unknown>[] = [{ id: 1 }, { id: 2 }, { id: 3 }];
+        const secondBatch: Record<string, unknown>[] = [{ id: 4 }, { id: 5 }, { id: 6 }];
+        const thirdBatch: Record<string, unknown>[] = [{ id: 7 }, { id: 8 }, { id: 9 }];
         (await import('@nangohq/node')).Nango.prototype.proxy = vi
             .fn()
             .mockReturnValueOnce({
@@ -370,7 +380,7 @@ describe('Pagination', () => {
 
         const generator = nangoAction.paginate({ endpoint });
 
-        const actualRecords: any[] = [];
+        const actualRecords: unknown[] = [];
         for await (const batch of generator) {
             actualRecords.push(...batch);
         }
@@ -420,8 +430,8 @@ describe('Log', () => {
     });
 
     it('should allow level', async () => {
-        const mock = vi.fn(() => ({ response: { status: 200 } }));
-        const nangoAction = new NangoAction({ ...nangoProps }, { persistApi: mock as any });
+        const mock = vi.fn(() => ({ response: { status: 200 } })) as unknown as typeof defaultPersistApi;
+        const nangoAction = new NangoAction({ ...nangoProps }, { persistApi: mock });
 
         await nangoAction.log('hello', { level: 'error' });
 
