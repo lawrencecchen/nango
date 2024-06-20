@@ -231,22 +231,26 @@ export async function upsert({
         });
 
         return Ok(summary);
-    } catch (error: any) {
+    } catch (error: unknown) {
         let errorMessage = `Failed to upsert records to table ${RECORDS_TABLE}.\n`;
         errorMessage += `Model: ${model}, Nango Connection ID: ${connectionId}.\n`;
         errorMessage += `Attempted to insert/update/delete: ${recordsWithoutDuplicates.length} records\n`;
 
-        if ('code' in error) {
-            const errorCode = (error as { code: string }).code;
-            errorMessage += `Error code: ${errorCode}.\n`;
-            let errorDetail = '';
-            switch (errorCode) {
-                case '22001': {
-                    errorDetail = "String length exceeds the column's maximum length (string_data_right_truncation)";
-                    break;
+        if (typeof error === 'object' && error !== null) {
+            if ('code' in error) {
+                const errorCode = (error as { code: string }).code;
+                errorMessage += `Error code: ${errorCode}.\n`;
+                let errorDetail = '';
+                switch (errorCode) {
+                    case '22001': {
+                        errorDetail = "String length exceeds the column's maximum length (string_data_right_truncation)";
+                        break;
+                    }
                 }
+                if (errorDetail) errorMessage += `Info: ${errorDetail}.\n`;
             }
-            if (errorDetail) errorMessage += `Info: ${errorDetail}.\n`;
+            if ('detail' in error) errorMessage += `Detail: ${(error as { detail: string }).detail}.\n`;
+            if ('message' in error) errorMessage += `Error Message: ${(error as { message: string }).message}`;
         }
 
         logger.error(`${errorMessage}${error}`);
@@ -312,14 +316,16 @@ export async function update({
             deletedKeys: [],
             nonUniqueKeys
         });
-    } catch (error: any) {
+    } catch (error: unknown) {
         let errorMessage = `Failed to update records to table ${RECORDS_TABLE}.\n`;
         errorMessage += `Model: ${model}, Nango Connection ID: ${connectionId}.\n`;
         errorMessage += `Attempted to update: ${recordsWithoutDuplicates.length} records\n`;
 
-        if ('code' in error) errorMessage += `Error code: ${(error as { code: string }).code}.\n`;
-        if ('detail' in error) errorMessage += `Detail: ${(error as { detail: string }).detail}.\n`;
-        if ('message' in error) errorMessage += `Error Message: ${(error as { message: string }).message}`;
+        if (typeof error === 'object' && error !== null) {
+            if ('code' in error) errorMessage += `Error code: ${(error as { code: string }).code}.\n`;
+            if ('detail' in error) errorMessage += `Detail: ${(error as { detail: string }).detail}.\n`;
+            if ('message' in error) errorMessage += `Error Message: ${(error as { message: string }).message}`;
+        }
 
         return Err(errorMessage);
     }

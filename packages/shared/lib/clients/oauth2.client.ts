@@ -97,11 +97,14 @@ export async function getFreshOAuth2Credentials(
 
     try {
         rawNewAccessToken = await oldAccessToken.refresh(additionalParams);
-    } catch (e: any) {
+    } catch (e: unknown) {
         let nangoErr: NangoError;
         let errorPayload;
-        if ('data' in e && 'payload' in e.data) {
-            errorPayload = e.data.payload;
+
+        type CustomError = Error & { data?: { payload?: unknown } };
+
+        if (e instanceof Error && 'data' in e && (e as CustomError).data !== undefined && typeof (e as CustomError).data === 'object' && 'payload' in (e as CustomError).data) {
+            errorPayload = (e as CustomError).data?.payload;
         }
 
         if (Boom.isBoom(e)) {
@@ -111,8 +114,10 @@ export async function getFreshOAuth2Credentials(
                 dataMessage: errorPayload instanceof Buffer ? errorPayload.toString() : errorPayload
             };
             nangoErr = new NangoError(`refresh_token_external_error`, payload);
-        } else {
+        } else if (e instanceof Error) {
             nangoErr = new NangoError(`refresh_token_external_error`, { message: e.message });
+        } else {
+            nangoErr = new NangoError(`refresh_token_external_error`, { message: 'Unknown error' });
         }
 
         errorManager.report(nangoErr.message, {

@@ -58,7 +58,7 @@ export const getServer = (scheduler: Scheduler, eventEmmiter: EventEmitter): Exp
         next();
     });
 
-    server.use((err: SyntaxError & { body?: unknown; type?: string }, _req: Request, res: Response<ApiError<'invalid_json' | 'internal_error'>>, _next: NextFunction) => {
+    server.use((err: SyntaxError & { body?: unknown; type?: string }, _req: Request, res: Response<ApiError<'invalid_json' | 'internal_error'>>) => {
         if (err instanceof SyntaxError && 'body' in err && 'type' in err && err.type === 'entity.parse.failed') {
             res.status(400).send({ error: { code: 'invalid_json', message: err.message } });
             return;
